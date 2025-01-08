@@ -1,0 +1,13 @@
+.container {
+  height: 95vh;
+  // background: linear-gradient($primary-light 0%, $primary-light 50%, #FFF 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+p {
+  width: 50vw;
+  text-indent: 2rem;
+}

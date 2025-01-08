@@ -1,0 +1,7 @@
+<div class="main-content">
+  <mat-spinner color="primary"></mat-spinner>
+  <p *ngIf="inProgress; else notStarted">{{ pageContext }} is in progress! However, the dev still has a full time job. Check back soon!</p>
+  <ng-template #notStarted>
+    <p>{{ pageContext }} might be done in a few months. Check back soon!</p>
+  </ng-template>
+</div>

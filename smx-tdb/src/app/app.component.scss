@@ -1,0 +1,74 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.app-toolbar {
+  // background-color: $primary-light;
+}
+
+.linkify {
+  cursor: pointer !important;
+}
+
+.mat-sidenav {
+  width: 175px;
+  // background: $primary-dark;
+}
+
+.mat-nav-list * {
+  color: white;
+}
+
+.mat-toolbar {
+  height: 5vh;
+  display: flex;
+}
+
+::ng-deep .main-content {
+  height: 95vh;
+  width: 100vw;
+  * :not(.material-icons) {
+    font-family: "Titillium Web", "Arial", "Times New Roman", "serif" !important;
+  }
+}
+
+h1 {
+  font-family: "Titillium Web", "Arial", "Times New Roman", "serif";
+}
+
+.routeText {
+  margin-left: 1rem;
+}
+
+.github, .linkedin {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin: 0 1rem;
+  a img {
+    height: 100%;
+    width: 100%;
+  }
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
