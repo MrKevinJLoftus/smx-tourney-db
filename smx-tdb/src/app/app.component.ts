@@ -11,6 +11,7 @@ import { Title } from '@angular/platform-browser';
 import { AuthService } from './services/auth.service';
 import { LoadingService } from './services/loading.service';
 import { filter, map } from 'rxjs';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +23,8 @@ import { filter, map } from 'rxjs';
     MatProgressSpinner,
     MatIconModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    ReactiveFormsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
@@ -34,7 +36,7 @@ export class AppComponent {
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
     { url: "/login", text: "Login", icon: "login" },
-    { url: "/signupRequest", text: "Request New User", icon: "settings" }];
+    { url: "/signup", text: "Request New User", icon: "settings" }];
   protectedRoutes: Route[] = [
     { url: '/adminPanel', text: 'Admin', icon: 'admin_panel_settings' }
   ];
