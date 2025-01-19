@@ -1,0 +1,34 @@
+<mat-card color="primary">
+  <mat-card-content>
+    <form [formGroup]="loginForm" (submit)="onSubmit()">
+      <div class="form-fields">
+        <div class="field">
+          <mat-form-field>
+            <mat-label>username</mat-label>
+            <input matInput placeholder="username" formControlName="username">
+            <ng-container *ngIf="loginForm.controls['username'].invalid && (loginForm.controls['username'].dirty || loginForm.controls['username'].touched)">
+              <mat-error *ngIf="loginForm.controls['username'].errors?.['required']">username is required</mat-error>
+            </ng-container>
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <mat-form-field>
+            <mat-label>password</mat-label>
+            <input matInput type="password" placeholder="password" formControlName="password">
+            <ng-container *ngIf="loginForm.controls['password'].invalid && (loginForm.controls['password'].dirty || loginForm.controls['password'].touched)">
+              <mat-error *ngIf="loginForm.controls['password'].errors?.['required']">password is required</mat-error>
+              <mat-error *ngIf="loginForm.controls['password'].errors?.['minlength']">Minimum password length is 16 characters.</mat-error>
+            </ng-container>
+          </mat-form-field>
+        </div>
+        <div class="field">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+          >Login</button>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

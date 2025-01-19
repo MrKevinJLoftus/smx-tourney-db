@@ -1,0 +1,12 @@
+.container {
+  height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+p {
+  width: 50vw;
+  text-indent: 2rem;
+}
