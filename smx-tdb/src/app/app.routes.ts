@@ -5,7 +5,7 @@ import { SignupRequestComponent } from './pages/signup-request/signup-request.co
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
-  { path: 'admin-panel', component: AdminPanelComponent, data: { title: 'Administration Panel' }},
+  { path: 'admin-panel', component: AdminPanelComponent, data: { title: 'Admin Panel' }},
   { path: 'signup', component: SignupRequestComponent, data: { title: 'Register As TO' } },
   { path: 'login', loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule), data: { title: 'Login' } },
   { path: '**', redirectTo: '/' }

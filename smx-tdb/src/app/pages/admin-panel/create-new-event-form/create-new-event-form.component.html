@@ -1,0 +1,21 @@
+<form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="fill">
+    <mat-label>Event Name</mat-label>
+    <input matInput id="eventName" formControlName="eventName" type="text" />
+    <mat-error *ngIf="eventForm.get('eventName')?.hasError('required')">
+      Event Name is required
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Event Date</mat-label>
+    <input matInput [matDatepicker]="picker" id="eventDate" formControlName="eventDate" />
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+    <mat-error *ngIf="eventForm.get('eventDate')?.hasError('required')">
+      Event Date is required
+    </mat-error>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Create Event</button>
+</form>

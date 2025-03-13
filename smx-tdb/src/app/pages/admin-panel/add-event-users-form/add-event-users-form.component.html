@@ -1,0 +1,24 @@
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="fill">
+    <mat-label>Gamertag</mat-label>
+    <input matInput id="gamertag" formControlName="gamertag" type="text" />
+    <mat-error *ngIf="userForm.get('gamertag')?.hasError('required')">
+      Gamertag is required
+    </mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Seed</mat-label>
+    <input matInput id="seed" formControlName="seed" type="number" />
+  </mat-form-field>
+
+  <mat-form-field appearance="fill">
+    <mat-label>Place</mat-label>
+    <input matInput id="place" formControlName="place" type="number" />
+    <mat-error *ngIf="userForm.get('place')?.hasError('required')">
+      Place is required
+    </mat-error>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid">Submit</button>
+</form>

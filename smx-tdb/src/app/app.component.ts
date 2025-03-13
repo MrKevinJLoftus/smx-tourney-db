@@ -38,7 +38,7 @@ export class AppComponent {
     { url: "/login", text: "Login", icon: "login" },
     { url: "/signup", text: "Request New User", icon: "settings" }];
   protectedRoutes: Route[] = [
-    { url: '/adminPanel', text: 'Admin', icon: 'admin_panel_settings' }
+    { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' }
   ];
   accessibleRoutes: Route[] = this.routes;
   constructor(
@@ -70,6 +70,9 @@ export class AppComponent {
       ).subscribe((title: string) => {
         this.titleService.setTitle(`${title} | ${this.title}`);
       });
+
+      // TODO: Remove this once login is implemented
+      this.accessibleRoutes = [...this.routes, ...this.protectedRoutes];
     }
 
   navigateHome() {

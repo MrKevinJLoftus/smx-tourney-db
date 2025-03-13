@@ -1,5 +1,13 @@
 <div class="admin-panel">
-  <button mat-raised-button color="primary" (click)="createNewEvent()">Create New Event</button>
-  <button mat-raised-button color="accent" (click)="addEditUsers()">Add/Edit Users for Existing Event</button>
-  <button mat-raised-button color="warn" (click)="addEditMatches()">Add/Edit Matches for Existing Event</button>
+  <mat-tab-group>
+    <mat-tab label="Create New Event">
+      <app-create-new-event-form></app-create-new-event-form>
+    </mat-tab>
+    <mat-tab label="Add/Edit Users for Existing Event">
+      <app-add-event-users-form></app-add-event-users-form>
+    </mat-tab>
+    <mat-tab label="Add/Edit Matches for Existing Event">
+      <app-add-event-matches-form></app-add-event-matches-form>
+    </mat-tab>
+  </mat-tab-group>
 </div>
