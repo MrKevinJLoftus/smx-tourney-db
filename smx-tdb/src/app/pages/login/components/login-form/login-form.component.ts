@@ -25,7 +25,7 @@ export class LoginFormComponent implements OnInit {
    */
   setupForm() {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(16)]]
     });
   }
@@ -35,9 +35,9 @@ export class LoginFormComponent implements OnInit {
    */
   onSubmit() {
     if (this.loginForm.valid) {
-      const { username, password } = this.loginForm.getRawValue();
+      const { email, password } = this.loginForm.getRawValue();
       this.login.emit({
-        username,
+        email,
         password
       });
     }

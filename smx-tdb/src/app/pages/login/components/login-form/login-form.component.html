@@ -4,10 +4,10 @@
       <div class="form-fields">
         <div class="field">
           <mat-form-field>
-            <mat-label>username</mat-label>
-            <input matInput placeholder="username" formControlName="username">
-            <ng-container *ngIf="loginForm.controls['username'].invalid && (loginForm.controls['username'].dirty || loginForm.controls['username'].touched)">
-              <mat-error *ngIf="loginForm.controls['username'].errors?.['required']">username is required</mat-error>
+            <mat-label>email</mat-label>
+            <input matInput placeholder="email" formControlName="email">
+            <ng-container *ngIf="loginForm.controls['email'].invalid && (loginForm.controls['email'].dirty || loginForm.controls['email'].touched)">
+              <mat-error *ngIf="loginForm.controls['email'].errors?.['required']">email is required</mat-error>
             </ng-container>
           </mat-form-field>
         </div>

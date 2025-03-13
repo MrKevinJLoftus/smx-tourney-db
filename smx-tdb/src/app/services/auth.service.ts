@@ -72,8 +72,8 @@ export class AuthService {
    * Hard-coded to always point to localhost, endpoint is not active on prod API.
    * This may be useful in the future if external users need to be able to register.
    */
-  createUser(username: string, password: string) {
-    const authData: AuthData = {username, password};
+  createUser(email: string, password: string) {
+    const authData: AuthData = {email, password};
     this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>('http://localhost:3000/api/user/signUp', authData)
       .subscribe({ next: (response) => {
         const token = response.token;
