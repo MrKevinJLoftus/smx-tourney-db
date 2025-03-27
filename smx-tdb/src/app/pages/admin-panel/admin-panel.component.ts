@@ -3,10 +3,11 @@ import { CreateNewEventFormComponent } from './create-new-event-form/create-new-
 import { SharedModule } from '../../shared/shared.module';
 import { AddEventMatchesFormComponent } from "./add-event-matches-form/add-event-matches-form.component";
 import { AddEventUsersFormComponent } from './add-event-users-form/add-event-users-form.component';
+import { FormWrapperComponent } from './form-wrapper/form-wrapper.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SharedModule, CreateNewEventFormComponent, AddEventMatchesFormComponent, AddEventUsersFormComponent],
+  imports: [SharedModule, CreateNewEventFormComponent, AddEventMatchesFormComponent, AddEventUsersFormComponent, FormWrapperComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })
