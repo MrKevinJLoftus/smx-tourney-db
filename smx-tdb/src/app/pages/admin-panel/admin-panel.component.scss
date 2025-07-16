@@ -1,3 +1,7 @@
 .admin-panel-card {
   margin: 0 16px 16px;
 }
+.mat-mdc-tab-group {
+  max-height: 95vh;
+  overflow-y: auto;
+}
