@@ -48,44 +48,63 @@ export class AuthService {
    * Will always redirect user to home page.
    */
   login(authData: AuthData) {
-    this.http.post<{token: string, expiresIn: number, username: string, userId: string, isAdmin: boolean}>(
+    this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
       `${environment.apiUrl}/user/login`, authData)
-      .subscribe(response => {
-        if (response.token) {
-          const token = response.token;
-          this.token = token;
-          const expiresInDuration = response.expiresIn;
-          this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
-          this.messageService.show('Login successful.');
-        } else {
+      .subscribe({
+        next: (response) => {
+          if (response.token) {
+            const token = response.token;
+            this.token = token;
+            const expiresInDuration = response.expiresIn;
+            this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin || false);
+            this.messageService.show('Login successful.');
+          } else {
+            this.logout(false);
+            this.messageService.show('Your email or password was incorrect. Please try again.');
+          }
+        },
+        error: (error) => {
+          console.error(error);
+          this.messageService.show('Your email or password was incorrect. Please try again.');
           this.logout(false);
-          this.messageService.show('Your username or password was incorrect. Please try again.');
         }
-    }, error => {
-      console.error(error);
-      this.messageService.show('Your username or password was incorrect. Please try again.');
-      this.logout(false);
-    });
+      });
   }
 
   /**
-   * Hard-coded to always point to localhost, endpoint is not active on prod API.
-   * This may be useful in the future if external users need to be able to register.
+   * Create a new user. If skipAutoLogin is true, the user will not be automatically logged in.
+   * This is useful for super admins creating other users.
    */
-  createUser(email: string, password: string) {
+  createUser(email: string, password: string, skipAutoLogin: boolean = false) {
     const authData: AuthData = {email, password};
-    this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>('http://localhost:3000/api/user/signUp', authData)
+    return this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
+      `${environment.apiUrl}/user/signUp`, authData)
       .subscribe({ next: (response) => {
-        const token = response.token;
-        this.token = token;
-        if (token) {
-          const expiresInDuration = response.expiresIn;
-          this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
+        if (skipAutoLogin) {
+          this.messageService.show('User created successfully!');
+        } else {
+          const token = response.token;
+          this.token = token;
+          if (token) {
+            const expiresInDuration = response.expiresIn;
+            this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
+          }
         }
     }, error: (e) => {
       console.error(e);
       this.messageService.show('Something went wrong.');
     }});
+  }
+
+  /**
+   * Update the current user's password.
+   * Requires authentication.
+   */
+  updatePassword(currentPassword: string, newPassword: string) {
+    return this.http.post<{message: string}>(
+      `${environment.apiUrl}/user/updatePassword`,
+      { currentPassword, newPassword }
+    );
   }
 
   autoAuthUser() {

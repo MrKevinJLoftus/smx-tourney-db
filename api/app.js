@@ -1,9 +1,19 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // external routing files
 const userRoutes = require('./routes/user');
+const eventRoutes = require('./routes/event');
+const playerRoutes = require('./routes/player');
+const eventPlayerRoutes = require('./routes/eventPlayer');
+const matchRoutes = require('./routes/match');
+const songRoutes = require('./routes/song');
+
+// middleware
+const requestLogger = require('./middleware/request-logger');
 
 const app = express();
 
@@ -18,7 +28,15 @@ app.use((req, res, next) => {
     next();
 });
 
+// Request/Response logging middleware (should be after CORS but before routes)
+app.use(requestLogger);
+
 app.use("/api/user", userRoutes);
+app.use("/api/event", eventRoutes);
+app.use("/api/player", playerRoutes);
+app.use("/api/eventPlayer", eventPlayerRoutes);
+app.use("/api/match", matchRoutes);
+app.use("/api/song", songRoutes);
 
 
 app.use((req, res, next) => {

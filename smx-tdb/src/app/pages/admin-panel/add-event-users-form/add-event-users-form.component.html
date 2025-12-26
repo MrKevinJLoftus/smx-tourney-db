@@ -4,9 +4,12 @@
       <mat-label>Event</mat-label>
       <mat-select id="event" formControlName="event">
         <mat-option *ngFor="let event of (events$ | async)" [value]="event">
-          {{ event }}
+          {{ event.name }} ({{ event.date | date:'shortDate' }})
         </mat-option>
       </mat-select>
+      <mat-error *ngIf="userForm.get('event')?.hasError('required')">
+        Event is required
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="fill">
@@ -31,5 +34,7 @@
     </mat-form-field>
   </div>
 
-  <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid">Submit</button>
+  <button mat-raised-button color="primary" type="submit" [disabled]="userForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+  </button>
 </form>

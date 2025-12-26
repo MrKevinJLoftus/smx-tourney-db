@@ -36,7 +36,7 @@ export class AppComponent {
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
     { url: "/login", text: "Login", icon: "login" },
-    { url: "/signup", text: "Request New User", icon: "settings" }];
+    { url: "/update-password", text: "Update Password", icon: "lock" }];
   protectedRoutes: Route[] = [
     { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' }
   ];

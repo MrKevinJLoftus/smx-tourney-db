@@ -1,1 +1,78 @@
-<p>add-event-matches-form works!</p>
+<form [formGroup]="matchForm" (ngSubmit)="onSubmit()">
+  <div class="form-fields">
+    <mat-form-field appearance="fill">
+      <mat-label>Event</mat-label>
+      <mat-select id="event" formControlName="event">
+        <mat-option *ngFor="let event of (events$ | async)" [value]="event">
+          {{ event.name }} ({{ event.date | date:'shortDate' }})
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="matchForm.get('event')?.hasError('required')">
+        Event is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Player 1</mat-label>
+      <mat-select id="player1" formControlName="player1">
+        <mat-option *ngFor="let player of (players$ | async)" [value]="player">
+          {{ player.gamertag }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="matchForm.get('player1')?.hasError('required')">
+        Player 1 is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Player 2</mat-label>
+      <mat-select id="player2" formControlName="player2">
+        <mat-option *ngFor="let player of (players$ | async)" [value]="player">
+          {{ player.gamertag }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="matchForm.get('player2')?.hasError('required')">
+        Player 2 is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Song (Optional)</mat-label>
+      <mat-select id="song" formControlName="song">
+        <mat-option [value]="">None</mat-option>
+        <mat-option *ngFor="let song of (songs$ | async)" [value]="song">
+          {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Player 1 Score</mat-label>
+      <input matInput id="score1" formControlName="score1" type="number" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Player 2 Score</mat-label>
+      <input matInput id="score2" formControlName="score2" type="number" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Round</mat-label>
+      <input matInput id="round" formControlName="round" type="text" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Winner (Optional)</mat-label>
+      <mat-select id="winner" formControlName="winner">
+        <mat-option [value]="">None</mat-option>
+        <mat-option *ngFor="let player of getWinnerOptions()" [value]="player">
+          {{ player.gamertag }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="matchForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : 'Create Match' }}
+  </button>
+</form>

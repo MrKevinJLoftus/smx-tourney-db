@@ -19,5 +19,7 @@
     </mat-form-field>
   </div>
 
-  <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">Create Event</button>
+  <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Creating...' : 'Create Event' }}
+  </button>
 </form>

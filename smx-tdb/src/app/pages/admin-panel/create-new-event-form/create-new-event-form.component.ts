@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared.module';
+import { EventService } from '../../../services/event.service';
+import { MessageService } from '../../../services/message.service';
+import { LoadingService } from '../../../services/loading.service';
 
 @Component({
   selector: 'app-create-new-event-form',
@@ -10,8 +13,14 @@ import { SharedModule } from '../../../shared/shared.module';
 })
 export class CreateNewEventFormComponent implements OnInit {
   eventForm!: FormGroup;
+  isSubmitting = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private eventService: EventService,
+    private messageService: MessageService,
+    private loadingService: LoadingService
+  ) {
     this.initializeForm();
   }
 
@@ -27,9 +36,33 @@ export class CreateNewEventFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.eventForm.valid) {
-      console.log('Form Submitted!', this.eventForm.value);
-      // Handle form submission logic here
+    if (this.eventForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
+      this.loadingService.setIsLoading(true);
+      
+      const formValue = this.eventForm.value;
+      const eventData = {
+        name: formValue.eventName,
+        date: formValue.eventDate instanceof Date 
+          ? formValue.eventDate.toISOString().split('T')[0] 
+          : formValue.eventDate
+      };
+
+      this.eventService.createEvent(eventData).subscribe({
+        next: (event) => {
+          this.messageService.show('Event created successfully!');
+          this.eventForm.reset();
+          this.isSubmitting = false;
+          this.loadingService.setIsLoading(false);
+        },
+        error: (error) => {
+          console.error('Error creating event:', error);
+          const errorMessage = error.error?.message || 'Failed to create event. Please try again.';
+          this.messageService.show(errorMessage);
+          this.isSubmitting = false;
+          this.loadingService.setIsLoading(false);
+        }
+      });
     }
   }
 }
