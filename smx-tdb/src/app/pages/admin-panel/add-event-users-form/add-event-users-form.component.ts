@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared.module';
 import { Observable, map } from 'rxjs';
@@ -8,17 +8,21 @@ import { EventPlayerService } from '../../../services/eventPlayer.service';
 import { MessageService } from '../../../services/message.service';
 import { LoadingService } from '../../../services/loading.service';
 import { Event } from '../../../models/event';
+import { EventUsersListComponent } from '../event-users-list/event-users-list.component';
+import { Player } from '../../../models/player';
 
 @Component({
   selector: 'app-add-event-users-form',
   templateUrl: './add-event-users-form.component.html',
   styleUrls: ['./add-event-users-form.component.scss'],
-  imports: [SharedModule]
+  imports: [SharedModule, EventUsersListComponent]
 })
 export class AddEventUsersFormComponent implements OnInit {
+  @ViewChild(EventUsersListComponent) usersListComponent!: EventUsersListComponent;
   userForm!: FormGroup;
   events$: Observable<Event[]>;
   isSubmitting = false;
+  selectedEventId?: number;
 
   constructor(
     private fb: FormBuilder,
@@ -34,10 +38,12 @@ export class AddEventUsersFormComponent implements OnInit {
     // Enable/disable form fields based on event selection
     this.userForm.get('event')?.valueChanges.subscribe(event => {
       if (event) {
+        this.selectedEventId = (event as any).id;
         this.userForm.get('gamertag')?.enable();
         this.userForm.get('seed')?.enable();
         this.userForm.get('place')?.enable();
       } else {
+        this.selectedEventId = undefined;
         this.userForm.get('gamertag')?.disable();
         this.userForm.get('seed')?.disable();
         this.userForm.get('place')?.disable();
@@ -65,22 +71,26 @@ export class AddEventUsersFormComponent implements OnInit {
       
       const formValue = this.userForm.value;
       const event: Event = formValue.event;
-      const gamertag = formValue.gamertag.trim();
+      const username = formValue.username.trim();
 
       // First, try to find or create the player
-      this.playerService.getPlayerByGamertag(gamertag).subscribe({
-        next: (player) => {
+      this.playerService.getPlayerByUsername(username).subscribe({
+        next: (player: Player) => {
           // Player exists, add to event
-          this.addPlayerToEvent(event.event_id!, player.player_id!, formValue.seed, formValue.place);
+          const eventId = (event as any).id;
+          const playerId = (player as any).id;
+          this.addPlayerToEvent(eventId!, playerId!, formValue.seed, formValue.place);
         },
-        error: (error) => {
+        error: (error: any) => {
           // Player doesn't exist, create it first
           if (error.status === 404) {
-            this.playerService.createPlayer({ gamertag }).subscribe({
-              next: (newPlayer) => {
-                this.addPlayerToEvent(event.event_id!, newPlayer.player_id!, formValue.seed, formValue.place);
+            this.playerService.createPlayer({ username: username }).subscribe({
+              next: (newPlayer: Player) => {
+                const eventId = (event as any).id;
+                const playerId = (newPlayer as any).id;
+                this.addPlayerToEvent(eventId!, playerId!, formValue.seed, formValue.place);
               },
-              error: (createError) => {
+              error: (createError: any) => {
                 console.error('Error creating player:', createError);
                 const errorMessage = createError.error?.message || 'Failed to create player. Please try again.';
                 this.messageService.show(errorMessage);
@@ -100,6 +110,12 @@ export class AddEventUsersFormComponent implements OnInit {
     }
   }
 
+  loadPlayers(): void {
+    if (this.usersListComponent) {
+      this.usersListComponent.loadPlayers();
+    }
+  }
+
   private addPlayerToEvent(eventId: number, playerId: number, seed?: number, place?: number): void {
     this.eventPlayerService.addPlayerToEvent({
       event_id: eventId,
@@ -109,12 +125,27 @@ export class AddEventUsersFormComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.messageService.show('Player added to event successfully!');
+        // Refresh the users list
+        if (this.usersListComponent) {
+          this.usersListComponent.loadPlayers();
+        }
+        // Keep the event selected, only reset other fields
+        const selectedEvent = this.userForm.get('event')?.value;
         this.userForm.reset();
-        this.userForm.get('event')?.setValue('');
-        // Disable fields after reset
-        this.userForm.get('gamertag')?.disable();
-        this.userForm.get('seed')?.disable();
-        this.userForm.get('place')?.disable();
+        this.userForm.get('event')?.setValue(selectedEvent);
+        this.userForm.get('gamertag')?.setValue('');
+        this.userForm.get('seed')?.setValue('');
+        this.userForm.get('place')?.setValue('');
+        // Keep fields enabled if event is still selected
+        if (selectedEvent) {
+          this.userForm.get('gamertag')?.enable();
+          this.userForm.get('seed')?.enable();
+          this.userForm.get('place')?.enable();
+        } else {
+          this.userForm.get('gamertag')?.disable();
+          this.userForm.get('seed')?.disable();
+          this.userForm.get('place')?.disable();
+        }
         this.isSubmitting = false;
         this.loadingService.setIsLoading(false);
       },

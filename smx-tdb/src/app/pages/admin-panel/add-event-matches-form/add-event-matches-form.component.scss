@@ -1,7 +1,133 @@
+.two-column-layout {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+  min-height: 0;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-column {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .form-fields {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+button {
+  margin-top: 10px;
+}
+
+.songs-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.songs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.songs-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+
+.songs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.song-entry {
+  width: 100%;
+}
+
+.song-entry-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.song-field {
+  flex: 2;
+  min-width: 200px;
+}
+
+.score-field {
+  flex: 1;
+  min-width: 120px;
+}
+
+.song-entry-content button {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.players-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.players-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.players-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.player-entry {
+  width: 100%;
+}
+
+.player-entry-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.player-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-entry-content button {
+  margin-top: 0;
+  flex-shrink: 0;
+}
   

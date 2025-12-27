@@ -23,11 +23,11 @@ export class PlayerService {
     return this.http.get<Player>(`${environment.apiUrl}/player/${id}`);
   }
 
-  getPlayerByGamertag(gamertag: string): Observable<Player> {
-    return this.http.get<Player>(`${environment.apiUrl}/player/gamertag/${encodeURIComponent(gamertag)}`);
+  getPlayerByUsername(username: string): Observable<Player> {
+    return this.http.get<Player>(`${environment.apiUrl}/player/username/${encodeURIComponent(username)}`);
   }
 
-  createPlayer(player: { gamertag: string; user_id?: number }): Observable<Player> {
+  createPlayer(player: { username: string; user_id?: number }): Observable<Player> {
     const token = this.authService.getToken();
     return this.http.post<Player>(`${environment.apiUrl}/player`, player, {
       headers: {

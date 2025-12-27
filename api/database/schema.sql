@@ -61,13 +61,15 @@ CREATE TABLE IF NOT EXISTS `event_x_player` (
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Table 7: match (references event, user)
+-- Table 7: match (references event, user, player)
 CREATE TABLE IF NOT EXISTS `match` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `event_id` INT,
+    `winner_id` INT,
     `created_by` INT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`event_id`) REFERENCES `event`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`winner_id`) REFERENCES `player`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -93,6 +95,8 @@ CREATE TABLE IF NOT EXISTS `match_x_song` (
     `match_id` INT,
     `song_id` INT,
     `song_order` INT,
+    `score1` INT,
+    `score2` INT,
     `created_by` INT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`match_id`) REFERENCES `match`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,

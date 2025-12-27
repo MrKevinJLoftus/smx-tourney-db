@@ -1,0 +1,55 @@
+# Cursor Rules for SMX Tournament Database
+
+## General Guidelines
+
+- Follow the existing code style and patterns in the codebase
+- Use TypeScript for frontend code (Angular)
+- Use JavaScript (Node.js) for backend API code
+- Use MySQL for database operations
+- Follow RESTful API conventions
+- Write clear, descriptive commit messages
+
+## Code Quality
+
+- Write clean, maintainable code
+- Add appropriate error handling
+- Include necessary validation
+- Use meaningful variable and function names
+- Comment complex logic when necessary
+
+## Database
+
+- Use the existing database schema structure
+- Follow the naming conventions (snake_case for database, camelCase for JavaScript/TypeScript)
+- Use parameterized queries to prevent SQL injection
+
+## Frontend (Angular)
+
+- Use Angular reactive forms
+- Follow Angular best practices and style guide
+- Use Material Design components where appropriate
+- Implement proper form validation
+- Handle loading states appropriately
+
+## Backend (Node.js/Express)
+
+- Use async/await for asynchronous operations
+- Implement proper error handling with appropriate HTTP status codes
+- Validate request data before processing
+- Use middleware for authentication and authorization
+
+## Important: No Backward Compatibility
+
+**DO NOT add code for backward compatibility. When making changes that break existing functionality, update all affected code paths rather than maintaining compatibility with old data structures or APIs.**
+
+## Testing
+
+- Test changes thoroughly before committing
+- Verify both frontend and backend functionality
+- Test edge cases and error scenarios
+
+## Git
+
+- Create focused, atomic commits
+- Write clear commit messages explaining what and why
+

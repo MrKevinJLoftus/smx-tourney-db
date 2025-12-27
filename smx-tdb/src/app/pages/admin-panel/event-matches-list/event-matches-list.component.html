@@ -1,0 +1,76 @@
+<div class="event-matches-list">
+  <h3>Event Matches</h3>
+  @if (isLoading) {
+    <div class="loading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+  }
+  @if (!isLoading && eventId) {
+    @if (matches$ | async; as matches) {
+      @if (matches.length === 0) {
+        <div class="empty-state">
+          <p>No matches added to this event yet.</p>
+        </div>
+      }
+      @if (matches.length > 0) {
+        <mat-list>
+          @for (match of matches; track match?.match_id || $index) {
+            <mat-list-item>
+              <div class="match-item">
+                <div class="match-players">
+                  @if (match.players && match.players.length > 0) {
+                    @for (player of match.players; track player.player_id; let i = $index) {
+                      <span class="player">{{ player.gamertag }}</span>
+                      @if (i < match.players.length - 1) {
+                        <span class="vs">vs</span>
+                      }
+                    }
+                  } @else {
+                    <span class="player">No players</span>
+                  }
+                </div>
+                <div class="match-details">
+                  @if (match.winner?.gamertag) {
+                    <div class="winner">
+                      Winner: {{ match.winner?.gamertag }}
+                    </div>
+                  }
+                  @if (match.songs && match.songs.length > 0) {
+                    <div class="songs">
+                      <span class="songs-label">Songs: </span>
+                      @for (song of match.songs; track song.song_id) {
+                        <div class="song-item">
+                          <span class="song">
+                            {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}
+                          </span>
+                          @if (song.player_scores && song.player_scores.length > 0) {
+                            <span class="song-scores">
+                              (
+                              @for (playerScore of song.player_scores; track playerScore.player_id; let i = $index) {
+                                {{ playerScore.player_gamertag }}: {{ playerScore.score }}
+                                @if (i < song.player_scores.length - 1) {
+                                  <span>, </span>
+                                }
+                              }
+                              )
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    }
+  }
+  @if (!eventId) {
+    <div class="empty-state">
+      <p>Select an event to view matches.</p>
+    </div>
+  }
+</div>
+

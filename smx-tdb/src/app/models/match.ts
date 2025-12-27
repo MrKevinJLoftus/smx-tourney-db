@@ -1,35 +1,35 @@
 export interface Match {
   match_id?: number;
   event_id: number;
-  player1_id: number;
-  player2_id: number;
-  song_id?: number;
-  winner_id?: number;
-  score1?: number;
-  score2?: number;
-  round?: string;
+  created_by?: number;
   created_at?: string;
   updated_at?: string;
 }
 
+export interface PlayerScore {
+  player_id: number;
+  score?: number;
+  win?: boolean;
+  player_gamertag?: string;
+}
+
+export interface MatchSong {
+  song_id: number;
+  title?: string;
+  artist?: string;
+  player_scores: PlayerScore[];
+}
+
 export interface MatchWithDetails extends Match {
-  player1?: {
+  players?: Array<{
     player_id: number;
     gamertag: string;
-  };
-  player2?: {
-    player_id: number;
-    gamertag: string;
-  };
+  }>;
   winner?: {
     player_id: number;
     gamertag: string;
-  };
-  song?: {
-    song_id: number;
-    title: string;
-    artist?: string;
-  };
+  } | null;
+  songs?: MatchSong[];
   event?: {
     event_id: number;
     name: string;

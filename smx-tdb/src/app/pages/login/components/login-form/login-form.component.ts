@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { AuthData } from '../../../../models/general';
 
@@ -9,6 +9,7 @@ import { AuthData } from '../../../../models/general';
   standalone: false,
 })
 export class LoginFormComponent implements OnInit {
+  @Input() isLoading = false;
   @Output() login = new EventEmitter<AuthData>();
   loginForm!: FormGroup;
 
@@ -34,7 +35,7 @@ export class LoginFormComponent implements OnInit {
    * Emit output event for the user's login attempt.
    */
   onSubmit() {
-    if (this.loginForm.valid) {
+    if (this.loginForm.valid && !this.isLoading) {
       const { email, password } = this.loginForm.getRawValue();
       this.login.emit({
         email,

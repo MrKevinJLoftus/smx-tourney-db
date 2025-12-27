@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { AuthData } from '../models/general';
 import { MessageService } from '../services/message.service';
 import { environment } from '../../environments/environment';
@@ -46,12 +48,13 @@ export class AuthService {
   /**
    * Attempt to log the user in.
    * Will always redirect user to home page.
+   * Returns an Observable that can be subscribed to for loading state management.
    */
-  login(authData: AuthData) {
-    this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
+  login(authData: AuthData): Observable<{token: string, expiresIn: number, userId: string, isAdmin: boolean}> {
+    return this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
       `${environment.apiUrl}/user/login`, authData)
-      .subscribe({
-        next: (response) => {
+      .pipe(
+        tap((response) => {
           if (response.token) {
             const token = response.token;
             this.token = token;
@@ -62,13 +65,14 @@ export class AuthService {
             this.logout(false);
             this.messageService.show('Your email or password was incorrect. Please try again.');
           }
-        },
-        error: (error) => {
+        }),
+        catchError((error) => {
           console.error(error);
           this.messageService.show('Your email or password was incorrect. Please try again.');
           this.logout(false);
-        }
-      });
+          return throwError(() => error);
+        })
+      );
   }
 
   /**

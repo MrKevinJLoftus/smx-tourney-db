@@ -1,0 +1,46 @@
+<div class="event-users-list">
+  <h3>Event Players</h3>
+  @if (isLoading) {
+    <div class="loading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+  }
+  @if (!isLoading && eventId) {
+    @if (players$ | async; as players) {
+      @if (players.length === 0) {
+        <div class="empty-state">
+          <p>No players added to this event yet.</p>
+        </div>
+      }
+      @if (players.length > 0) {
+        <mat-list>
+          @for (player of players; track player.id || player.player_id || $index) {
+            <mat-list-item>
+              <div class="player-item">
+                <div class="player-info">
+                  <span class="gamertag">{{ player.username || player.gamertag }}</span>
+                  @if (player.seed || player.placement) {
+                    <div class="player-details">
+                      @if (player.seed) {
+                        <span class="seed">Seed: {{ player.seed }}</span>
+                      }
+                      @if (player.placement) {
+                        <span class="placement">Place: {{ player.placement }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    }
+  }
+  @if (!eventId) {
+    <div class="empty-state">
+      <p>Select an event to view players.</p>
+    </div>
+  }
+</div>
+

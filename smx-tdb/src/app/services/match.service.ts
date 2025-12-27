@@ -25,12 +25,15 @@ export class MatchService {
 
   createMatch(match: {
     event_id: number;
-    player1_id: number;
-    player2_id: number;
-    song_id?: number;
+    player_ids: number[];
+    songs?: Array<{
+      song_id: number;
+      player_scores: Array<{
+        player_id: number;
+        score?: number;
+      }>;
+    }>;
     winner_id?: number;
-    score1?: number;
-    score2?: number;
     round?: string;
   }): Observable<MatchWithDetails> {
     const token = this.authService.getToken();
@@ -43,12 +46,15 @@ export class MatchService {
 
   updateMatch(id: number, match: {
     event_id: number;
-    player1_id: number;
-    player2_id: number;
-    song_id?: number;
+    player_ids: number[];
+    songs?: Array<{
+      song_id: number;
+      player_scores: Array<{
+        player_id: number;
+        score?: number;
+      }>;
+    }>;
     winner_id?: number;
-    score1?: number;
-    score2?: number;
     round?: string;
   }): Observable<MatchWithDetails> {
     const token = this.authService.getToken();

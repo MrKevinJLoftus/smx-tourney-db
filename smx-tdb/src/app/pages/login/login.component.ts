@@ -9,13 +9,23 @@ import { AuthData } from '../../models/general';
   standalone: false,
 })
 export class LoginComponent {
+  isLoading = false;
+
   constructor(private authService: AuthService) { }
 
   /**
    * Call auth service to handle login attempt.
    */
   handleLoginAttempt(data: AuthData) {
-    this.authService.login(data);
+    this.isLoading = true;
+    this.authService.login(data).subscribe({
+      next: () => {
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
 }

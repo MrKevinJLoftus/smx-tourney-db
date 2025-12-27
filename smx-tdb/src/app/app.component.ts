@@ -35,10 +35,10 @@ export class AppComponent {
   isAuthenticated = false;
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
-    { url: "/login", text: "Login", icon: "login" },
-    { url: "/update-password", text: "Update Password", icon: "lock" }];
+    { url: "/login", text: "Login", icon: "login" }];
   protectedRoutes: Route[] = [
-    { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' }
+    { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' },
+    { url: "/update-password", text: "Update Password", icon: "lock" }
   ];
   accessibleRoutes: Route[] = this.routes;
   constructor(
@@ -70,9 +70,6 @@ export class AppComponent {
       ).subscribe((title: string) => {
         this.titleService.setTitle(`${title} | ${this.title}`);
       });
-
-      // TODO: Remove this once login is implemented
-      this.accessibleRoutes = [...this.routes, ...this.protectedRoutes];
     }
 
   navigateHome() {

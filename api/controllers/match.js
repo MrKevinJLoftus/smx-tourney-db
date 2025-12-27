@@ -1,24 +1,91 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/match');
 
-const transformMatchResult = (match) => {
+/**
+ * Determines the winner(s) of a song based on scores.
+ * Returns a Set of player_ids who won (empty Set if tie/no winner).
+ * @param {Array} playerScores - Array of {player_id, score} objects
+ * @returns {Set} Set of winning player_ids (empty if tie)
+ */
+const determineSongWinner = (playerScores) => {
+  if (!playerScores || playerScores.length === 0) {
+    return new Set();
+  }
+
+  // Filter out players with null/undefined scores
+  const validScores = playerScores.filter(ps => 
+    ps && ps.player_id && ps.score !== null && ps.score !== undefined
+  );
+
+  if (validScores.length === 0) {
+    return new Set();
+  }
+
+  // Find the maximum score
+  const maxScore = Math.max(...validScores.map(ps => ps.score));
+
+  // Find all players with the maximum score
+  const winners = validScores.filter(ps => ps.score === maxScore);
+
+  // If only one player has the max score, they win; otherwise it's a tie
+  return winners.length === 1 ? new Set([winners[0].player_id]) : new Set();
+};
+
+const transformMatchResult = async (match) => {
   if (!match) return null;
+  
+  // Fetch players for this match
+  const players = await dbconn.executeMysqlQuery(queries.GET_PLAYERS_BY_MATCH, [match.id]);
+  const playersArray = players.map(player => ({
+    player_id: player.player_id,
+    gamertag: player.gamertag
+  }));
+
+  // Fetch all player-song-score combinations
+  const playerSongScores = await dbconn.executeMysqlQuery(queries.GET_PLAYER_SONG_SCORES, [match.id]);
+  
+  // Group by song_id to create songs array
+  const songsMap = new Map();
+  playerSongScores.forEach(entry => {
+    if (!entry.song_id) return; // Skip entries without songs
+    
+    if (!songsMap.has(entry.song_id)) {
+      songsMap.set(entry.song_id, {
+        song_id: entry.song_id,
+        title: entry.song_title,
+        artist: entry.song_artist,
+        player_scores: []
+      });
+    }
+    
+    const song = songsMap.get(entry.song_id);
+    song.player_scores.push({
+      player_id: entry.player_id,
+      score: entry.score,
+      win: entry.win,
+      player_gamertag: entry.player_gamertag
+    });
+  });
+  
+  const songsArray = Array.from(songsMap.values());
+
+  // Determine winner from win flags
+  let winner = null;
+  const winnerEntry = playerSongScores.find(entry => entry.win);
+  if (winnerEntry) {
+    winner = {
+      player_id: winnerEntry.player_id,
+      gamertag: winnerEntry.player_gamertag
+    };
+  }
+
   return {
-    match_id: match.match_id,
+    match_id: match.id,
     event_id: match.event_id,
-    player1_id: match.player1_id,
-    player2_id: match.player2_id,
-    song_id: match.song_id,
-    winner_id: match.winner_id,
-    score1: match.score1,
-    score2: match.score2,
-    round: match.round,
     created_at: match.created_at,
-    updated_at: match.updated_at,
-    player1: match.p1_id ? { player_id: match.p1_id, gamertag: match.p1_gamertag } : null,
-    player2: match.p2_id ? { player_id: match.p2_id, gamertag: match.p2_gamertag } : null,
-    winner: match.w_id ? { player_id: match.w_id, gamertag: match.w_gamertag } : null,
-    song: match.song_id ? { song_id: match.song_id, title: match.song_title, artist: match.song_artist } : null
+    players: playersArray,
+    winner: winner,
+    songs: songsArray
   };
 };
 
@@ -26,7 +93,7 @@ exports.getMatchesByEvent = async (req, res) => {
   const eventId = req.params.eventId;
   console.log(`Fetching matches for event: ${eventId}`);
   const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_EVENT, [eventId]);
-  const transformedMatches = matches.map(transformMatchResult);
+  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
   res.status(200).json(transformedMatches);
 };
 
@@ -37,37 +104,135 @@ exports.getMatchById = async (req, res) => {
   if (!matches || matches.length < 1) {
     return res.status(404).json({ message: 'Match not found' });
   }
-  res.status(200).json(transformMatchResult(matches[0]));
+  const transformedMatch = await transformMatchResult(matches[0]);
+  res.status(200).json(transformedMatch);
 };
 
 exports.createMatch = async (req, res) => {
-  const { event_id, player1_id, player2_id, song_id, winner_id, score1, score2, round } = req.body;
+  const { event_id, player_ids, songs, winner_id } = req.body;
   console.log(`Creating new match for event: ${event_id}`);
-  if (!event_id || !player1_id || !player2_id) {
-    return res.status(400).json({ message: 'Event ID, Player 1 ID, and Player 2 ID are required' });
+  if (!event_id || !player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+    return res.status(400).json({ message: 'Event ID and at least 2 player IDs are required' });
   }
+  
+  const createdBy = req.userData?.userId || null;
+  
+  // Create the match
   const result = await dbconn.executeMysqlQuery(queries.CREATE_MATCH, [
-    event_id, player1_id, player2_id, song_id || null, winner_id || null, score1 || null, score2 || null, round || null
+    event_id,
+    winner_id || null,
+    createdBy
   ]);
-  const newMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [result.insertId]);
-  res.status(201).json(transformMatchResult(newMatch[0]));
+  console.log(JSON.stringify(result));
+  const matchId = result.insertId;
+  
+  // Insert player-song-score combinations into match_x_player_x_song table
+  if (songs && Array.isArray(songs) && songs.length > 0) {
+    for (const songData of songs) {
+      if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
+        // Determine song winner based on highest score
+        const songWinners = determineSongWinner(songData.player_scores);
+        
+        for (const playerScore of songData.player_scores) {
+          if (playerScore && playerScore.player_id) {
+            // Check if this player won the song (not the match)
+            const isSongWin = songWinners.has(playerScore.player_id);
+            await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
+              matchId,
+              playerScore.player_id,
+              songData.song_id ? Number(songData.song_id) : null,
+              playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
+              isSongWin ? 1 : 0,
+              createdBy
+            ]);
+          }
+        }
+      }
+    }
+  } else {
+    // If no songs provided, still create entries for each player (without song_id)
+    // Use match winner_id for win flag when there are no songs
+    for (const playerId of player_ids) {
+      await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
+        matchId,
+        playerId,
+        null, // no song
+        null, // no score
+        winner_id && winner_id === playerId ? 1 : 0,
+        createdBy
+      ]);
+    }
+  }
+  
+  const newMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
+  console.log(JSON.stringify(newMatch));
+  const transformedMatch = await transformMatchResult(newMatch[0]);
+  res.status(201).json(transformedMatch);
 };
 
 exports.updateMatch = async (req, res) => {
   const matchId = req.params.id;
-  const { event_id, player1_id, player2_id, song_id, winner_id, score1, score2, round } = req.body;
+  const { event_id, player_ids, songs, winner_id } = req.body;
   console.log(`Updating match with id: ${matchId}`);
-  if (!event_id || !player1_id || !player2_id) {
-    return res.status(400).json({ message: 'Event ID, Player 1 ID, and Player 2 ID are required' });
+  if (!event_id || !player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+    return res.status(400).json({ message: 'Event ID and at least 2 player IDs are required' });
   }
+  
+  // Update the match
   await dbconn.executeMysqlQuery(queries.UPDATE_MATCH, [
-    event_id, player1_id, player2_id, song_id || null, winner_id || null, score1 || null, score2 || null, round || null, matchId
+    event_id,
+    winner_id || null,
+    matchId
   ]);
+  
+  // Delete existing player-song combinations and insert new ones
+  await dbconn.executeMysqlQuery(queries.DELETE_MATCH_PLAYER_SONGS, [matchId]);
+  const createdBy = req.userData?.userId || null;
+  
+  // Insert player-song-score combinations into match_x_player_x_song table
+  if (songs && Array.isArray(songs) && songs.length > 0) {
+    for (const songData of songs) {
+      if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
+        // Determine song winner based on highest score
+        const songWinners = determineSongWinner(songData.player_scores);
+        
+        for (const playerScore of songData.player_scores) {
+          if (playerScore && playerScore.player_id) {
+            // Check if this player won the song (not the match)
+            const isSongWin = songWinners.has(playerScore.player_id);
+            await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
+              matchId,
+              playerScore.player_id,
+              songData.song_id ? Number(songData.song_id) : null,
+              playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
+              isSongWin ? 1 : 0,
+              createdBy
+            ]);
+          }
+        }
+      }
+    }
+  } else {
+    // If no songs provided, still create entries for each player (without song_id)
+    // Use match winner_id for win flag when there are no songs
+    for (const playerId of player_ids) {
+      await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
+        matchId,
+        playerId,
+        null, // no song
+        null, // no score
+        winner_id && winner_id === playerId ? 1 : 0,
+        createdBy
+      ]);
+    }
+  }
+  
   const updatedMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
   if (!updatedMatch || updatedMatch.length < 1) {
     return res.status(404).json({ message: 'Match not found' });
   }
-  res.status(200).json(transformMatchResult(updatedMatch[0]));
+  const transformedMatch = await transformMatchResult(updatedMatch[0]);
+  res.status(200).json(transformedMatch);
 };
 
 exports.deleteMatch = async (req, res) => {
