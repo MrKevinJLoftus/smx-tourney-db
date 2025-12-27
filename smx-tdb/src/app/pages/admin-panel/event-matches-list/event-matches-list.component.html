@@ -17,7 +17,8 @@
           @for (match of matches; track match?.match_id || $index) {
             <mat-list-item>
               <div class="match-item">
-                <div class="match-players">
+                <div class="match-header">
+                  <div class="match-players">
                   @if (match.players && match.players.length > 0) {
                     @for (player of match.players; track player.player_id; let i = $index) {
                       <span class="player">{{ player.gamertag }}</span>
@@ -28,6 +29,13 @@
                   } @else {
                     <span class="player">No players</span>
                   }
+                  </div>
+                  <button mat-icon-button 
+                          class="delete-button" 
+                          (click)="deleteMatch(match.match_id!)"
+                          matTooltip="Delete match">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </div>
                 <div class="match-details">
                   @if (match.winner?.gamertag) {
@@ -47,7 +55,11 @@
                             <span class="song-scores">
                               (
                               @for (playerScore of song.player_scores; track playerScore.player_id; let i = $index) {
-                                {{ playerScore.player_gamertag }}: {{ playerScore.score }}
+                                @if (playerScore.win) {
+                                  <strong>{{ playerScore.player_gamertag }}: {{ playerScore.score }}</strong>
+                                } @else {
+                                  {{ playerScore.player_gamertag }}: {{ playerScore.score }}
+                                }
                                 @if (i < song.player_scores.length - 1) {
                                   <span>, </span>
                                 }

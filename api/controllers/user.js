@@ -30,7 +30,7 @@ exports.userLogin = async (req, res) => {
   const isAdmin = fetchedUser[0].role === 'admin';
   res.status(200).json({
     token: token,
-    expiresIn: 14400,
+    expiresIn: 691200,
     userId: fetchedUser[0].id,
     isAdmin: isAdmin
   });

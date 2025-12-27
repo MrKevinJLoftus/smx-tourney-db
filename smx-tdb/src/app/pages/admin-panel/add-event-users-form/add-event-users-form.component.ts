@@ -40,11 +40,13 @@ export class AddEventUsersFormComponent implements OnInit {
       if (event) {
         this.selectedEventId = (event as any).id;
         this.userForm.get('gamertag')?.enable();
+        this.userForm.get('pronouns')?.enable();
         this.userForm.get('seed')?.enable();
         this.userForm.get('place')?.enable();
       } else {
         this.selectedEventId = undefined;
         this.userForm.get('gamertag')?.disable();
+        this.userForm.get('pronouns')?.disable();
         this.userForm.get('seed')?.disable();
         this.userForm.get('place')?.disable();
       }
@@ -58,6 +60,7 @@ export class AddEventUsersFormComponent implements OnInit {
   initForm(): void {
     this.userForm = this.fb.group({
       gamertag: new FormControl({ value: '', disabled: true }, Validators.required),
+      pronouns: new FormControl({ value: '', disabled: true }), // Pronouns is optional
       seed: new FormControl({ value: '', disabled: true }), // Seed is optional and disabled until an event is selected
       place: new FormControl({ value: '', disabled: true }, Validators.required),
       event: ['', Validators.required] // New required field for event
@@ -71,10 +74,11 @@ export class AddEventUsersFormComponent implements OnInit {
       
       const formValue = this.userForm.value;
       const event: Event = formValue.event;
-      const username = formValue.username.trim();
+      const gamertag = formValue.gamertag.trim();
+      const pronouns = formValue.pronouns?.trim() || undefined;
 
       // First, try to find or create the player
-      this.playerService.getPlayerByUsername(username).subscribe({
+      this.playerService.getPlayerByUsername(gamertag).subscribe({
         next: (player: Player) => {
           // Player exists, add to event
           const eventId = (event as any).id;
@@ -84,7 +88,7 @@ export class AddEventUsersFormComponent implements OnInit {
         error: (error: any) => {
           // Player doesn't exist, create it first
           if (error.status === 404) {
-            this.playerService.createPlayer({ username: username }).subscribe({
+            this.playerService.createPlayer({ username: gamertag, pronouns: pronouns }).subscribe({
               next: (newPlayer: Player) => {
                 const eventId = (event as any).id;
                 const playerId = (newPlayer as any).id;
@@ -134,15 +138,18 @@ export class AddEventUsersFormComponent implements OnInit {
         this.userForm.reset();
         this.userForm.get('event')?.setValue(selectedEvent);
         this.userForm.get('gamertag')?.setValue('');
+        this.userForm.get('pronouns')?.setValue('');
         this.userForm.get('seed')?.setValue('');
         this.userForm.get('place')?.setValue('');
         // Keep fields enabled if event is still selected
         if (selectedEvent) {
           this.userForm.get('gamertag')?.enable();
+          this.userForm.get('pronouns')?.enable();
           this.userForm.get('seed')?.enable();
           this.userForm.get('place')?.enable();
         } else {
           this.userForm.get('gamertag')?.disable();
+          this.userForm.get('pronouns')?.disable();
           this.userForm.get('seed')?.disable();
           this.userForm.get('place')?.disable();
         }

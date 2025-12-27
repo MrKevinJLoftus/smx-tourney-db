@@ -17,18 +17,26 @@
           @for (player of players; track player.id || player.player_id || $index) {
             <mat-list-item>
               <div class="player-item">
-                <div class="player-info">
-                  <span class="gamertag">{{ player.username || player.gamertag }}</span>
-                  @if (player.seed || player.placement) {
-                    <div class="player-details">
-                      @if (player.seed) {
-                        <span class="seed">Seed: {{ player.seed }}</span>
-                      }
-                      @if (player.placement) {
-                        <span class="placement">Place: {{ player.placement }}</span>
-                      }
-                    </div>
-                  }
+                <div class="player-header">
+                  <div class="player-info">
+                    <span class="gamertag">{{ player.username || player.gamertag }}</span>
+                    @if (player.seed || player.placement) {
+                      <div class="player-details">
+                        @if (player.seed) {
+                          <span class="seed">Seed: {{ player.seed }}</span>
+                        }
+                        @if (player.placement) {
+                          <span class="placement">Place: {{ player.placement }}</span>
+                        }
+                      </div>
+                    }
+                  </div>
+                  <button mat-icon-button 
+                          class="delete-button" 
+                          (click)="deletePlayer(player.id, player.username || player.gamertag)"
+                          matTooltip="Remove player from event">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </div>
               </div>
             </mat-list-item>

@@ -34,21 +34,58 @@ mat-list {
   padding: 0;
 }
 
+::ng-deep mat-list-item {
+  height: auto !important;
+  min-height: 48px;
+  
+  .mat-mdc-list-item-content {
+    padding: 0 16px !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 .player-item {
   width: 100%;
   padding: 8px 0;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
+}
+
+.player-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .player-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.delete-button {
+  flex-shrink: 0;
+  color: #f44336;
+  
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+  }
 }
 
 .gamertag {
   font-weight: 500;
   font-size: 0.95rem;
   color: #212121;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .player-details {

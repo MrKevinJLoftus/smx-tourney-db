@@ -23,6 +23,11 @@
         </mat-form-field>
 
         <mat-form-field appearance="fill">
+          <mat-label>Pronouns</mat-label>
+          <input matInput id="pronouns" formControlName="pronouns" type="text" [disabled]="!userForm.get('event')?.value" placeholder="e.g., they/them, he/him, she/her" />
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
           <mat-label>Seed</mat-label>
           <input matInput id="seed" formControlName="seed" type="number" [disabled]="!userForm.get('event')?.value" />
         </mat-form-field>

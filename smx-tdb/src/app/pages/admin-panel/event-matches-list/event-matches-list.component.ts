@@ -4,6 +4,9 @@ import { MatchService } from '../../../services/match.service';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { MatchWithDetails } from '../../../models/match';
+import { MatDialog } from '@angular/material/dialog';
+import { MessageService } from '../../../services/message.service';
+import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-event-matches-list',
@@ -16,7 +19,11 @@ export class EventMatchesListComponent implements OnInit, OnChanges {
   matches$: Observable<MatchWithDetails[]> = of([]);
   isLoading = false;
 
-  constructor(private matchService: MatchService) {}
+  constructor(
+    private matchService: MatchService,
+    private dialog: MatDialog,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit(): void {
     this.loadMatches();
@@ -44,6 +51,33 @@ export class EventMatchesListComponent implements OnInit, OnChanges {
       this.matches$ = of([]);
       this.isLoading = false;
     }
+  }
+
+  deleteMatch(matchId: number): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Match',
+        message: 'Are you sure you want to delete this match? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.matchService.deleteMatch(matchId).subscribe({
+          next: () => {
+            this.messageService.show('Match deleted successfully');
+            this.loadMatches();
+          },
+          error: (error) => {
+            console.error('Error deleting match:', error);
+            this.messageService.show('Error deleting match. Please try again.');
+          }
+        });
+      }
+    });
   }
 }
 

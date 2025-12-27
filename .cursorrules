@@ -53,3 +53,12 @@
 - Create focused, atomic commits
 - Write clear commit messages explaining what and why
 
+## Code Reusability (DRY Principle)
+
+- **DO NOT repeat or duplicate code across multiple places**
+- Reuse existing components, services, utilities, and shared logic wherever possible
+- Extract common functionality into reusable services, components, or utility functions
+- Keep shared/reusable code in appropriate shared modules or utility files
+- Before implementing new functionality, check if similar functionality already exists that can be extended or reused
+- When multiple components need similar features, create shared components or services rather than duplicating code
+

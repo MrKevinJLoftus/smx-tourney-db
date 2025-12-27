@@ -34,27 +34,66 @@ mat-list {
   padding: 0;
 }
 
+::ng-deep mat-list-item {
+  height: auto !important;
+  min-height: 48px;
+  
+  .mat-mdc-list-item-content {
+    padding: 0 16px !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 .match-item {
   width: 100%;
   padding: 12px 0;
   border-bottom: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
 .match-item:last-child {
   border-bottom: none;
 }
 
+.match-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .match-players {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 8px;
   font-weight: 500;
+  flex: 1;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.delete-button {
+  flex-shrink: 0;
+  color: #f44336;
+  
+  &:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+  }
 }
 
 .player {
   font-size: 0.95rem;
   color: #212121;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .vs {
@@ -70,6 +109,10 @@ mat-list {
   font-size: 0.85rem;
   color: #212121;
   margin-left: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
 .scores {
@@ -84,6 +127,10 @@ mat-list {
 
 .round, .song {
   font-style: italic;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  flex: 1;
+  min-width: 0;
 }
 
 .songs {
@@ -100,12 +147,19 @@ mat-list {
 
 .song-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .song-scores {
   color: #212121;
   font-size: 0.9em;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  flex: 1;
+  min-width: 0;
 }
 

@@ -30,6 +30,11 @@
   display: flex;
 }
 
+.mat-drawer-content {
+  overflow: unset;
+  height: unset;
+}
+
 ::ng-deep .main-content {
   height: 95vh;
   width: 100vw;

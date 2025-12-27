@@ -28,7 +28,7 @@ exports.getPlayerByGamertag = async (req, res) => {
 };
 
 exports.createPlayer = async (req, res) => {
-  const { gamertag, user_id } = req.body;
+  const { gamertag, pronouns, user_id } = req.body;
   console.log(`Creating new player: ${gamertag}`);
   if (!gamertag) {
     return res.status(400).json({ message: 'Gamertag is required' });
@@ -38,7 +38,7 @@ exports.createPlayer = async (req, res) => {
   if (existing && existing.length > 0) {
     return res.status(409).json({ message: 'Player with this gamertag already exists', player: existing[0] });
   }
-  const result = await dbconn.executeMysqlQuery(queries.CREATE_PLAYER, [gamertag, user_id || null]);
+  const result = await dbconn.executeMysqlQuery(queries.CREATE_PLAYER, [gamertag, pronouns || null, user_id || null]);
   const newPlayer = await dbconn.executeMysqlQuery(queries.GET_PLAYER_BY_ID, [result.insertId]);
   res.status(201).json(newPlayer[0]);
 };

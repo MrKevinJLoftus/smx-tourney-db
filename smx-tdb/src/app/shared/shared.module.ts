@@ -20,6 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 
 const MODULES = [
@@ -43,7 +44,8 @@ const MODULES = [
   MatTooltipModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatTabsModule
+  MatTabsModule,
+  MatDialogModule
 ];
 
 const COMPONENTS = [

@@ -24,12 +24,18 @@ export class PlayerService {
   }
 
   getPlayerByUsername(username: string): Observable<Player> {
-    return this.http.get<Player>(`${environment.apiUrl}/player/username/${encodeURIComponent(username)}`);
+    return this.http.get<Player>(`${environment.apiUrl}/player/gamertag/${encodeURIComponent(username)}`);
   }
 
-  createPlayer(player: { username: string; user_id?: number }): Observable<Player> {
+  createPlayer(player: { username: string; pronouns?: string; user_id?: number }): Observable<Player> {
     const token = this.authService.getToken();
-    return this.http.post<Player>(`${environment.apiUrl}/player`, player, {
+    // Map username to gamertag for API compatibility
+    const requestBody = {
+      gamertag: player.username,
+      pronouns: player.pronouns,
+      user_id: player.user_id
+    };
+    return this.http.post<Player>(`${environment.apiUrl}/player`, requestBody, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
