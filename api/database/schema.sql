@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS `event` (
     `name` VARCHAR(100) NOT NULL,
     `date` DATETIME,
     `description` VARCHAR(500),
+    `location` VARCHAR(200),
+    `organizers` VARCHAR(200),
     `created_by` INT,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE

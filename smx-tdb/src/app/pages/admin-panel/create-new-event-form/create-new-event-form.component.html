@@ -17,6 +17,24 @@
         Event Date is required
       </mat-error>
     </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Event Description</mat-label>
+      <textarea matInput id="eventDescription" formControlName="eventDescription" rows="4" maxlength="500"></textarea>
+      <mat-hint>Optional. Maximum 500 characters.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Event Location</mat-label>
+      <input matInput id="eventLocation" formControlName="eventLocation" type="text" maxlength="200" />
+      <mat-hint>Optional. Maximum 200 characters.</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill">
+      <mat-label>Event Organizers</mat-label>
+      <input matInput id="eventOrganizers" formControlName="eventOrganizers" type="text" maxlength="200" />
+      <mat-hint>Optional. Maximum 200 characters.</mat-hint>
+    </mat-form-field>
   </div>
 
   <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid || isSubmitting">

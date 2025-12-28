@@ -43,7 +43,13 @@ export class EventService {
     return this.http.get<Event>(`${environment.apiUrl}/event/${id}`);
   }
 
-  createEvent(event: { name: string; date: string | Date }): Observable<Event> {
+  createEvent(event: { 
+    name: string; 
+    date: string | Date;
+    description?: string | null;
+    location?: string | null;
+    organizers?: string | null;
+  }): Observable<Event> {
     const token = this.authService.getToken();
     return this.http.post<Event>(`${environment.apiUrl}/event`, event, {
       headers: {
@@ -57,7 +63,13 @@ export class EventService {
     );
   }
 
-  updateEvent(id: number, event: { name: string; date: string | Date }): Observable<Event> {
+  updateEvent(id: number, event: { 
+    name: string; 
+    date: string | Date;
+    description?: string | null;
+    location?: string | null;
+    organizers?: string | null;
+  }): Observable<Event> {
     const token = this.authService.getToken();
     return this.http.put<Event>(`${environment.apiUrl}/event/${id}`, event, {
       headers: {

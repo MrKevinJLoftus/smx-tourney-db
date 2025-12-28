@@ -31,7 +31,10 @@ export class CreateNewEventFormComponent implements OnInit {
   initializeForm(): void {
     this.eventForm = this.fb.group({
       eventName: ['', Validators.required],
-      eventDate: ['', Validators.required]
+      eventDate: ['', Validators.required],
+      eventDescription: [''],
+      eventLocation: [''],
+      eventOrganizers: ['']
     });
   }
 
@@ -45,7 +48,10 @@ export class CreateNewEventFormComponent implements OnInit {
         name: formValue.eventName,
         date: formValue.eventDate instanceof Date 
           ? formValue.eventDate.toISOString().split('T')[0] 
-          : formValue.eventDate
+          : formValue.eventDate,
+        description: formValue.eventDescription || null,
+        location: formValue.eventLocation || null,
+        organizers: formValue.eventOrganizers || null
       };
 
       this.eventService.createEvent(eventData).subscribe({

@@ -18,24 +18,37 @@ exports.getEventById = async (req, res) => {
 };
 
 exports.createEvent = async (req, res) => {
-  const { name, date } = req.body;
+  const { name, date, description, location, organizers } = req.body;
   console.log(`Creating new event: ${name}`);
   if (!name || !date) {
     return res.status(400).json({ message: 'Event name and date are required' });
   }
-  const result = await dbconn.executeMysqlQuery(queries.CREATE_EVENT, [name, date]);
+  const result = await dbconn.executeMysqlQuery(queries.CREATE_EVENT, [
+    name, 
+    date, 
+    description || null, 
+    location || null, 
+    organizers || null
+  ]);
   const newEvent = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [result.insertId]);
   res.status(201).json(newEvent[0]);
 };
 
 exports.updateEvent = async (req, res) => {
   const eventId = req.params.id;
-  const { name, date } = req.body;
+  const { name, date, description, location, organizers } = req.body;
   console.log(`Updating event with id: ${eventId}`);
   if (!name || !date) {
     return res.status(400).json({ message: 'Event name and date are required' });
   }
-  await dbconn.executeMysqlQuery(queries.UPDATE_EVENT, [name, date, eventId]);
+  await dbconn.executeMysqlQuery(queries.UPDATE_EVENT, [
+    name, 
+    date, 
+    description || null, 
+    location || null, 
+    organizers || null, 
+    eventId
+  ]);
   const updatedEvent = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [eventId]);
   if (!updatedEvent || updatedEvent.length < 1) {
     return res.status(404).json({ message: 'Event not found' });
