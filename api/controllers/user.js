@@ -49,7 +49,7 @@ exports.createUser = async (req, res) => {
     process.env.SMX_TDB_JWT_KEY,
     { expiresIn: '192h' }
   );
-  res.status(200).json({token: token, expiresIn: 3600, userId: newUser[0].id});
+  res.status(200).json({token: token, expiresIn: 691200, userId: newUser[0].id});
 };
 
 exports.updatePassword = async (req, res) => {
