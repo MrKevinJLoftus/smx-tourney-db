@@ -7,11 +7,31 @@
   flex-direction: column;
 }
 
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
 h3 {
-  margin: 0 0 16px 0;
+  margin: 0;
   font-size: 1.2rem;
   font-weight: 500;
   color: #212121;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.event-selector {
+  min-width: 250px;
 }
 
 .loading {
@@ -71,8 +91,21 @@ mat-list {
   min-width: 0;
 }
 
-.delete-button {
+.action-buttons {
+  display: flex;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.edit-button {
+  color: #2196f3;
+  
+  &:hover {
+    background-color: rgba(33, 150, 243, 0.1);
+  }
+}
+
+.delete-button {
   color: #f44336;
   
   &:hover {
@@ -93,6 +126,13 @@ mat-list {
   gap: 12px;
   font-size: 0.85rem;
   color: #212121;
+  flex-wrap: wrap;
+}
+
+.pronouns {
+  display: inline-block;
+  font-style: italic;
+  color: #666;
 }
 
 .seed, .placement {

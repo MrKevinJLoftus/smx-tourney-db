@@ -1,0 +1,136 @@
+::ng-deep .mat-mdc-dialog-container {
+  border: 2px solid #e0e0e0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  background-color: #ffffff !important;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 600px;
+  padding-top: 16px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-dialog-content {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+}
+
+.songs-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.songs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.songs-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+
+.songs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.song-entry {
+  width: 100%;
+}
+
+.song-entry-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.song-field {
+  flex: 2;
+  min-width: 200px;
+}
+
+.score-field {
+  flex: 1;
+  min-width: 120px;
+}
+
+.song-entry-content button {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.players-section {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.players-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.players-label {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+  font-weight: 400;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.player-entry {
+  width: 100%;
+}
+
+.player-entry-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.player-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.player-entry-content button {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.scores-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  flex: 1;
+}
+
+.score-field-wrapper {
+  width: 100%;
+}
+

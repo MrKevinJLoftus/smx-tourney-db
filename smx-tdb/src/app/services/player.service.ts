@@ -42,6 +42,26 @@ export class PlayerService {
     });
   }
 
+  updatePlayer(id: number, player: { username?: string; pronouns?: string; user_id?: number }): Observable<Player> {
+    const token = this.authService.getToken();
+    // Map username to gamertag for API compatibility
+    const requestBody: any = {};
+    if (player.username !== undefined) {
+      requestBody.gamertag = player.username;
+    }
+    if (player.pronouns !== undefined) {
+      requestBody.pronouns = player.pronouns;
+    }
+    if (player.user_id !== undefined) {
+      requestBody.user_id = player.user_id;
+    }
+    return this.http.put<Player>(`${environment.apiUrl}/player/${id}`, requestBody, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
   getPlayersByEvent(eventId: number): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/player/event/${eventId}`);
   }

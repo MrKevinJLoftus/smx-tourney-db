@@ -1,11 +1,28 @@
 <div class="event-users-list">
-  <h3>Event Players</h3>
+  <div class="header-section">
+    <h3>Event Players</h3>
+    <div class="controls">
+      <mat-form-field appearance="fill" class="event-selector">
+        <mat-label>Event</mat-label>
+        <mat-select [value]="selectedEvent" (selectionChange)="onEventChange($event.value)">
+          <mat-option [value]="null">None</mat-option>
+          <mat-option *ngFor="let event of (events$ | async)" [value]="event">
+            {{ event.name }} ({{ event.date | date:'shortDate' }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="openAddUserDialog()" [disabled]="!selectedEventId">
+        <mat-icon>add</mat-icon>
+        Add User To Event
+      </button>
+    </div>
+  </div>
   @if (isLoading) {
     <div class="loading">
       <mat-spinner diameter="30"></mat-spinner>
     </div>
   }
-  @if (!isLoading && eventId) {
+  @if (!isLoading && selectedEventId) {
     @if (players$ | async; as players) {
       @if (players.length === 0) {
         <div class="empty-state">
@@ -20,23 +37,32 @@
                 <div class="player-header">
                   <div class="player-info">
                     <span class="gamertag">{{ player.username || player.gamertag }}</span>
-                    @if (player.seed || player.placement) {
-                      <div class="player-details">
-                        @if (player.seed) {
-                          <span class="seed">Seed: {{ player.seed }}</span>
-                        }
-                        @if (player.placement) {
-                          <span class="placement">Place: {{ player.placement }}</span>
-                        }
-                      </div>
-                    }
+                    <div class="player-details">
+                      @if (player.pronouns) {
+                        <span class="pronouns">{{ player.pronouns }}</span>
+                      }
+                      @if (player.seed) {
+                        <span class="seed">Seed: {{ player.seed }}</span>
+                      }
+                      @if (player.placement) {
+                        <span class="placement">Place: {{ player.placement }}</span>
+                      }
+                    </div>
                   </div>
-                  <button mat-icon-button 
-                          class="delete-button" 
-                          (click)="deletePlayer(player.id, player.username || player.gamertag)"
-                          matTooltip="Remove player from event">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  <div class="action-buttons">
+                    <button mat-icon-button 
+                            class="edit-button" 
+                            (click)="editPlayer(player)"
+                            matTooltip="Edit player">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button 
+                            class="delete-button" 
+                            (click)="deletePlayer(player.id, player.username || player.gamertag)"
+                            matTooltip="Remove player from event">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
               </div>
             </mat-list-item>
@@ -45,7 +71,7 @@
       }
     }
   }
-  @if (!eventId) {
+  @if (!selectedEventId) {
     <div class="empty-state">
       <p>Select an event to view players.</p>
     </div>

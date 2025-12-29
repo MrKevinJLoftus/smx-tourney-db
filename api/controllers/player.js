@@ -50,3 +50,16 @@ exports.getPlayersByEvent = async (req, res) => {
   res.status(200).json(players);
 };
 
+exports.updatePlayer = async (req, res) => {
+  const playerId = req.params.id;
+  const { gamertag, pronouns, user_id } = req.body;
+  console.log(`Updating player with id: ${playerId}`);
+  const player = await dbconn.executeMysqlQuery(queries.GET_PLAYER_BY_ID, [playerId]);
+  if (!player || player.length < 1) {
+    return res.status(404).json({ message: 'Player not found' });
+  }
+  await dbconn.executeMysqlQuery(queries.UPDATE_PLAYER, [gamertag || player[0].username, pronouns !== undefined ? pronouns : player[0].pronouns, user_id || player[0].created_by, playerId]);
+  const updatedPlayer = await dbconn.executeMysqlQuery(queries.GET_PLAYER_BY_ID, [playerId]);
+  res.status(200).json(updatedPlayer[0]);
+};
+

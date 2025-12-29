@@ -69,14 +69,29 @@ const transformMatchResult = async (match) => {
   
   const songsArray = Array.from(songsMap.values());
 
-  // Determine winner from win flags
+  // Determine winner from match.winner_id (not from song win flags)
   let winner = null;
-  const winnerEntry = playerSongScores.find(entry => entry.win);
-  if (winnerEntry) {
-    winner = {
-      player_id: winnerEntry.player_id,
-      gamertag: winnerEntry.player_gamertag
-    };
+  if (match.winner_id) {
+    // Find the winner player from the players array
+    const winnerPlayer = playersArray.find(p => p.player_id === match.winner_id);
+    if (winnerPlayer) {
+      winner = {
+        player_id: winnerPlayer.player_id,
+        gamertag: winnerPlayer.gamertag
+      };
+    } else {
+      // If winner not in players array, fetch it directly
+      const winnerData = await dbconn.executeMysqlQuery(
+        'SELECT id as player_id, username as gamertag FROM player WHERE id = ?',
+        [match.winner_id]
+      );
+      if (winnerData && winnerData.length > 0) {
+        winner = {
+          player_id: winnerData[0].player_id,
+          gamertag: winnerData[0].gamertag
+        };
+      }
+    }
   }
 
   return {

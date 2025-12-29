@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Update User In Event' : 'Add User To Event' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="form-fields">
+      <mat-form-field appearance="fill">
+        <mat-label>Event</mat-label>
+        <mat-select id="event" formControlName="event">
+          <mat-option *ngFor="let event of (events$ | async)" [value]="event">
+            {{ event.name }} ({{ event.date | date:'shortDate' }})
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="userForm.get('event')?.hasError('required')">
+          Event is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Gamertag</mat-label>
+        <input matInput id="gamertag" formControlName="gamertag" type="text" [disabled]="isEditMode || !userForm.get('event')?.value" />
+        <mat-error *ngIf="userForm.get('gamertag')?.hasError('required')">
+          Gamertag is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Pronouns</mat-label>
+        <input matInput id="pronouns" formControlName="pronouns" type="text" [disabled]="!userForm.get('event')?.value" placeholder="e.g., they/them, he/him, she/her" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Seed</mat-label>
+        <input matInput id="seed" formControlName="seed" type="number" [disabled]="!userForm.get('event')?.value" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Place</mat-label>
+        <input matInput id="place" formControlName="place" type="number" [disabled]="!userForm.get('event')?.value" />
+        <mat-error *ngIf="userForm.get('place')?.hasError('required')">
+          Place is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="userForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : (isEditMode ? 'Update User' : 'Submit') }}
+  </button>
+</mat-dialog-actions>
+

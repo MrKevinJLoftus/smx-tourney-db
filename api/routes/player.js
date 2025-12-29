@@ -12,6 +12,7 @@ router.get("/event/:eventId", asyncWrapper(playerController.getPlayersByEvent));
 
 // Admin-only routes
 router.post("/", checkAdmin, asyncWrapper(playerController.createPlayer));
+router.put("/:id", checkAdmin, asyncWrapper(playerController.updatePlayer));
 
 module.exports = router;
 

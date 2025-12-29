@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { CreateNewEventFormComponent } from './create-new-event-form/create-new-event-form.component';
 import { SharedModule } from '../../shared/shared.module';
-import { AddEventMatchesFormComponent } from "./add-event-matches-form/add-event-matches-form.component";
-import { AddEventUsersFormComponent } from './add-event-users-form/add-event-users-form.component';
+import { EventUsersListComponent } from './event-users-list/event-users-list.component';
+import { EventMatchesListComponent } from './event-matches-list/event-matches-list.component';
 import { FormWrapperComponent } from './form-wrapper/form-wrapper.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SharedModule, CreateNewEventFormComponent, AddEventMatchesFormComponent, AddEventUsersFormComponent, FormWrapperComponent],
+  imports: [SharedModule, CreateNewEventFormComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })
