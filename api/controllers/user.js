@@ -19,7 +19,7 @@ exports.userLogin = async (req, res) => {
   // time to generate user's JWT
   const token = jwt.sign(
     {
-      email: fetchedUser[0].email, userId: fetchedUser[0].id, isAdmin: fetchedUser[0].role === 'admin'
+      email: fetchedUser[0].username, userId: fetchedUser[0].id, isAdmin: fetchedUser[0].role === 'admin'
     },
     process.env.SMX_TDB_JWT_KEY,
     {
@@ -45,7 +45,7 @@ exports.createUser = async (req, res) => {
   const newUserId = createUserRes.insertId;
   const newUser = await dbconn.executeMysqlQuery(queries.GET_USER_BY_ID, [newUserId]);
   console.log(`new user created: ${JSON.stringify(newUser)}`);
-  const token = jwt.sign({email: newUser[0].email, userId: newUser[0].id},
+  const token = jwt.sign({email: newUser[0].username, userId: newUser[0].id},
     process.env.SMX_TDB_JWT_KEY,
     { expiresIn: '192h' }
   );
