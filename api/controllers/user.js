@@ -40,6 +40,13 @@ exports.createUser = async (req, res) => {
   // create a new user and store it in the database
   const username = req.body.email;
   console.log(`creating new user ${username}`);
+  
+  // Check if user with this email already exists
+  const existing = await dbconn.executeMysqlQuery(queries.FIND_USER_BY_EMAIL, [username]);
+  if (existing && existing.length > 0) {
+    return res.status(409).json({ message: 'User with this email already exists' });
+  }
+  
   const hash = await bcrypt.hash(req.body.password, 15)
   const createUserRes = await dbconn.executeMysqlQuery(queries.CREATE_USER, [username, hash]);
   const newUserId = createUserRes.insertId;
