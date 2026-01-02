@@ -4,7 +4,7 @@
 -- Table 1: user (must be created first as it's referenced by other tables)
 CREATE TABLE IF NOT EXISTS `user` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
-    `username` VARCHAR(20) NOT NULL,
+    `username` VARCHAR(100) NOT NULL,
     `hashed_pw` VARCHAR(500) NOT NULL,
     `role` VARCHAR(20),
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
