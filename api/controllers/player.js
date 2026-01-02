@@ -58,7 +58,7 @@ exports.updatePlayer = async (req, res) => {
   if (!player || player.length < 1) {
     return res.status(404).json({ message: 'Player not found' });
   }
-  await dbconn.executeMysqlQuery(queries.UPDATE_PLAYER, [gamertag || player[0].username, pronouns !== undefined ? pronouns : player[0].pronouns, user_id || player[0].created_by, playerId]);
+  await dbconn.executeMysqlQuery(queries.UPDATE_PLAYER, [gamertag || player[0].username, pronouns !== undefined ? pronouns : player[0].pronouns, user_id !== undefined ? user_id : player[0].created_by, playerId]);
   const updatedPlayer = await dbconn.executeMysqlQuery(queries.GET_PLAYER_BY_ID, [playerId]);
   res.status(200).json(updatedPlayer[0]);
 };
