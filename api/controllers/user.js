@@ -52,11 +52,15 @@ exports.createUser = async (req, res) => {
   const newUserId = createUserRes.insertId;
   const newUser = await dbconn.executeMysqlQuery(queries.GET_USER_BY_ID, [newUserId]);
   console.log(`new user created: ${JSON.stringify(newUser)}`);
-  const token = jwt.sign({email: newUser[0].username, userId: newUser[0].id},
+  const isAdmin = newUser[0].role === 'admin';
+  const token = jwt.sign(
+    {
+      email: newUser[0].username, userId: newUser[0].id, isAdmin: isAdmin
+    },
     process.env.SMX_TDB_JWT_KEY,
     { expiresIn: '192h' }
   );
-  res.status(200).json({token: token, expiresIn: 691200, userId: newUser[0].id});
+  res.status(200).json({token: token, expiresIn: 691200, userId: newUser[0].id, isAdmin: isAdmin});
 };
 
 exports.updatePassword = async (req, res) => {
