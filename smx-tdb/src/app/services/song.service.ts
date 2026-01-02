@@ -24,7 +24,7 @@ export class SongService {
     return this.http.get<Song>(`${environment.apiUrl}/song/${id}`);
   }
 
-  createSong(song: { title: string; artist?: string; difficulty?: string }): Observable<Song> {
+  createSong(song: { title: string; artist?: string }): Observable<Song> {
     const token = this.authService.getToken();
     return this.http.post<Song>(`${environment.apiUrl}/song`, song, {
       headers: {
@@ -33,7 +33,7 @@ export class SongService {
     });
   }
 
-  updateSong(id: number, song: { title: string; artist?: string; difficulty?: string }): Observable<Song> {
+  updateSong(id: number, song: { title: string; artist?: string }): Observable<Song> {
     const token = this.authService.getToken();
     return this.http.put<Song>(`${environment.apiUrl}/song/${id}`, song, {
       headers: {

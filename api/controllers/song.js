@@ -18,24 +18,24 @@ exports.getSongById = async (req, res) => {
 };
 
 exports.createSong = async (req, res) => {
-  const { title, artist, difficulty } = req.body;
+  const { title, artist } = req.body;
   console.log(`Creating new song: ${title}`);
   if (!title) {
     return res.status(400).json({ message: 'Song title is required' });
   }
-  const result = await dbconn.executeMysqlQuery(queries.CREATE_SONG, [title, artist || null, difficulty || null]);
+  const result = await dbconn.executeMysqlQuery(queries.CREATE_SONG, [title, artist || null]);
   const newSong = await dbconn.executeMysqlQuery(queries.GET_SONG_BY_ID, [result.insertId]);
   res.status(201).json(newSong[0]);
 };
 
 exports.updateSong = async (req, res) => {
   const songId = req.params.id;
-  const { title, artist, difficulty } = req.body;
+  const { title, artist } = req.body;
   console.log(`Updating song with id: ${songId}`);
   if (!title) {
     return res.status(400).json({ message: 'Song title is required' });
   }
-  await dbconn.executeMysqlQuery(queries.UPDATE_SONG, [title, artist || null, difficulty || null, songId]);
+  await dbconn.executeMysqlQuery(queries.UPDATE_SONG, [title, artist || null, songId]);
   const updatedSong = await dbconn.executeMysqlQuery(queries.GET_SONG_BY_ID, [songId]);
   if (!updatedSong || updatedSong.length < 1) {
     return res.status(404).json({ message: 'Song not found' });
