@@ -204,6 +204,12 @@ exports.updateMatch = async (req, res) => {
     return res.status(400).json({ message: 'Event ID and at least 2 player IDs are required' });
   }
   
+  // Verify the match exists before attempting any modifications
+  const existingMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
+  if (!existingMatch || existingMatch.length < 1) {
+    return res.status(404).json({ message: 'Match not found' });
+  }
+  
   // Update the match
   await dbconn.executeMysqlQuery(queries.UPDATE_MATCH, [
     event_id,
@@ -261,9 +267,6 @@ exports.updateMatch = async (req, res) => {
   }
   
   const updatedMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
-  if (!updatedMatch || updatedMatch.length < 1) {
-    return res.status(404).json({ message: 'Match not found' });
-  }
   const transformedMatch = await transformMatchResult(updatedMatch[0]);
   res.status(200).json(transformedMatch);
 };
