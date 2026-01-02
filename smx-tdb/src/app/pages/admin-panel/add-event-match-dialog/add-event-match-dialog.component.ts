@@ -12,6 +12,7 @@ import { LoadingService } from '../../../services/loading.service';
 import { Event } from '../../../models/event';
 import { Player } from '../../../models/player';
 import { Song } from '../../../models/song';
+import { Chart } from '../../../models/chart';
 
 @Component({
   selector: 'app-add-event-match-dialog',
@@ -27,6 +28,7 @@ export class AddEventMatchDialogComponent implements OnInit {
   isSubmitting = false;
   isEditMode = false;
   matchId?: number;
+  chartsBySongIndex: Map<number, Chart[]> = new Map();
 
   constructor(
     private fb: FormBuilder,
@@ -237,8 +239,13 @@ export class AddEventMatchDialogComponent implements OnInit {
             })
             .filter((entry: any) => entry !== null);
 
+          // Get chart_id from the form
+          const chartObj = songEntry.chart;
+          const chartId = chartObj && typeof chartObj === 'object' ? chartObj.id : (chartObj || null);
+
           return {
             song_id: songId,
+            chart_id: chartId,
             player_scores: playerScores
           };
         })
@@ -412,9 +419,36 @@ export class AddEventMatchDialogComponent implements OnInit {
               
               const songGroup = this.fb.group({
                 song: [songToUse],
+                chart: [''],
                 playerScores: playerScores
               });
               this.songsFormArray.push(songGroup);
+              
+              // Setup chart loading for this song
+              const songIndex = this.songsFormArray.length - 1;
+              this.setupSongChartLoading(songIndex);
+              
+              // Load charts and set chart if available
+              const songId = songToUse.song_id || songToUse.id;
+              if (songId) {
+                this.songService.getChartsBySong(songId).subscribe({
+                  next: (charts: Chart[]) => {
+                    this.chartsBySongIndex.set(songIndex, charts);
+                    // Try to find and set the chart if matchSong has chart_id
+                    if (matchSong.chart_id && charts.length > 0) {
+                      const chartObj = charts.find(c => c.id === matchSong.chart_id);
+                      if (chartObj) {
+                        const songGroupToUpdate = this.getSongFormGroup(songIndex);
+                        songGroupToUpdate.get('chart')?.setValue(chartObj, { emitEvent: false });
+                      }
+                    }
+                  },
+                  error: (error) => {
+                    console.error('Error loading charts:', error);
+                    this.chartsBySongIndex.set(songIndex, []);
+                  }
+                });
+              }
             }
           });
         } else {
@@ -469,9 +503,14 @@ export class AddEventMatchDialogComponent implements OnInit {
     }
     const songGroup = this.fb.group({
       song: [''],
+      chart: [''],
       playerScores: playerScores
     });
     this.songsFormArray.push(songGroup);
+
+    // Subscribe to song changes to load charts
+    const songIndex = this.songsFormArray.length - 1;
+    this.setupSongChartLoading(songIndex);
   }
 
   removeSong(index: number): void {
@@ -487,6 +526,43 @@ export class AddEventMatchDialogComponent implements OnInit {
 
   getPlayerScoresFormArray(songIndex: number): FormArray {
     return this.getSongFormGroup(songIndex).get('playerScores') as FormArray;
+  }
+
+  getChartsForSongIndex(songIndex: number): Chart[] {
+    return this.chartsBySongIndex.get(songIndex) || [];
+  }
+
+  private setupSongChartLoading(songIndex: number): void {
+    const songGroup = this.getSongFormGroup(songIndex);
+    const songControl = songGroup.get('song');
+    const chartControl = songGroup.get('chart');
+
+    if (!songControl || !chartControl) return;
+
+    songControl.valueChanges.subscribe((selectedSong: Song | string) => {
+      // Clear chart when song changes
+      chartControl.setValue('', { emitEvent: false });
+      
+      if (selectedSong && typeof selectedSong !== 'string') {
+        const songId = (selectedSong as any).id || selectedSong.song_id;
+        if (songId) {
+          // Load charts for this song
+          this.songService.getChartsBySong(songId).subscribe({
+            next: (charts: Chart[]) => {
+              this.chartsBySongIndex.set(songIndex, charts);
+            },
+            error: (error) => {
+              console.error('Error loading charts:', error);
+              this.chartsBySongIndex.set(songIndex, []);
+            }
+          });
+        } else {
+          this.chartsBySongIndex.set(songIndex, []);
+        }
+      } else {
+        this.chartsBySongIndex.set(songIndex, []);
+      }
+    });
   }
 
   comparePlayers(player1: Player | null, player2: Player | null): boolean {

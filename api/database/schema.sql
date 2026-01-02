@@ -75,12 +75,13 @@ CREATE TABLE IF NOT EXISTS `match` (
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Table 8: match_x_player_x_song (references match, player, song, user)
+-- Table 8: match_x_player_x_song (references match, player, song, song_x_chart, user)
 CREATE TABLE IF NOT EXISTS `match_x_player_x_song` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `match_id` INT,
     `player_id` INT,
     `song_id` INT,
+    `chart_id` INT,
     `score` INT,
     `win` BOOLEAN DEFAULT FALSE,
     `created_by` INT,
@@ -88,6 +89,7 @@ CREATE TABLE IF NOT EXISTS `match_x_player_x_song` (
     FOREIGN KEY (`match_id`) REFERENCES `match`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`player_id`) REFERENCES `player`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (`song_id`) REFERENCES `song`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (`chart_id`) REFERENCES `song_x_chart`(`id`) ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

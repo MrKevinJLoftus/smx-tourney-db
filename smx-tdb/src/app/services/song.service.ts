@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Song } from '../models/song';
+import { Chart } from '../models/chart';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -48,6 +49,10 @@ export class SongService {
         'Authorization': `Bearer ${token}`
       }
     });
+  }
+
+  getChartsBySong(songId: number): Observable<Chart[]> {
+    return this.http.get<Chart[]>(`${environment.apiUrl}/song/${songId}/charts`);
   }
 }
 

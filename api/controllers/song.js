@@ -54,3 +54,10 @@ exports.deleteSong = async (req, res) => {
   res.status(200).json({ message: 'Song deleted successfully' });
 };
 
+exports.getChartsBySong = async (req, res) => {
+  const songId = req.params.id;
+  console.log(`Fetching charts for song id: ${songId}`);
+  const charts = await dbconn.executeMysqlQuery(queries.GET_CHARTS_BY_SONG, [songId]);
+  res.status(200).json(charts);
+};
+

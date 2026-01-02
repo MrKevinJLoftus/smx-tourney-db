@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/", asyncWrapper(songController.getAllSongs));
+router.get("/:id/charts", asyncWrapper(songController.getChartsBySong));
 router.get("/:id", asyncWrapper(songController.getSongById));
 
 // Admin-only routes

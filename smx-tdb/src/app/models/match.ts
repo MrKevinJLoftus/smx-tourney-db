@@ -17,6 +17,10 @@ export interface MatchSong {
   song_id: number;
   title?: string;
   artist?: string;
+  chart_id?: number;
+  chart_mode?: string;
+  chart_difficulty?: number;
+  chart_display?: string;
   player_scores: PlayerScore[];
 }
 

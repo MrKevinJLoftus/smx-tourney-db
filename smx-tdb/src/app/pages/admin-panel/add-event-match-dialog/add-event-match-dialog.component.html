@@ -68,6 +68,15 @@
                   </mat-option>
                 </mat-select>
               </mat-form-field>
+              <mat-form-field appearance="fill" class="chart-field">
+                <mat-label>Chart {{ i + 1 }}</mat-label>
+                <mat-select formControlName="chart" [disabled]="!getSongFormGroup(i).get('song')?.value">
+                  <mat-option [value]="">None</mat-option>
+                  <mat-option *ngFor="let chart of getChartsForSongIndex(i)" [value]="chart">
+                    {{ chart.display_name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
               <div formArrayName="playerScores" class="scores-container">
                 <div *ngFor="let scoreControl of getPlayerScoresFormArray(i).controls; let j = index" class="score-field-wrapper">
                   <mat-form-field appearance="fill" class="score-field">

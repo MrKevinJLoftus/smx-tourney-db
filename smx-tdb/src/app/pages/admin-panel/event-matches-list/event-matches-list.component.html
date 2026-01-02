@@ -74,7 +74,7 @@
                       @for (song of match.songs; track song.song_id) {
                         <div class="song-item">
                           <span class="song">
-                            {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}
+                            {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}{{ song.chart_display ? ' (' + song.chart_display + ')' : '' }}
                           </span>
                           @if (song.player_scores && song.player_scores.length > 0) {
                             <span class="song-scores">

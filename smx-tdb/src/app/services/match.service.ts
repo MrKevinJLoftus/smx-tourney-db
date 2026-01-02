@@ -28,6 +28,7 @@ export class MatchService {
     player_ids: number[];
     songs?: Array<{
       song_id: number;
+      chart_id?: number;
       player_scores: Array<{
         player_id: number;
         score?: number;
@@ -49,6 +50,7 @@ export class MatchService {
     player_ids: number[];
     songs?: Array<{
       song_id: number;
+      chart_id?: number;
       player_scores: Array<{
         player_id: number;
         score?: number;

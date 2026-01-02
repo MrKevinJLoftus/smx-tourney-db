@@ -52,6 +52,10 @@ const transformMatchResult = async (match) => {
     if (!songsMap.has(entry.song_id)) {
       songsMap.set(entry.song_id, {
         song_id: entry.song_id,
+        chart_id: entry.chart_id,
+        chart_mode: entry.chart_mode,
+        chart_difficulty: entry.chart_difficulty,
+        chart_display: entry.chart_mode && entry.chart_difficulty ? `${entry.chart_mode} ${entry.chart_difficulty}` : null,
         title: entry.song_title,
         artist: entry.song_artist,
         player_scores: []
@@ -156,6 +160,7 @@ exports.createMatch = async (req, res) => {
               matchId,
               playerScore.player_id,
               songData.song_id ? Number(songData.song_id) : null,
+              songData.chart_id ? Number(songData.chart_id) : null,
               playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
               isSongWin ? 1 : 0,
               createdBy
@@ -172,6 +177,7 @@ exports.createMatch = async (req, res) => {
         matchId,
         playerId,
         null, // no song
+        null, // no chart
         null, // no score
         winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
         createdBy
@@ -219,6 +225,7 @@ exports.updateMatch = async (req, res) => {
               matchId,
               playerScore.player_id,
               songData.song_id ? Number(songData.song_id) : null,
+              songData.chart_id ? Number(songData.chart_id) : null,
               playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
               isSongWin ? 1 : 0,
               createdBy
@@ -235,6 +242,7 @@ exports.updateMatch = async (req, res) => {
         matchId,
         playerId,
         null, // no song
+        null, // no chart
         null, // no score
         winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
         createdBy
