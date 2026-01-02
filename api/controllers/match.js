@@ -173,7 +173,7 @@ exports.createMatch = async (req, res) => {
         playerId,
         null, // no song
         null, // no score
-        winner_id && winner_id === playerId ? 1 : 0,
+        winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
         createdBy
       ]);
     }
@@ -236,7 +236,7 @@ exports.updateMatch = async (req, res) => {
         playerId,
         null, // no song
         null, // no score
-        winner_id && winner_id === playerId ? 1 : 0,
+        winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
         createdBy
       ]);
     }
