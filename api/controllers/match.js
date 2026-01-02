@@ -130,8 +130,35 @@ exports.getMatchById = async (req, res) => {
 exports.createMatch = async (req, res) => {
   const { event_id, player_ids, songs, winner_id } = req.body;
   console.log(`Creating new match for event: ${event_id}`);
-  if (!event_id || !player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
-    return res.status(400).json({ message: 'Event ID and at least 2 player IDs are required' });
+  
+  if (!event_id) {
+    return res.status(400).json({ message: 'Event ID is required' });
+  }
+  
+  // Validate players based on whether songs are provided
+  let uniquePlayerIds = new Set();
+  if (songs && Array.isArray(songs) && songs.length > 0) {
+    // Extract unique player IDs from song player_scores
+    for (const songData of songs) {
+      if (songData && songData.player_scores && Array.isArray(songData.player_scores)) {
+        for (const playerScore of songData.player_scores) {
+          if (playerScore && playerScore.player_id) {
+            uniquePlayerIds.add(Number(playerScore.player_id));
+          }
+        }
+      }
+    }
+    
+    if (uniquePlayerIds.size < 2) {
+      return res.status(400).json({ message: 'At least 2 unique players are required in song player_scores' });
+    }
+  } else {
+    // When no songs, validate player_ids
+    if (!player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+      return res.status(400).json({ message: 'At least 2 player IDs are required when no songs are provided' });
+    }
+    // Store player_ids for later use
+    player_ids.forEach(id => uniquePlayerIds.add(Number(id)));
   }
   
   const createdBy = req.userData?.userId || null;
@@ -177,7 +204,9 @@ exports.createMatch = async (req, res) => {
   // create entries for each player using player_ids (without song_id)
   if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
-    for (const playerId of player_ids) {
+    // Use the validated player_ids array
+    const playerIdsArray = player_ids || Array.from(uniquePlayerIds);
+    for (const playerId of playerIdsArray) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
         matchId,
         playerId,
@@ -200,14 +229,41 @@ exports.updateMatch = async (req, res) => {
   const matchId = req.params.id;
   const { event_id, player_ids, songs, winner_id } = req.body;
   console.log(`Updating match with id: ${matchId}`);
-  if (!event_id || !player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
-    return res.status(400).json({ message: 'Event ID and at least 2 player IDs are required' });
+  
+  if (!event_id) {
+    return res.status(400).json({ message: 'Event ID is required' });
   }
   
   // Verify the match exists before attempting any modifications
   const existingMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
   if (!existingMatch || existingMatch.length < 1) {
     return res.status(404).json({ message: 'Match not found' });
+  }
+  
+  // Validate players based on whether songs are provided
+  let uniquePlayerIds = new Set();
+  if (songs && Array.isArray(songs) && songs.length > 0) {
+    // Extract unique player IDs from song player_scores
+    for (const songData of songs) {
+      if (songData && songData.player_scores && Array.isArray(songData.player_scores)) {
+        for (const playerScore of songData.player_scores) {
+          if (playerScore && playerScore.player_id) {
+            uniquePlayerIds.add(Number(playerScore.player_id));
+          }
+        }
+      }
+    }
+    
+    if (uniquePlayerIds.size < 2) {
+      return res.status(400).json({ message: 'At least 2 unique players are required in song player_scores' });
+    }
+  } else {
+    // When no songs, validate player_ids
+    if (!player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+      return res.status(400).json({ message: 'At least 2 player IDs are required when no songs are provided' });
+    }
+    // Store player_ids for later use
+    player_ids.forEach(id => uniquePlayerIds.add(Number(id)));
   }
   
   // Update the match
@@ -253,7 +309,9 @@ exports.updateMatch = async (req, res) => {
   // create entries for each player using player_ids (without song_id)
   if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
-    for (const playerId of player_ids) {
+    // Use the validated player_ids array
+    const playerIdsArray = player_ids || Array.from(uniquePlayerIds);
+    for (const playerId of playerIdsArray) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
         matchId,
         playerId,
