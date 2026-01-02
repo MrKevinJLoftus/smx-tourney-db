@@ -21,11 +21,11 @@ const determineSongWinner = (playerScores) => {
     return new Set();
   }
 
-  // Find the maximum score
-  const maxScore = Math.max(...validScores.map(ps => ps.score));
+  // Find the maximum score (convert to numbers for comparison)
+  const maxScore = Math.max(...validScores.map(ps => Number(ps.score)));
 
-  // Find all players with the maximum score
-  const winners = validScores.filter(ps => ps.score === maxScore);
+  // Find all players with the maximum score (compare as numbers)
+  const winners = validScores.filter(ps => Number(ps.score) === maxScore);
 
   // If only one player has the max score, they win; otherwise it's a tie
   return winners.length === 1 ? new Set([winners[0].player_id]) : new Set();
