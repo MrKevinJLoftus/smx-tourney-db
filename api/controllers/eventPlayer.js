@@ -26,7 +26,11 @@ exports.updateEventPlayer = async (req, res) => {
   if (!eventPlayer || eventPlayer.length < 1) {
     return res.status(404).json({ message: 'Event player not found' });
   }
-  await dbconn.executeMysqlQuery(queries.UPDATE_EVENT_PLAYER, [seed || null, place || null, eventPlayerId]);
+  await dbconn.executeMysqlQuery(queries.UPDATE_EVENT_PLAYER, [
+    seed !== undefined ? seed : eventPlayer[0].seed,
+    place !== undefined ? place : eventPlayer[0].placement,
+    eventPlayerId
+  ]);
   const updatedEventPlayer = await dbconn.executeMysqlQuery(queries.GET_EVENT_PLAYER_BY_ID, [eventPlayerId]);
   res.status(200).json(updatedEventPlayer[0]);
 };
