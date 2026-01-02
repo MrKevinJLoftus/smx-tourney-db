@@ -146,6 +146,7 @@ exports.createMatch = async (req, res) => {
   const matchId = result.insertId;
   
   // Insert player-song-score combinations into match_x_player_x_song table
+  let validSongsInserted = false;
   if (songs && Array.isArray(songs) && songs.length > 0) {
     for (const songData of songs) {
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
@@ -165,12 +166,16 @@ exports.createMatch = async (req, res) => {
               isSongWin ? 1 : 0,
               createdBy
             ]);
+            validSongsInserted = true;
           }
         }
       }
     }
-  } else {
-    // If no songs provided, still create entries for each player (without song_id)
+  }
+  
+  // If no valid songs were inserted (songs array was empty, missing, or all entries invalid),
+  // create entries for each player using player_ids (without song_id)
+  if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
     for (const playerId of player_ids) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
@@ -211,6 +216,7 @@ exports.updateMatch = async (req, res) => {
   const createdBy = req.userData?.userId || null;
   
   // Insert player-song-score combinations into match_x_player_x_song table
+  let validSongsInserted = false;
   if (songs && Array.isArray(songs) && songs.length > 0) {
     for (const songData of songs) {
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
@@ -230,12 +236,16 @@ exports.updateMatch = async (req, res) => {
               isSongWin ? 1 : 0,
               createdBy
             ]);
+            validSongsInserted = true;
           }
         }
       }
     }
-  } else {
-    // If no songs provided, still create entries for each player (without song_id)
+  }
+  
+  // If no valid songs were inserted (songs array was empty, missing, or all entries invalid),
+  // create entries for each player using player_ids (without song_id)
+  if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
     for (const playerId of player_ids) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
