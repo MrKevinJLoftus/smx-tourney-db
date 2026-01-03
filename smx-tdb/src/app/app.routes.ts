@@ -1,12 +1,15 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
-import { SignupRequestComponent } from './pages/signup-request/signup-request.component';
+import { UpdatePasswordComponent } from './pages/update-password/update-password.component';
+import { SuperAdminPanelComponent } from './pages/super-admin-panel/super-admin-panel.component';
+import { AuthGuard } from './shared/auth/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
-  { path: 'admin-panel', component: AdminPanelComponent, data: { title: 'Administration Panel' }},
-  { path: 'signup', component: SignupRequestComponent, data: { title: 'Register As TO' } },
+  { path: 'admin-panel', component: AdminPanelComponent, canActivate: [AuthGuard], data: { title: 'Admin Panel' }},
+  { path: 'super-admin-panel', component: SuperAdminPanelComponent, data: { title: 'Super Admin Panel' }},
+  { path: 'update-password', component: UpdatePasswordComponent, canActivate: [AuthGuard], data: { title: 'Update Password' } },
   { path: 'login', loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule), data: { title: 'Login' } },
   { path: '**', redirectTo: '/' }
 ];

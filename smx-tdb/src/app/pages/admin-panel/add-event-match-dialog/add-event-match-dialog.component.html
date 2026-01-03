@@ -1,0 +1,127 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Update Match In Event' : 'Add Match To Event' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="matchForm" (ngSubmit)="onSubmit()">
+    <div class="form-fields">
+      <mat-form-field appearance="fill">
+        <mat-label>Event</mat-label>
+        <mat-select id="event" formControlName="event">
+          <mat-option *ngFor="let event of (events$ | async)" [value]="event">
+            {{ event.name }} ({{ event.date | date:'shortDate' }})
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="matchForm.get('event')?.hasError('required')">
+          Event is required
+        </mat-error>
+      </mat-form-field>
+
+      <div class="players-section">
+        <div class="players-header">
+          <label class="players-label">Players</label>
+          <button type="button" mat-icon-button color="primary" (click)="addPlayer()" matTooltip="Add Player">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <div formArrayName="players" class="players-list">
+          <div *ngFor="let playerGroup of playersFormArray.controls; let i = index" [formGroupName]="i" class="player-entry">
+            <div class="player-entry-content">
+              <mat-form-field appearance="fill" class="player-field">
+                <mat-label>Player {{ i + 1 }}</mat-label>
+                <mat-select formControlName="player" [compareWith]="comparePlayers">
+                  <mat-option [value]="">None</mat-option>
+                  <mat-option *ngFor="let player of (players$ | async)" [value]="player">
+                    {{ player.username }}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="playerGroup.get('player')?.hasError('required')">
+                  Player {{ i + 1 }} is required
+                </mat-error>
+              </mat-form-field>
+              <button type="button" mat-icon-button color="warn" (click)="removePlayer(i)" 
+                      [disabled]="playersFormArray.length <= 2" 
+                      matTooltip="Remove Player">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <mat-error *ngIf="matchForm.get('players')?.hasError('minPlayers')">
+          At least 2 players are required
+        </mat-error>
+      </div>
+
+      <div class="songs-section">
+        <div class="songs-header">
+          <label class="songs-label">Songs (Optional)</label>
+          <button type="button" mat-icon-button color="primary" (click)="addSong()" matTooltip="Add Song">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <div formArrayName="songs" class="songs-list">
+          <div *ngFor="let songGroup of songsFormArray.controls; let i = index" [formGroupName]="i" class="song-entry">
+            <div class="song-entry-content">
+              <mat-form-field appearance="fill" class="song-field">
+                <mat-label>Song {{ i + 1 }}</mat-label>
+                <mat-select formControlName="song" [compareWith]="compareSongs">
+                  <mat-option [value]="">None</mat-option>
+                  <mat-option *ngFor="let song of (songs$ | async)" [value]="song">
+                    {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="fill" class="chart-field">
+                <mat-label>Chart {{ i + 1 }}</mat-label>
+                <mat-select formControlName="chart" [disabled]="!getSongFormGroup(i).get('song')?.value">
+                  <mat-option [value]="">None</mat-option>
+                  <mat-option *ngFor="let chart of getChartsForSongIndex(i)" [value]="chart">
+                    {{ chart.display_name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div formArrayName="playerScores" class="scores-container">
+                <div *ngFor="let scoreControl of getPlayerScoresFormArray(i).controls; let j = index" class="score-field-wrapper">
+                  <mat-form-field appearance="fill" class="score-field">
+                    <mat-label>{{ playersFormArray.at(j).get('player')?.value?.username || 'Player ' + (j + 1) }} Score</mat-label>
+                    <input matInput type="number" min="0" max="100000" [formControlName]="j" />
+                    <mat-error *ngIf="getPlayerScoresFormArray(i).at(j).hasError('min')">
+                      Score must be at least 0
+                    </mat-error>
+                    <mat-error *ngIf="getPlayerScoresFormArray(i).at(j).hasError('max')">
+                      Score cannot exceed 100,000
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+              </div>
+              <button type="button" mat-icon-button color="warn" (click)="removeSong(i)" 
+                      [disabled]="songsFormArray.length === 1" 
+                      matTooltip="Remove Song">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Round</mat-label>
+        <input matInput id="round" formControlName="round" type="text" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Winner (Optional)</mat-label>
+        <mat-select id="winner" formControlName="winner">
+          <mat-option [value]="">None</mat-option>
+          <mat-option *ngFor="let player of getWinnerOptions()" [value]="player">
+            {{ player.username }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="matchForm.invalid || isSubmitting">
+    {{ isSubmitting ? 'Submitting...' : (isEditMode ? 'Update Match' : 'Create Match') }}
+  </button>
+</mat-dialog-actions>
+

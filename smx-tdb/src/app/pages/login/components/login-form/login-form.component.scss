@@ -8,3 +8,23 @@ mat-card {
   justify-content: center;
   align-items: center;
 }
+
+.login-button {
+  min-width: 120px;
+}
+
+.button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button-spinner {
+  display: inline-block;
+  ::ng-deep svg {
+    circle {
+      stroke: currentColor;
+    }
+  }
+}

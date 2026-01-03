@@ -17,6 +17,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule } from '@angular/material/dialog';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 
 const MODULES = [
@@ -37,7 +41,11 @@ const MODULES = [
   MatListModule,
   MatProgressSpinnerModule,
   MatChipsModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatDatepickerModule,
+  MatNativeDateModule,
+  MatTabsModule,
+  MatDialogModule
 ];
 
 const COMPONENTS = [

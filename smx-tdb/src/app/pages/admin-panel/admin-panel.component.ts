@@ -1,16 +1,22 @@
 import { Component } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
+import { CreateNewEventFormComponent } from './create-new-event-form/create-new-event-form.component';
+import { SharedModule } from '../../shared/shared.module';
+import { EventUsersListComponent } from './event-users-list/event-users-list.component';
+import { EventMatchesListComponent } from './event-matches-list/event-matches-list.component';
+import { FormWrapperComponent } from './form-wrapper/form-wrapper.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [MatButtonModule],
+  imports: [SharedModule, CreateNewEventFormComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })
 export class AdminPanelComponent {
+  isCreateNewEventFormVisible = false;
 
   createNewEvent(): void {
     // Logic to create a new event
+    this.isCreateNewEventFormVisible = true;
     console.log('Create New Event clicked');
   }
 

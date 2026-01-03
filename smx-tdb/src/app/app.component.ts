@@ -35,10 +35,10 @@ export class AppComponent {
   isAuthenticated = false;
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
-    { url: "/login", text: "Login", icon: "login" },
-    { url: "/signup", text: "Request New User", icon: "settings" }];
+    { url: "/login", text: "Login", icon: "login" }];
   protectedRoutes: Route[] = [
-    { url: '/adminPanel', text: 'Admin', icon: 'admin_panel_settings' }
+    { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' },
+    { url: "/update-password", text: "Update Password", icon: "lock" }
   ];
   accessibleRoutes: Route[] = this.routes;
   constructor(

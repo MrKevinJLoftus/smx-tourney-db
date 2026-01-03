@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { AuthData } from '../models/general';
 import { MessageService } from '../services/message.service';
 import { environment } from '../../environments/environment';
@@ -46,46 +48,67 @@ export class AuthService {
   /**
    * Attempt to log the user in.
    * Will always redirect user to home page.
+   * Returns an Observable that can be subscribed to for loading state management.
    */
-  login(authData: AuthData) {
-    this.http.post<{token: string, expiresIn: number, username: string, userId: string, isAdmin: boolean}>(
+  login(authData: AuthData): Observable<{token: string, expiresIn: number, userId: string, isAdmin: boolean}> {
+    return this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
       `${environment.apiUrl}/user/login`, authData)
-      .subscribe(response => {
-        if (response.token) {
-          const token = response.token;
-          this.token = token;
-          const expiresInDuration = response.expiresIn;
-          this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
-          this.messageService.show('Login successful.');
-        } else {
+      .pipe(
+        tap((response) => {
+          if (response.token) {
+            const token = response.token;
+            this.token = token;
+            const expiresInDuration = response.expiresIn;
+            this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin || false);
+            this.messageService.show('Login successful.');
+          } else {
+            this.logout(false);
+            this.messageService.show('Your email or password was incorrect. Please try again.');
+          }
+        }),
+        catchError((error) => {
+          console.error(error);
+          this.messageService.show('Your email or password was incorrect. Please try again.');
           this.logout(false);
-          this.messageService.show('Your username or password was incorrect. Please try again.');
-        }
-    }, error => {
-      console.error(error);
-      this.messageService.show('Your username or password was incorrect. Please try again.');
-      this.logout(false);
-    });
+          return throwError(() => error);
+        })
+      );
   }
 
   /**
-   * Hard-coded to always point to localhost, endpoint is not active on prod API.
-   * This may be useful in the future if external users need to be able to register.
+   * Create a new user. If skipAutoLogin is true, the user will not be automatically logged in.
+   * This is useful for super admins creating other users.
    */
-  createUser(username: string, password: string) {
-    const authData: AuthData = {username, password};
-    this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>('http://localhost:3000/api/user/signUp', authData)
+  createUser(email: string, password: string, skipAutoLogin: boolean = false) {
+    const authData: AuthData = {email, password};
+    return this.http.post<{token: string, expiresIn: number, userId: string, isAdmin: boolean}>(
+      `${environment.apiUrl}/user/signUp`, authData)
       .subscribe({ next: (response) => {
-        const token = response.token;
-        this.token = token;
-        if (token) {
-          const expiresInDuration = response.expiresIn;
-          this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
+        if (skipAutoLogin) {
+          this.messageService.show('User created successfully!');
+        } else {
+          const token = response.token;
+          this.token = token;
+          if (token) {
+            const expiresInDuration = response.expiresIn;
+            this.loginSetup(expiresInDuration, response.userId, token, response.isAdmin);
+          }
         }
     }, error: (e) => {
       console.error(e);
       this.messageService.show('Something went wrong.');
     }});
+  }
+
+  /**
+   * Update the current user's password.
+   * Requires authentication.
+   */
+  updatePassword(currentPassword: string, newPassword: string) {
+    return this.http.post<{message: string}>(
+      `${environment.apiUrl}/user/updatePassword`,
+      { currentPassword, newPassword }
+    );
   }
 
   autoAuthUser() {
