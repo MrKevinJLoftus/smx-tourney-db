@@ -23,12 +23,14 @@ exports.createEvent = async (req, res) => {
   if (!name || !date) {
     return res.status(400).json({ message: 'Event name and date are required' });
   }
+  const createdBy = req.userData?.userId || null;
   const result = await dbconn.executeMysqlQuery(queries.CREATE_EVENT, [
     name, 
     date, 
     description || null, 
     location || null, 
-    organizers || null
+    organizers || null,
+    createdBy
   ]);
   const newEvent = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [result.insertId]);
   res.status(201).json(newEvent[0]);

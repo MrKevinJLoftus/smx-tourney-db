@@ -13,7 +13,8 @@ exports.addPlayerToEvent = async (req, res) => {
   if (existing && existing.length > 0) {
     return res.status(409).json({ message: 'Player is already in this event', eventPlayer: existing[0] });
   }
-  const result = await dbconn.executeMysqlQuery(queries.ADD_PLAYER_TO_EVENT, [event_id, player_id, seed || null, place || null]);
+  const createdBy = req.userData?.userId || null;
+  const result = await dbconn.executeMysqlQuery(queries.ADD_PLAYER_TO_EVENT, [event_id, player_id, seed || null, place || null, createdBy]);
   const newEventPlayer = await dbconn.executeMysqlQuery(queries.GET_EVENT_PLAYER_BY_ID, [result.insertId]);
   res.status(201).json(newEventPlayer[0]);
 };
