@@ -138,9 +138,9 @@ exports.createMatch = async (req, res) => {
   // Validate players based on whether songs are provided
   let uniquePlayerIds = new Set();
   if (songs && Array.isArray(songs) && songs.length > 0) {
-    // Extract unique player IDs from song player_scores
+    // Extract unique player IDs from song player_scores (only from songs with song_id, matching insertion logic)
     for (const songData of songs) {
-      if (songData && songData.player_scores && Array.isArray(songData.player_scores)) {
+      if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
         for (const playerScore of songData.player_scores) {
           if (playerScore && playerScore.player_id) {
             uniquePlayerIds.add(Number(playerScore.player_id));
@@ -204,8 +204,8 @@ exports.createMatch = async (req, res) => {
   // create entries for each player using player_ids (without song_id)
   if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
-    // Use the validated player_ids array
-    const playerIdsArray = player_ids || Array.from(uniquePlayerIds);
+    // Use the validated player_ids array from uniquePlayerIds (which contains validated IDs from either songs or player_ids)
+    const playerIdsArray = Array.from(uniquePlayerIds);
     for (const playerId of playerIdsArray) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
         matchId,
@@ -243,9 +243,9 @@ exports.updateMatch = async (req, res) => {
   // Validate players based on whether songs are provided
   let uniquePlayerIds = new Set();
   if (songs && Array.isArray(songs) && songs.length > 0) {
-    // Extract unique player IDs from song player_scores
+    // Extract unique player IDs from song player_scores (only from songs with song_id, matching insertion logic)
     for (const songData of songs) {
-      if (songData && songData.player_scores && Array.isArray(songData.player_scores)) {
+      if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
         for (const playerScore of songData.player_scores) {
           if (playerScore && playerScore.player_id) {
             uniquePlayerIds.add(Number(playerScore.player_id));
@@ -309,8 +309,8 @@ exports.updateMatch = async (req, res) => {
   // create entries for each player using player_ids (without song_id)
   if (!validSongsInserted) {
     // Use match winner_id for win flag when there are no songs
-    // Use the validated player_ids array
-    const playerIdsArray = player_ids || Array.from(uniquePlayerIds);
+    // Use the validated player_ids array from uniquePlayerIds (which contains validated IDs from either songs or player_ids)
+    const playerIdsArray = Array.from(uniquePlayerIds);
     for (const playerId of playerIdsArray) {
       await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_SONG, [
         matchId,
