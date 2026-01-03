@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Player } from '../models/player';
 import { environment } from '../../environments/environment';
@@ -25,6 +25,14 @@ export class PlayerService {
 
   getPlayerByUsername(username: string): Observable<Player> {
     return this.http.get<Player>(`${environment.apiUrl}/player/gamertag/${encodeURIComponent(username)}`);
+  }
+
+  searchPlayers(query: string): Observable<Player[]> {
+    let params = new HttpParams();
+    if (query.trim()) {
+      params = params.set('q', query.trim());
+    }
+    return this.http.get<Player[]>(`${environment.apiUrl}/player/search`, { params });
   }
 
   createPlayer(player: { username: string; pronouns?: string; user_id?: number }): Observable<Player> {

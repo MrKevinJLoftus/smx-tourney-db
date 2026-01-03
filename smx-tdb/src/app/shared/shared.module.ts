@@ -21,6 +21,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 
 const MODULES = [
@@ -45,7 +46,8 @@ const MODULES = [
   MatDatepickerModule,
   MatNativeDateModule,
   MatTabsModule,
-  MatDialogModule
+  MatDialogModule,
+  MatAutocompleteModule
 ];
 
 const COMPONENTS = [

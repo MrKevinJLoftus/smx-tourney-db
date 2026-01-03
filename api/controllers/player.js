@@ -27,6 +27,20 @@ exports.getPlayerByGamertag = async (req, res) => {
   res.status(200).json(players[0]);
 };
 
+exports.searchPlayers = async (req, res) => {
+  const query = req.query.q || req.query.query || '';
+  console.log(`Searching players with query: ${query}`);
+  if (!query || query.trim().length === 0) {
+    // If no query, return all players (limited)
+    const players = await dbconn.executeMysqlQuery(queries.GET_ALL_PLAYERS, []);
+    res.status(200).json(players.slice(0, 50)); // Limit to 50 for performance
+    return;
+  }
+  const searchTerm = `%${query.trim()}%`;
+  const players = await dbconn.executeMysqlQuery(queries.SEARCH_PLAYERS, [searchTerm]);
+  res.status(200).json(players);
+};
+
 exports.createPlayer = async (req, res) => {
   const { gamertag, pronouns, user_id } = req.body;
   console.log(`Creating new player: ${gamertag}`);
