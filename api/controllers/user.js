@@ -5,6 +5,9 @@ const queries = require('../queries/user');
 const authError = new Error('Your email or password is incorrect.');
 
 exports.userLogin = async (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).json({message: 'Email and password are required.'});
+  }
   console.log(`${req.body.email} logging in`);
   const fetchedUser = await dbconn.executeMysqlQuery(queries.FIND_USER_BY_EMAIL, [req.body.email]);
   if (!fetchedUser || fetchedUser.length < 1) {
@@ -38,6 +41,9 @@ exports.userLogin = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   // create a new user and store it in the database
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).json({message: 'Email and password are required.'});
+  }
   const username = req.body.email;
   console.log(`creating new user ${username}`);
   
