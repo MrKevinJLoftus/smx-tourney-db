@@ -154,11 +154,15 @@ exports.createMatch = async (req, res) => {
     }
   } else {
     // When no songs, validate player_ids
-    if (!player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+    if (!player_ids || !Array.isArray(player_ids)) {
       return res.status(400).json({ message: 'At least 2 player IDs are required when no songs are provided' });
     }
-    // Store player_ids for later use
+    // Store player_ids for later use (deduplicate via Set)
     player_ids.forEach(id => uniquePlayerIds.add(Number(id)));
+    // Validate after deduplication to ensure at least 2 unique players
+    if (uniquePlayerIds.size < 2) {
+      return res.status(400).json({ message: 'At least 2 unique player IDs are required when no songs are provided' });
+    }
   }
   
   const createdBy = req.userData?.userId || null;
@@ -259,11 +263,15 @@ exports.updateMatch = async (req, res) => {
     }
   } else {
     // When no songs, validate player_ids
-    if (!player_ids || !Array.isArray(player_ids) || player_ids.length < 2) {
+    if (!player_ids || !Array.isArray(player_ids)) {
       return res.status(400).json({ message: 'At least 2 player IDs are required when no songs are provided' });
     }
-    // Store player_ids for later use
+    // Store player_ids for later use (deduplicate via Set)
     player_ids.forEach(id => uniquePlayerIds.add(Number(id)));
+    // Validate after deduplication to ensure at least 2 unique players
+    if (uniquePlayerIds.size < 2) {
+      return res.status(400).json({ message: 'At least 2 unique player IDs are required when no songs are provided' });
+    }
   }
   
   // Update the match
