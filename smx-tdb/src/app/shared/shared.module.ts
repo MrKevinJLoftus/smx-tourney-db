@@ -22,6 +22,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 
 const MODULES = [
@@ -47,7 +48,8 @@ const MODULES = [
   MatNativeDateModule,
   MatTabsModule,
   MatDialogModule,
-  MatAutocompleteModule
+  MatAutocompleteModule,
+  MatExpansionModule
 ];
 
 const COMPONENTS = [

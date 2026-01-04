@@ -69,32 +69,38 @@
                     </div>
                   }
                   @if (match.songs && match.songs.length > 0) {
-                    <div class="songs">
-                      <span class="songs-label">Songs: </span>
-                      @for (song of match.songs; track song.song_id) {
-                        <div class="song-item">
-                          <span class="song">
-                            {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}{{ song.chart_display ? ' (' + song.chart_display + ')' : '' }}
-                          </span>
-                          @if (song.player_scores && song.player_scores.length > 0) {
-                            <span class="song-scores">
-                              (
-                              @for (playerScore of song.player_scores; track playerScore.player_id; let i = $index) {
-                                @if (playerScore.win) {
-                                  <strong>{{ playerScore.player_gamertag }}: {{ playerScore.score }}</strong>
-                                } @else {
-                                  {{ playerScore.player_gamertag }}: {{ playerScore.score }}
-                                }
-                                @if (i < song.player_scores.length - 1) {
-                                  <span>, </span>
-                                }
-                              }
-                              )
+                    <mat-expansion-panel class="songs-expansion-panel">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <span class="songs-label">Songs ({{ match.songs.length }})</span>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <div class="songs">
+                        @for (song of match.songs; track song.song_id) {
+                          <div class="song-item">
+                            <span class="song">
+                              {{ song.title }}{{ song.artist ? ' - ' + song.artist : '' }}{{ song.chart_display ? ' (' + song.chart_display + ')' : '' }}
                             </span>
-                          }
-                        </div>
-                      }
-                    </div>
+                            @if (song.player_scores && song.player_scores.length > 0) {
+                              <span class="song-scores">
+                                (
+                                @for (playerScore of song.player_scores; track playerScore.player_id; let i = $index) {
+                                  @if (playerScore.win) {
+                                    <strong>{{ playerScore.player_gamertag }}: {{ playerScore.score }}</strong>
+                                  } @else {
+                                    {{ playerScore.player_gamertag }}: {{ playerScore.score }}
+                                  }
+                                  @if (i < song.player_scores.length - 1) {
+                                    <span>, </span>
+                                  }
+                                }
+                                )
+                              </span>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </mat-expansion-panel>
                   }
                 </div>
               </div>

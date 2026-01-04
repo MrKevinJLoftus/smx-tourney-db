@@ -166,8 +166,19 @@ mat-list {
   min-width: 0;
 }
 
-.songs {
+.songs-expansion-panel {
   margin-top: 8px;
+  
+  ::ng-deep .mat-expansion-panel-header {
+    padding: 8px 16px;
+  }
+  
+  ::ng-deep .mat-expansion-panel-body {
+    padding: 0 16px 8px;
+  }
+}
+
+.songs {
   display: flex;
   flex-direction: column;
   gap: 4px;

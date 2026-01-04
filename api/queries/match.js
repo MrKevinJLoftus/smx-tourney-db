@@ -16,18 +16,18 @@ module.exports = {
     LEFT JOIN song s ON mps.song_id = s.id
     WHERE mps.match_id = ?
     ORDER BY mps.song_id ASC`,
-  GET_PLAYER_SONG_SCORES: `SELECT mps.player_id, mps.song_id, mps.chart_id, mps.score, mps.win, p.username as player_gamertag, s.title as song_title, s.artist as song_artist, 
+  GET_PLAYER_SONG_SCORES: `SELECT mps.player_id, mps.song_id, mps.song_order, mps.chart_id, mps.score, mps.win, p.username as player_gamertag, s.title as song_title, s.artist as song_artist, 
     sc.mode as chart_mode, sc.difficulty as chart_difficulty
     FROM match_x_player_x_song mps
     LEFT JOIN player p ON mps.player_id = p.id
     LEFT JOIN song s ON mps.song_id = s.id
     LEFT JOIN song_x_chart sc ON mps.chart_id = sc.id
     WHERE mps.match_id = ?
-    ORDER BY mps.song_id ASC, mps.player_id ASC`,
+    ORDER BY COALESCE(mps.song_order, mps.song_id) ASC, mps.player_id ASC`,
   CREATE_MATCH: `INSERT INTO \`match\` (event_id, winner_id, created_by) 
     VALUES (?, ?, ?)`,
-  CREATE_MATCH_PLAYER_SONG: `INSERT INTO match_x_player_x_song (match_id, player_id, song_id, chart_id, score, win, created_by) 
-    VALUES (?, ?, ?, ?, ?, ?, ?)`,
+  CREATE_MATCH_PLAYER_SONG: `INSERT INTO match_x_player_x_song (match_id, player_id, song_id, song_order, chart_id, score, win, created_by) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   DELETE_MATCH_PLAYER_SONGS: `DELETE FROM match_x_player_x_song WHERE match_id = ?`,
   UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ? 
     WHERE id = ?`,
