@@ -107,6 +107,12 @@ export class AddEventMatchDialogComponent implements OnInit {
     this.addPlayer();
     // Start with one empty song field
     this.addSong();
+    
+    // Subscribe to songs changes to auto-calculate W-L-D and update field states
+    this.songsFormArray.valueChanges.subscribe(() => {
+      this.calculateWLDFromSongs();
+      this.updateWLDFieldStates();
+    });
   }
 
   minPlayersValidator(min: number) {
@@ -148,6 +154,168 @@ export class AddEventMatchDialogComponent implements OnInit {
       else if (currentLength > numPlayers) {
         for (let i = currentLength - 1; i >= numPlayers; i--) {
           currentScores.removeAt(i);
+        }
+      }
+    });
+    // Recalculate W-L-D after updating score fields
+    this.calculateWLDFromSongs();
+  }
+
+  private updateWLDFieldStates(): void {
+    // Check if there are any valid songs
+    const hasValidSongs = this.songsFormArray.controls.some(songControl => {
+      const song = (songControl as FormGroup).get('song')?.value;
+      return song && song !== '' && song.song_id;
+    });
+    
+    // Disable W-L-D fields if songs exist (auto-calculation is mandatory)
+    // Enable them if no songs exist (manual entry allowed)
+    this.playersFormArray.controls.forEach(control => {
+      const winsControl = control.get('wins');
+      const lossesControl = control.get('losses');
+      const drawsControl = control.get('draws');
+      
+      if (hasValidSongs) {
+        winsControl?.disable();
+        lossesControl?.disable();
+        drawsControl?.disable();
+      } else {
+        winsControl?.enable();
+        lossesControl?.enable();
+        drawsControl?.enable();
+      }
+    });
+  }
+
+  private calculateWLDFromSongs(): void {
+    // Get all valid players
+    const players = this.playersFormArray.controls
+      .map(control => control.get('player')?.value)
+      .filter((player: any) => player && player !== '' && player.player_id) as Player[];
+
+    if (players.length === 0) {
+      return;
+    }
+
+    // Initialize W-L-D stats for each player
+    const stats = new Map<number, { wins: number; losses: number; draws: number }>();
+    players.forEach(player => {
+      stats.set(player.player_id!, { wins: 0, losses: 0, draws: 0 });
+    });
+
+    // Process each song
+    this.songsFormArray.controls.forEach((songControl, songIndex) => {
+      const songGroup = songControl as FormGroup;
+      const song = songGroup.get('song')?.value;
+      
+      if (!song || song === '' || !song.song_id) {
+        return; // Skip invalid songs
+      }
+
+      const playerScoresFormArray = songGroup.get('playerScores') as FormArray;
+      const validScores: Array<{ player_id: number; score: number }> = [];
+
+      // Collect valid scores
+      playerScoresFormArray.controls.forEach((scoreControl, playerIndex) => {
+        const player = players[playerIndex];
+        if (!player) return;
+        
+        const scoreValue = scoreControl.value;
+        if (scoreValue !== null && scoreValue !== undefined && scoreValue !== '') {
+          const parsedScore = parseInt(scoreValue, 10);
+          if (!isNaN(parsedScore) && parsedScore >= 0) {
+            validScores.push({
+              player_id: player.player_id!,
+              score: parsedScore
+            });
+          }
+        }
+      });
+
+      if (validScores.length === 0) {
+        return; // Skip songs with no valid scores
+      }
+
+      // Find max and min scores
+      const scores = validScores.map(ps => ps.score);
+      const maxScore = Math.max(...scores);
+      const minScore = Math.min(...scores);
+
+      // Find players with max score (winners or draws)
+      const maxScorePlayers = validScores.filter(ps => ps.score === maxScore).map(ps => ps.player_id);
+      // Find players with min score
+      const minScorePlayers = validScores.filter(ps => ps.score === minScore).map(ps => ps.player_id);
+
+      // If all players have the same score, it's a draw for all
+      if (maxScore === minScore) {
+        maxScorePlayers.forEach(playerId => {
+          const playerStats = stats.get(playerId);
+          if (playerStats) {
+            playerStats.draws++;
+          }
+        });
+      } else {
+        // If only one winner, they win; others lose
+        if (maxScorePlayers.length === 1) {
+          const winnerId = maxScorePlayers[0];
+          const winnerStats = stats.get(winnerId);
+          if (winnerStats) {
+            winnerStats.wins++;
+          }
+
+          // All other players lose
+          validScores.forEach(ps => {
+            if (ps.player_id !== winnerId) {
+              const playerStats = stats.get(ps.player_id);
+              if (playerStats) {
+                playerStats.losses++;
+              }
+            }
+          });
+        } else {
+          // Multiple players tied for highest score - all get a draw
+          maxScorePlayers.forEach(playerId => {
+            const playerStats = stats.get(playerId);
+            if (playerStats) {
+              playerStats.draws++;
+            }
+          });
+
+          // Players with lower scores lose
+          validScores.forEach(ps => {
+            if (!maxScorePlayers.includes(ps.player_id)) {
+              const playerStats = stats.get(ps.player_id);
+              if (playerStats) {
+                playerStats.losses++;
+              }
+            }
+          });
+        }
+      }
+    });
+
+    // Update W-L-D fields in player form groups
+    this.playersFormArray.controls.forEach((playerControl, index) => {
+      const playerGroup = playerControl as FormGroup;
+      const player = playerGroup.get('player')?.value as Player;
+      
+      if (player && player.player_id) {
+        const playerStats = stats.get(player.player_id);
+        if (playerStats) {
+          // Update W-L-D fields without triggering valueChanges to avoid infinite loop
+          const winsControl = playerGroup.get('wins');
+          const lossesControl = playerGroup.get('losses');
+          const drawsControl = playerGroup.get('draws');
+          
+          if (winsControl) {
+            winsControl.setValue(playerStats.wins, { emitEvent: false });
+          }
+          if (lossesControl) {
+            lossesControl.setValue(playerStats.losses, { emitEvent: false });
+          }
+          if (drawsControl) {
+            drawsControl.setValue(playerStats.draws, { emitEvent: false });
+          }
         }
       }
     });
@@ -251,10 +419,27 @@ export class AddEventMatchDialogComponent implements OnInit {
         })
         .filter((entry: any) => entry !== null);
 
+      // Extract W-L-D stats from form
+      const playerStats = formValue.players
+        .map((playerEntry: any, index: number) => {
+          const playerObj = playerEntry.player;
+          if (!playerObj || playerObj === '' || !playerObj.player_id) {
+            return null;
+          }
+          return {
+            player_id: playerObj.player_id,
+            wins: playerEntry.wins || 0,
+            losses: playerEntry.losses || 0,
+            draws: playerEntry.draws || 0
+          };
+        })
+        .filter((stat: any) => stat !== null);
+
       const matchData = {
         event_id: event.id!,
         player_ids: playerIds,
         songs: songsData.length > 0 ? songsData : undefined,
+        player_stats: songsData.length === 0 ? playerStats : undefined, // Only send player_stats if no songs
         winner_id: winner && winner.player_id ? winner.player_id : undefined
       };
 
@@ -348,8 +533,23 @@ export class AddEventMatchDialogComponent implements OnInit {
                   playerObj.username = (playerObj as any).gamertag;
                 }
                 
+                // Find W-L-D stats for this player
+                const playerStats = match.player_stats?.find((ps: any) => ps.player_id === playerObj.player_id);
+                
                 const playerGroup = this.fb.group({
-                  player: new FormControl({ value: playerObj, disabled: false }, Validators.required)
+                  player: new FormControl({ value: playerObj, disabled: false }, Validators.required),
+                  wins: new FormControl({ 
+                    value: playerStats?.wins || 0, 
+                    disabled: false 
+                  }, [Validators.min(0), Validators.required]),
+                  losses: new FormControl({ 
+                    value: playerStats?.losses || 0, 
+                    disabled: false 
+                  }, [Validators.min(0), Validators.required]),
+                  draws: new FormControl({ 
+                    value: playerStats?.draws || 0, 
+                    disabled: false 
+                  }, [Validators.min(0), Validators.required])
                 });
                 this.playersFormArray.push(playerGroup);
               }
@@ -358,6 +558,16 @@ export class AddEventMatchDialogComponent implements OnInit {
             // Enable player fields after populating
             this.playersFormArray.controls.forEach(control => control.enable());
             this.updateSongScoreFields();
+            
+            // Disable W-L-D fields if songs exist (since auto-calculation is mandatory)
+            const hasSongs = match.songs && match.songs.length > 0;
+            this.playersFormArray.controls.forEach(control => {
+              if (hasSongs) {
+                control.get('wins')?.disable();
+                control.get('losses')?.disable();
+                control.get('draws')?.disable();
+              }
+            });
             
             // Set winner after players are loaded
             if (match.winner && match.winner.player_id) {
@@ -451,6 +661,11 @@ export class AddEventMatchDialogComponent implements OnInit {
               }
             }
           });
+          
+          // Recalculate W-L-D from songs after loading (if songs exist)
+          if (match.songs && match.songs.length > 0) {
+            this.calculateWLDFromSongs();
+          }
         } else {
           // If no songs, add one empty song field
           this.addSong();
@@ -479,7 +694,10 @@ export class AddEventMatchDialogComponent implements OnInit {
 
   addPlayer(): void {
     const playerGroup = this.fb.group({
-      player: new FormControl({ value: '', disabled: true }, Validators.required)
+      player: new FormControl({ value: '', disabled: true }, Validators.required),
+      wins: new FormControl({ value: 0, disabled: false }, [Validators.min(0), Validators.required]),
+      losses: new FormControl({ value: 0, disabled: false }, [Validators.min(0), Validators.required]),
+      draws: new FormControl({ value: 0, disabled: false }, [Validators.min(0), Validators.required])
     });
     this.playersFormArray.push(playerGroup);
     this.updateSongScoreFields();
@@ -511,6 +729,9 @@ export class AddEventMatchDialogComponent implements OnInit {
     // Subscribe to song changes to load charts
     const songIndex = this.songsFormArray.length - 1;
     this.setupSongChartLoading(songIndex);
+    
+    // Update W-L-D field states after adding song
+    this.updateWLDFieldStates();
   }
 
   removeSong(index: number): void {
@@ -518,6 +739,8 @@ export class AddEventMatchDialogComponent implements OnInit {
     if (this.songsFormArray.length === 0) {
       this.addSong();
     }
+    // Update W-L-D field states after removing song
+    this.updateWLDFieldStates();
   }
 
   getSongFormGroup(index: number): FormGroup {

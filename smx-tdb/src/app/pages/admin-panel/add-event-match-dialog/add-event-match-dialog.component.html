@@ -36,6 +36,29 @@
                   Player {{ i + 1 }} is required
                 </mat-error>
               </mat-form-field>
+              <div class="wld-fields" *ngIf="playerGroup.get('player')?.value">
+                <mat-form-field appearance="fill" class="wld-field">
+                  <mat-label>Wins</mat-label>
+                  <input matInput type="number" min="0" formControlName="wins" />
+                  <mat-error *ngIf="playerGroup.get('wins')?.hasError('min')">
+                    Must be at least 0
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="wld-field">
+                  <mat-label>Losses</mat-label>
+                  <input matInput type="number" min="0" formControlName="losses" />
+                  <mat-error *ngIf="playerGroup.get('losses')?.hasError('min')">
+                    Must be at least 0
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="wld-field">
+                  <mat-label>Draws</mat-label>
+                  <input matInput type="number" min="0" formControlName="draws" />
+                  <mat-error *ngIf="playerGroup.get('draws')?.hasError('min')">
+                    Must be at least 0
+                  </mat-error>
+                </mat-form-field>
+              </div>
               <button type="button" mat-icon-button color="warn" (click)="removePlayer(i)" 
                       [disabled]="playersFormArray.length <= 2" 
                       matTooltip="Remove Player">

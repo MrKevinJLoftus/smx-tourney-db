@@ -24,6 +24,14 @@ export interface MatchSong {
   player_scores: PlayerScore[];
 }
 
+export interface PlayerStats {
+  player_id: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  gamertag?: string;
+}
+
 export interface MatchWithDetails extends Match {
   players?: Array<{
     player_id: number;
@@ -34,6 +42,7 @@ export interface MatchWithDetails extends Match {
     gamertag: string;
   } | null;
   songs?: MatchSong[];
+  player_stats?: PlayerStats[];
   event?: {
     event_id: number;
     name: string;

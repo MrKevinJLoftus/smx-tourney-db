@@ -68,7 +68,20 @@
                       Winner: {{ match.winner?.gamertag }}
                     </div>
                   }
-                  @if (match.songs && match.songs.length > 0) {
+                  @if (match.player_stats && match.player_stats.length > 0) {
+                    <div class="player-stats">
+                      @for (stat of match.player_stats; track stat.player_id) {
+                        <div class="stat-item">
+                          <span class="player-name">{{ stat.gamertag || 'Player ' + stat.player_id }}:</span>
+                          <span class="wld-stats">
+                            <span class="wins">W: {{ stat.wins }}</span>
+                            <span class="losses">L: {{ stat.losses }}</span>
+                            <span class="draws">D: {{ stat.draws }}</span>
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  } @else if (match.songs && match.songs.length > 0) {
                     <mat-expansion-panel class="songs-expansion-panel">
                       <mat-expansion-panel-header>
                         <mat-panel-title>
