@@ -219,11 +219,13 @@ export class AddEventUserDialogComponent implements OnInit, OnDestroy {
       
       if (this.isEditMode && this.eventPlayerId) {
         // Update existing event player and player pronouns if changed
-        const pronouns = formValue.pronouns?.trim() || undefined;
+        // Trim the pronouns value but preserve empty strings (to allow clearing pronouns)
+        const pronouns = formValue.pronouns != null ? formValue.pronouns.trim() : '';
         const playerId = this.data?.player?.id;
         
-        // Update player pronouns if player ID is available and pronouns changed
-        if (playerId && pronouns !== undefined) {
+        // Update player pronouns if player ID is available
+        // Always update pronouns when playerId exists (backend handles empty strings correctly)
+        if (playerId) {
           this.playerService.updatePlayer(playerId, { pronouns: pronouns }).subscribe({
             next: () => {
               // After updating player, update event player relationship
