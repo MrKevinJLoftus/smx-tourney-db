@@ -15,10 +15,27 @@
       </mat-form-field>
 
       <mat-form-field appearance="fill">
-        <mat-label>Gamertag</mat-label>
-        <input matInput id="gamertag" formControlName="gamertag" type="text" [disabled]="isEditMode || !userForm.get('event')?.value" />
-        <mat-error *ngIf="userForm.get('gamertag')?.hasError('required')">
-          Gamertag is required
+        <mat-label>Player</mat-label>
+        <input 
+          matInput 
+          id="playerInput" 
+          formControlName="playerInput" 
+          type="text"
+          [matAutocomplete]="playerAutocomplete"
+          [disabled]="isEditMode || !userForm.get('event')?.value"
+          (input)="onInputChange($any($event.target).value)"
+          placeholder="Search for existing player or type to create new" />
+        <mat-autocomplete 
+          #playerAutocomplete="matAutocomplete"
+          [displayWith]="displayPlayer"
+          (optionSelected)="onPlayerSelected($event.option.value)">
+          <mat-option *ngFor="let player of filteredPlayers$ | async" [value]="player">
+            <span>{{ player.username }}</span>
+            <span *ngIf="player.pronouns" class="player-pronouns"> ({{ player.pronouns }})</span>
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error *ngIf="userForm.get('playerInput')?.hasError('required')">
+          Player is required
         </mat-error>
       </mat-form-field>
 

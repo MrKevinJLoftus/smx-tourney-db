@@ -43,7 +43,30 @@ exports.removePlayerFromEvent = async (req, res) => {
   if (!eventPlayer || eventPlayer.length < 1) {
     return res.status(404).json({ message: 'Event player not found' });
   }
+  
+  // Store player_id before deletion to check for orphaned player
+  const playerId = eventPlayer[0].player_id;
+  
+  // Remove player from event
   await dbconn.executeMysqlQuery(queries.REMOVE_PLAYER_FROM_EVENT, [eventPlayerId]);
-  res.status(200).json({ message: 'Player removed from event successfully' });
+  
+  // Check if player is orphaned (not in any other events)
+  const remainingEventPlayers = await dbconn.executeMysqlQuery(queries.COUNT_EVENT_PLAYERS_BY_PLAYER_ID, [playerId]);
+  const eventPlayerCount = remainingEventPlayers[0]?.count || 0;
+  
+  // If player is not in any events, delete the player record
+  if (eventPlayerCount === 0) {
+    console.log(`Player ${playerId} is orphaned (not in any events), deleting player record`);
+    await dbconn.executeMysqlQuery(playerQueries.DELETE_PLAYER, [playerId]);
+    res.status(200).json({ 
+      message: 'Player removed from event successfully and player record deleted (no longer in any events)',
+      playerDeleted: true
+    });
+  } else {
+    res.status(200).json({ 
+      message: 'Player removed from event successfully',
+      playerDeleted: false
+    });
+  }
 };
 

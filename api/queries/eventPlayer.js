@@ -3,6 +3,7 @@ module.exports = {
   UPDATE_EVENT_PLAYER: `UPDATE event_x_player SET seed = ?, placement = ? WHERE id = ?`,
   REMOVE_PLAYER_FROM_EVENT: `DELETE FROM event_x_player WHERE id = ?`,
   GET_EVENT_PLAYER_BY_ID: `SELECT * FROM event_x_player WHERE id = ?`,
-  GET_EVENT_PLAYER_BY_EVENT_AND_PLAYER: `SELECT * FROM event_x_player WHERE event_id = ? AND player_id = ?`
+  GET_EVENT_PLAYER_BY_EVENT_AND_PLAYER: `SELECT * FROM event_x_player WHERE event_id = ? AND player_id = ?`,
+  COUNT_EVENT_PLAYERS_BY_PLAYER_ID: `SELECT COUNT(*) as count FROM event_x_player WHERE player_id = ?`
 };
 

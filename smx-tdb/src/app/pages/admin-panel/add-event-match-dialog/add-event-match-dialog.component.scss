@@ -50,6 +50,13 @@ mat-dialog-actions {
   gap: 16px;
 }
 
+.songs-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 8px;
+}
+
 .song-entry {
   width: 100%;
 }

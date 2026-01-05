@@ -44,8 +44,9 @@ const transformMatchResult = async (match) => {
   // Fetch all player-song-score combinations
   const playerSongScores = await dbconn.executeMysqlQuery(queries.GET_PLAYER_SONG_SCORES, [match.id]);
   
-  // Group by song_id to create songs array
+  // Group by song_id to create songs array, preserving order
   const songsMap = new Map();
+  const songOrderMap = new Map(); // Track order for each song_id
   playerSongScores.forEach(entry => {
     if (!entry.song_id) return; // Skip entries without songs
     
@@ -60,6 +61,10 @@ const transformMatchResult = async (match) => {
         artist: entry.song_artist,
         player_scores: []
       });
+      // Store the order for this song (use first occurrence's order)
+      if (entry.song_order !== null && entry.song_order !== undefined) {
+        songOrderMap.set(entry.song_id, entry.song_order);
+      }
     }
     
     const song = songsMap.get(entry.song_id);
@@ -71,7 +76,16 @@ const transformMatchResult = async (match) => {
     });
   });
   
-  const songsArray = Array.from(songsMap.values());
+  // Convert map to array and sort by song_order (or song_id as fallback)
+  const songsArray = Array.from(songsMap.entries())
+    .map(([songId, song]) => ({ ...song, _order: songOrderMap.get(songId) ?? songId }))
+    .sort((a, b) => {
+      // Sort by song_order if available, otherwise by song_id
+      const orderA = a._order ?? a.song_id;
+      const orderB = b._order ?? b.song_id;
+      return orderA - orderB;
+    })
+    .map(({ _order, ...song }) => song); // Remove temporary _order property
 
   // Determine winner from match.winner_id (not from song win flags)
   let winner = null;
@@ -179,7 +193,8 @@ exports.createMatch = async (req, res) => {
   // Insert player-song-score combinations into match_x_player_x_song table
   let validSongsInserted = false;
   if (songs && Array.isArray(songs) && songs.length > 0) {
-    for (const songData of songs) {
+    for (let songIndex = 0; songIndex < songs.length; songIndex++) {
+      const songData = songs[songIndex];
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
         // Determine song winner based on highest score
         const songWinners = determineSongWinner(songData.player_scores);
@@ -192,6 +207,7 @@ exports.createMatch = async (req, res) => {
               matchId,
               playerScore.player_id,
               songData.song_id ? Number(songData.song_id) : null,
+              songIndex + 1, // song_order is 1-indexed
               songData.chart_id ? Number(songData.chart_id) : null,
               playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
               isSongWin ? 1 : 0,
@@ -215,6 +231,7 @@ exports.createMatch = async (req, res) => {
         matchId,
         playerId,
         null, // no song
+        null, // no song_order
         null, // no chart
         null, // no score
         winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
@@ -288,7 +305,8 @@ exports.updateMatch = async (req, res) => {
   // Insert player-song-score combinations into match_x_player_x_song table
   let validSongsInserted = false;
   if (songs && Array.isArray(songs) && songs.length > 0) {
-    for (const songData of songs) {
+    for (let songIndex = 0; songIndex < songs.length; songIndex++) {
+      const songData = songs[songIndex];
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
         // Determine song winner based on highest score
         const songWinners = determineSongWinner(songData.player_scores);
@@ -301,6 +319,7 @@ exports.updateMatch = async (req, res) => {
               matchId,
               playerScore.player_id,
               songData.song_id ? Number(songData.song_id) : null,
+              songIndex + 1, // song_order is 1-indexed
               songData.chart_id ? Number(songData.chart_id) : null,
               playerScore.score !== undefined && playerScore.score !== null ? playerScore.score : null,
               isSongWin ? 1 : 0,
@@ -324,6 +343,7 @@ exports.updateMatch = async (req, res) => {
         matchId,
         playerId,
         null, // no song
+        null, // no song_order
         null, // no chart
         null, // no score
         winner_id && Number(winner_id) === Number(playerId) ? 1 : 0,
