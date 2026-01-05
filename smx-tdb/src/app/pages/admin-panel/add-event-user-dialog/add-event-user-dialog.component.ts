@@ -101,7 +101,7 @@ export class AddEventUserDialogComponent implements OnInit, OnDestroy {
           pronouns: playerData.pronouns
         };
         this.selectedPlayer = player;
-        this.userForm.get('playerInput')?.setValue(player.username);
+        this.userForm.get('playerInput')?.setValue(player); // Set Player object for autocomplete consistency
         this.userForm.get('playerInput')?.disable(); // Disable player input in edit mode
         if (playerData.pronouns) {
           this.userForm.get('pronouns')?.setValue(playerData.pronouns);
@@ -180,8 +180,15 @@ export class AddEventUserDialogComponent implements OnInit, OnDestroy {
     );
   }
 
-  displayPlayer(player: Player | null): string {
-    return player ? player.username : '';
+  displayPlayer(player: Player | string | null): string {
+    if (!player) {
+      return '';
+    }
+    // Handle both Player objects and string values
+    if (typeof player === 'string') {
+      return player;
+    }
+    return player.username || '';
   }
 
   onPlayerSelected(player: Player): void {
