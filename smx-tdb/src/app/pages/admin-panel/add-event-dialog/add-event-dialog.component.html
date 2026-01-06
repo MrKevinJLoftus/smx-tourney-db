@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Event' : 'Create New Event' }}</h2>
+<mat-dialog-content>
+  <app-create-new-event-form 
+    [event]="event"
+    (eventSaved)="onEventSaved()"
+    (cancel)="onCancel()">
+  </app-create-new-event-form>
+</mat-dialog-content>
+
