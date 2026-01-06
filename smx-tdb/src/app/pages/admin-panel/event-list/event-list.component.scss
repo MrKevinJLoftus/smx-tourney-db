@@ -1,4 +1,4 @@
-.event-users-list {
+.event-list {
   padding: 16px;
   background-color: #f5f5f5;
   border-radius: 4px;
@@ -28,10 +28,6 @@ h3 {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-}
-
-.event-selector {
-  min-width: 250px;
 }
 
 .loading {
@@ -65,7 +61,7 @@ mat-list {
   }
 }
 
-.player-item {
+.event-item {
   width: 100%;
   padding: 8px 0;
   box-sizing: border-box;
@@ -74,7 +70,7 @@ mat-list {
   max-width: 100%;
 }
 
-.player-header {
+.event-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,7 +79,7 @@ mat-list {
   box-sizing: border-box;
 }
 
-.player-info {
+.event-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -113,7 +109,7 @@ mat-list {
   }
 }
 
-.gamertag {
+.event-name {
   font-weight: 500;
   font-size: 0.95rem;
   color: #212121;
@@ -121,7 +117,7 @@ mat-list {
   word-wrap: break-word;
 }
 
-.player-details {
+.event-details {
   display: flex;
   gap: 12px;
   font-size: 0.85rem;
@@ -129,45 +125,14 @@ mat-list {
   flex-wrap: wrap;
 }
 
-.pronouns {
+.date, .location, .organizers {
   display: inline-block;
-  font-style: italic;
+}
+
+.description {
+  font-size: 0.85rem;
   color: #666;
-}
-
-.seed, .placement {
-  display: inline-block;
-}
-
-.import-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.import-spinner-container {
-  background-color: white;
-  padding: 32px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  min-width: 300px;
-
-  p {
-    margin: 0;
-    color: #212121;
-    font-size: 0.95rem;
-    text-align: center;
-  }
+  margin-top: 4px;
+  font-style: italic;
 }
 

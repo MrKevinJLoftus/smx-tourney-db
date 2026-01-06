@@ -42,6 +42,9 @@
                       @if (i < match.players.length - 1) {
                         <span class="vs">vs</span>
                       }
+                      @if (i === match.players.length - 1) {
+                        <span class="player">(Round {{ match.round }})</span>
+                      }
                     }
                   } @else {
                     <span class="player">No players</span>

@@ -24,8 +24,8 @@ module.exports = {
     LEFT JOIN song_x_chart sc ON mps.chart_id = sc.id
     WHERE mps.match_id = ?
     ORDER BY COALESCE(mps.song_order, mps.song_id) ASC, mps.player_id ASC`,
-  CREATE_MATCH: `INSERT INTO \`match\` (event_id, winner_id, created_by) 
-    VALUES (?, ?, ?)`,
+  CREATE_MATCH: `INSERT INTO \`match\` (event_id, winner_id, round, created_by) 
+    VALUES (?, ?, ?, ?)`,
   CREATE_MATCH_PLAYER_SONG: `INSERT INTO match_x_player_x_song (match_id, player_id, song_id, song_order, chart_id, score, win, created_by) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   DELETE_MATCH_PLAYER_SONGS: `DELETE FROM match_x_player_x_song WHERE match_id = ?`,
@@ -38,7 +38,7 @@ module.exports = {
     VALUES (?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE wins = VALUES(wins), losses = VALUES(losses), draws = VALUES(draws)`,
   DELETE_MATCH_PLAYER_STATS: `DELETE FROM match_x_player_stats WHERE match_id = ?`,
-  UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ? 
+  UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ?, round = ? 
     WHERE id = ?`,
   DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`
 };

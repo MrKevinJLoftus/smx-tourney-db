@@ -1,0 +1,9 @@
+mat-dialog-content {
+  min-width: 500px;
+  max-width: 90vw;
+}
+
+::ng-deep .mat-mdc-dialog-content {
+  padding: 24px !important;
+}
+

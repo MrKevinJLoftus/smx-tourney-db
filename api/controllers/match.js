@@ -219,6 +219,7 @@ const transformMatchResult = async (match) => {
   return {
     match_id: match.id,
     event_id: match.event_id,
+    round: match.round || null,
     created_at: match.created_at,
     players: playersArray,
     winner: winner,
@@ -247,7 +248,7 @@ exports.getMatchById = async (req, res) => {
 };
 
 exports.createMatch = async (req, res) => {
-  const { event_id, player_ids, songs, winner_id, player_stats } = req.body;
+  const { event_id, player_ids, songs, winner_id, player_stats, round } = req.body;
   console.log(`Creating new match for event: ${event_id}`);
   
   if (!event_id) {
@@ -292,6 +293,7 @@ exports.createMatch = async (req, res) => {
   const result = await dbconn.executeMysqlQuery(queries.CREATE_MATCH, [
     event_id,
     winner_id || null,
+    round || null,
     createdBy
   ]);
   console.log(JSON.stringify(result));
@@ -409,7 +411,7 @@ exports.createMatch = async (req, res) => {
 
 exports.updateMatch = async (req, res) => {
   const matchId = req.params.id;
-  const { event_id, player_ids, songs, winner_id, player_stats } = req.body;
+  const { event_id, player_ids, songs, winner_id, player_stats, round } = req.body;
   console.log(`Updating match with id: ${matchId}`);
   
   if (!event_id) {
@@ -458,6 +460,7 @@ exports.updateMatch = async (req, res) => {
   await dbconn.executeMysqlQuery(queries.UPDATE_MATCH, [
     event_id,
     winner_id || null,
+    round || null,
     matchId
   ]);
   

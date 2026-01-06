@@ -1,0 +1,69 @@
+<div class="event-list">
+  <div class="header-section">
+    <h3>Events</h3>
+    <div class="controls">
+      <button mat-raised-button color="primary" (click)="openAddEventDialog()">
+        <mat-icon>add</mat-icon>
+        Add Event
+      </button>
+    </div>
+  </div>
+  @if (isLoading) {
+    <div class="loading">
+      <mat-spinner diameter="30"></mat-spinner>
+    </div>
+  }
+  @if (!isLoading) {
+    @if (events$ | async; as events) {
+      @if (events.length === 0) {
+        <div class="empty-state">
+          <p>No events created yet.</p>
+        </div>
+      }
+      @if (events.length > 0) {
+        <mat-list>
+          @for (event of events; track event.id || $index) {
+            <mat-list-item>
+              <div class="event-item">
+                <div class="event-header">
+                  <div class="event-info">
+                    <span class="event-name">{{ event.name }}</span>
+                    <div class="event-details">
+                      @if (event.date) {
+                        <span class="date">{{ event.date | date:'shortDate' }}</span>
+                      }
+                      @if (event.location) {
+                        <span class="location">{{ event.location }}</span>
+                      }
+                      @if (event.organizers) {
+                        <span class="organizers">Organizers: {{ event.organizers }}</span>
+                      }
+                    </div>
+                    @if (event.description) {
+                      <div class="description">{{ event.description }}</div>
+                    }
+                  </div>
+                  <div class="action-buttons">
+                    <button mat-icon-button 
+                            class="edit-button" 
+                            (click)="editEvent(event)"
+                            matTooltip="Edit event">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button 
+                            class="delete-button" 
+                            (click)="deleteEvent(event)"
+                            matTooltip="Delete event">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </mat-list-item>
+          }
+        </mat-list>
+      }
+    }
+  }
+</div>
+

@@ -1,6 +1,7 @@
 export interface Match {
   match_id?: number;
   event_id: number;
+  round?: string;
   created_by?: number;
   created_at?: string;
   updated_at?: string;

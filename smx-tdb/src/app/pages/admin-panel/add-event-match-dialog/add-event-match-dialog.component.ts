@@ -421,7 +421,8 @@ export class AddEventMatchDialogComponent implements OnInit {
       let matchData: any = {
         event_id: event.id!,
         player_ids: playerIds,
-        winner_id: winner && winner.player_id ? winner.player_id : undefined
+        winner_id: winner && winner.player_id ? winner.player_id : undefined,
+        round: formValue.round || undefined
       };
 
       if (this.reportingMode === 'songs') {
@@ -556,6 +557,11 @@ export class AddEventMatchDialogComponent implements OnInit {
   }
 
   private prepopulateForm(match: any): void {
+    // Set round field if it exists
+    if (match.round !== undefined && match.round !== null) {
+      this.matchForm.get('round')?.setValue(match.round);
+    }
+    
     // Set event first
     this.events$.subscribe(events => {
       const event = events.find(e => e.id === match.event_id);
@@ -708,12 +714,19 @@ export class AddEventMatchDialogComponent implements OnInit {
                 this.songService.getChartsBySong(songId).subscribe({
                   next: (charts: Chart[]) => {
                     this.chartsBySongIndex.set(songIndex, charts);
+                    const songGroupToUpdate = this.getSongFormGroup(songIndex);
+                    
                     // Try to find and set the chart if matchSong has chart_id
                     if (matchSong.chart_id && charts.length > 0) {
                       const chartObj = charts.find(c => c.id === matchSong.chart_id);
                       if (chartObj) {
-                        const songGroupToUpdate = this.getSongFormGroup(songIndex);
                         songGroupToUpdate.get('chart')?.setValue(chartObj, { emitEvent: false });
+                      }
+                    } else if (this.reportingMode === 'songs' && charts.length > 0) {
+                      // Default to Wild chart if no chart_id is set and we're reporting by songs
+                      const wildChart = charts.find(chart => chart.mode === 'Wild');
+                      if (wildChart) {
+                        songGroupToUpdate.get('chart')?.setValue(wildChart, { emitEvent: false });
                       }
                     }
                   },
@@ -837,6 +850,14 @@ export class AddEventMatchDialogComponent implements OnInit {
           this.songService.getChartsBySong(songId).subscribe({
             next: (charts: Chart[]) => {
               this.chartsBySongIndex.set(songIndex, charts);
+              
+              // Default to Wild chart if available and reporting by songs
+              if (this.reportingMode === 'songs' && charts.length > 0) {
+                const wildChart = charts.find(chart => chart.mode === 'Wild');
+                if (wildChart) {
+                  chartControl.setValue(wildChart, { emitEvent: false });
+                }
+              }
             },
             error: (error) => {
               console.error('Error loading charts:', error);

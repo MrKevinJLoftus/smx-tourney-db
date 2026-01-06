@@ -15,8 +15,30 @@
         <mat-icon>add</mat-icon>
         Add User To Event
       </button>
+      <button mat-raised-button color="accent" (click)="triggerFileInput()" [disabled]="!selectedEventId || isImporting">
+        <mat-icon>upload_file</mat-icon>
+        @if (isImporting) {
+          Importing...
+        } @else {
+          Import Users From start.gg Bracket Export CSV
+        }
+      </button>
+      <input 
+        #fileInput 
+        type="file" 
+        accept=".csv,text/csv,application/vnd.ms-excel" 
+        (change)="onFileSelected($event)" 
+        style="display: none;">
     </div>
   </div>
+  @if (isImporting) {
+    <div class="import-overlay">
+      <div class="import-spinner-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Processing CSV file and importing players...</p>
+      </div>
+    </div>
+  }
   @if (isLoading) {
     <div class="loading">
       <mat-spinner diameter="30"></mat-spinner>

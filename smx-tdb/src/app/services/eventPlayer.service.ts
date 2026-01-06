@@ -49,5 +49,46 @@ export class EventPlayerService {
       }
     });
   }
+
+  bulkImportPlayers(eventId: number, csvFile: File): Observable<{
+    message: string;
+    summary: {
+      totalRows: number;
+      playersCreated: number;
+      playersAddedToEvent: number;
+      rowsSkipped: number;
+      errors: number;
+    };
+    errors?: Array<{
+      row: number;
+      message: string;
+      data: any;
+    }>;
+  }> {
+    const token = this.authService.getToken();
+    const formData = new FormData();
+    formData.append('csv', csvFile);
+
+    return this.http.post<{
+      message: string;
+      summary: {
+        totalRows: number;
+        playersCreated: number;
+        playersAddedToEvent: number;
+        rowsSkipped: number;
+        errors: number;
+      };
+      errors?: Array<{
+        row: number;
+        message: string;
+        data: any;
+      }>;
+    }>(`${environment.apiUrl}/eventPlayer/event/${eventId}/bulk-import`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+        // Note: Don't set Content-Type header - browser will set it with boundary for FormData
+      }
+    });
+  }
 }
 

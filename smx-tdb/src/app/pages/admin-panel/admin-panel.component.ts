@@ -1,32 +1,15 @@
 import { Component } from '@angular/core';
-import { CreateNewEventFormComponent } from './create-new-event-form/create-new-event-form.component';
 import { SharedModule } from '../../shared/shared.module';
 import { EventUsersListComponent } from './event-users-list/event-users-list.component';
 import { EventMatchesListComponent } from './event-matches-list/event-matches-list.component';
+import { EventListComponent } from './event-list/event-list.component';
 import { FormWrapperComponent } from './form-wrapper/form-wrapper.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SharedModule, CreateNewEventFormComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent],
+  imports: [SharedModule, EventListComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })
 export class AdminPanelComponent {
-  isCreateNewEventFormVisible = false;
-
-  createNewEvent(): void {
-    // Logic to create a new event
-    this.isCreateNewEventFormVisible = true;
-    console.log('Create New Event clicked');
-  }
-
-  addEditUsers(): void {
-    // Logic to add/edit users for an existing event
-    console.log('Add/Edit Users clicked');
-  }
-
-  addEditMatches(): void {
-    // Logic to add/edit matches for an existing event
-    console.log('Add/Edit Matches clicked');
-  }
 }
