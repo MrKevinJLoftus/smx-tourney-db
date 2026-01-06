@@ -14,6 +14,26 @@
         </mat-error>
       </mat-form-field>
 
+      @if (!isEditMode) {
+        <div class="reporting-mode-section">
+          <label class="reporting-mode-label">How would you like to report match results? (W-L-D stats will be calculated even if reporting songs)</label>
+          <mat-button-toggle-group 
+            [value]="reportingMode" 
+            (change)="setReportingMode($event.value)"
+            class="reporting-mode-toggle-group"
+            exclusive>
+            <mat-button-toggle value="wld" class="mode-toggle">
+              <mat-icon>bar_chart</mat-icon>
+              <span>W-L-D Stats</span>
+            </mat-button-toggle>
+            <mat-button-toggle value="songs" class="mode-toggle">
+              <mat-icon>music_note</mat-icon>
+              <span>Songs</span>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+      }
+
       <div class="players-section">
         <div class="players-header">
           <label class="players-label">Players</label>
@@ -24,19 +44,26 @@
         <div formArrayName="players" class="players-list">
           <div *ngFor="let playerGroup of playersFormArray.controls; let i = index" [formGroupName]="i" class="player-entry">
             <div class="player-entry-content">
-              <mat-form-field appearance="fill" class="player-field">
-                <mat-label>Player {{ i + 1 }}</mat-label>
-                <mat-select formControlName="player" [compareWith]="comparePlayers">
-                  <mat-option [value]="">None</mat-option>
-                  <mat-option *ngFor="let player of (players$ | async)" [value]="player">
-                    {{ player.username }}
-                  </mat-option>
-                </mat-select>
-                <mat-error *ngIf="playerGroup.get('player')?.hasError('required')">
-                  Player {{ i + 1 }} is required
-                </mat-error>
-              </mat-form-field>
-              <div class="wld-fields" *ngIf="playerGroup.get('player')?.value">
+              <div class="player-field-row">
+                <mat-form-field appearance="fill" class="player-field">
+                  <mat-label>Player {{ i + 1 }}</mat-label>
+                  <mat-select formControlName="player" [compareWith]="comparePlayers">
+                    <mat-option [value]="">None</mat-option>
+                    <mat-option *ngFor="let player of (players$ | async)" [value]="player">
+                      {{ player.username }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="playerGroup.get('player')?.hasError('required')">
+                    Player {{ i + 1 }} is required
+                  </mat-error>
+                </mat-form-field>
+                <button type="button" mat-icon-button color="warn" (click)="removePlayer(i)" 
+                        [disabled]="playersFormArray.length <= 2" 
+                        matTooltip="Remove Player">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <div class="wld-fields" *ngIf="playerGroup.get('player')?.value && (reportingMode === 'wld' || (isEditMode && reportingMode !== 'songs'))">
                 <mat-form-field appearance="fill" class="wld-field">
                   <mat-label>Wins</mat-label>
                   <input matInput type="number" min="0" formControlName="wins" />
@@ -59,11 +86,6 @@
                   </mat-error>
                 </mat-form-field>
               </div>
-              <button type="button" mat-icon-button color="warn" (click)="removePlayer(i)" 
-                      [disabled]="playersFormArray.length <= 2" 
-                      matTooltip="Remove Player">
-                <mat-icon>delete</mat-icon>
-              </button>
             </div>
           </div>
         </div>
@@ -72,9 +94,9 @@
         </mat-error>
       </div>
 
-      <div class="songs-section">
+      <div class="songs-section" *ngIf="reportingMode === 'songs'">
         <div class="songs-header">
-          <label class="songs-label">Songs (Optional)</label>
+          <label class="songs-label">Songs</label>
         </div>
         <div formArrayName="songs" class="songs-list">
           <div *ngFor="let songGroup of songsFormArray.controls; let i = index" [formGroupName]="i" class="song-entry">

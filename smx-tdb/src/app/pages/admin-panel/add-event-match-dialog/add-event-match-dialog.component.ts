@@ -29,6 +29,7 @@ export class AddEventMatchDialogComponent implements OnInit {
   isEditMode = false;
   matchId?: number;
   chartsBySongIndex: Map<number, Chart[]> = new Map();
+  reportingMode: 'wld' | 'songs' | null = null; // null = not selected yet, 'wld' = W-L-D stats, 'songs' = songs
 
   constructor(
     private fb: FormBuilder,
@@ -86,6 +87,15 @@ export class AddEventMatchDialogComponent implements OnInit {
     this.isEditMode = !!data?.matchId;
     this.matchId = data?.matchId;
     if (this.isEditMode && data?.match) {
+      // Determine reporting mode based on existing match data
+      if (data.match.songs && data.match.songs.length > 0) {
+        this.reportingMode = 'songs';
+      } else if (data.match.player_stats && data.match.player_stats.length > 0) {
+        this.reportingMode = 'wld';
+      } else {
+        // Default to W-L-D if no data exists
+        this.reportingMode = 'wld';
+      }
       this.prepopulateForm(data.match);
     }
   }
@@ -105,14 +115,57 @@ export class AddEventMatchDialogComponent implements OnInit {
     // Start with 2 players
     this.addPlayer();
     this.addPlayer();
-    // Start with one empty song field
-    this.addSong();
+    // Don't add song by default - wait for user to select reporting mode
     
     // Subscribe to songs changes to auto-calculate W-L-D and update field states
+    // Only calculate from songs if in 'songs' mode
     this.songsFormArray.valueChanges.subscribe(() => {
-      this.calculateWLDFromSongs();
+      if (this.reportingMode === 'songs') {
+        this.calculateWLDFromSongs();
+      }
       this.updateWLDFieldStates();
     });
+  }
+
+  setReportingMode(mode: 'wld' | 'songs' | null): void {
+    // Handle null case (when toggle is deselected)
+    if (mode === null) {
+      return;
+    }
+    
+    this.reportingMode = mode;
+    
+    if (mode === 'songs') {
+      // Clear W-L-D fields and ensure at least one song exists
+      this.playersFormArray.controls.forEach(control => {
+        control.get('wins')?.setValue(0, { emitEvent: false });
+        control.get('losses')?.setValue(0, { emitEvent: false });
+        control.get('draws')?.setValue(0, { emitEvent: false });
+        control.get('wins')?.disable();
+        control.get('losses')?.disable();
+        control.get('draws')?.disable();
+      });
+      
+      // Add a song if none exist
+      if (this.songsFormArray.length === 0) {
+        this.addSong();
+      }
+    } else if (mode === 'wld') {
+      // Clear songs and enable W-L-D fields
+      while (this.songsFormArray.length > 0) {
+        this.songsFormArray.removeAt(0);
+      }
+      
+      // Explicitly enable W-L-D fields
+      this.playersFormArray.controls.forEach(control => {
+        control.get('wins')?.enable();
+        control.get('losses')?.enable();
+        control.get('draws')?.enable();
+      });
+      
+      // Ensure field states are correct
+      this.updateWLDFieldStates();
+    }
   }
 
   minPlayersValidator(min: number) {
@@ -157,34 +210,32 @@ export class AddEventMatchDialogComponent implements OnInit {
         }
       }
     });
-    // Recalculate W-L-D after updating score fields
-    this.calculateWLDFromSongs();
+    // Recalculate W-L-D after updating score fields (only if in songs mode)
+    if (this.reportingMode === 'songs') {
+      this.calculateWLDFromSongs();
+    }
   }
 
   private updateWLDFieldStates(): void {
-    // Check if there are any valid songs
-    const hasValidSongs = this.songsFormArray.controls.some(songControl => {
-      const song = (songControl as FormGroup).get('song')?.value;
-      return song && song !== '' && song.song_id;
-    });
-    
-    // Disable W-L-D fields if songs exist (auto-calculation is mandatory)
-    // Enable them if no songs exist (manual entry allowed)
-    this.playersFormArray.controls.forEach(control => {
-      const winsControl = control.get('wins');
-      const lossesControl = control.get('losses');
-      const drawsControl = control.get('draws');
-      
-      if (hasValidSongs) {
-        winsControl?.disable();
-        lossesControl?.disable();
-        drawsControl?.disable();
-      } else {
-        winsControl?.enable();
-        lossesControl?.enable();
-        drawsControl?.enable();
-      }
-    });
+    // Only update field states based on reporting mode
+    // If in 'wld' mode, fields should always be enabled
+    // If in 'songs' mode, fields should be disabled (auto-calculated)
+    // If reportingMode is null, enable fields by default (for new matches before mode selection)
+    if (this.reportingMode === 'wld' || this.reportingMode === null) {
+      // Enable W-L-D fields when in W-L-D mode or when mode hasn't been selected yet
+      this.playersFormArray.controls.forEach(control => {
+        control.get('wins')?.enable();
+        control.get('losses')?.enable();
+        control.get('draws')?.enable();
+      });
+    } else if (this.reportingMode === 'songs') {
+      // Disable W-L-D fields when in songs mode (auto-calculation is mandatory)
+      this.playersFormArray.controls.forEach(control => {
+        control.get('wins')?.disable();
+        control.get('losses')?.disable();
+        control.get('draws')?.disable();
+      });
+    }
   }
 
   private calculateWLDFromSongs(): void {
@@ -358,90 +409,103 @@ export class AddEventMatchDialogComponent implements OnInit {
         return;
       }
 
-      // Validate score fields before processing
-      let hasInvalidScore = false;
-      this.songsFormArray.controls.forEach((songControl: any, songIndex: number) => {
-        const playerScoresFormArray = this.getPlayerScoresFormArray(songIndex);
-        playerScoresFormArray.controls.forEach((scoreControl: any, playerIndex: number) => {
-          const scoreValue = scoreControl.value;
-          if (scoreValue !== null && scoreValue !== undefined && scoreValue !== '') {
-            const parsedScore = parseInt(scoreValue, 10);
-            if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100000) {
-              hasInvalidScore = true;
-            }
-          }
-        });
-      });
-      if (hasInvalidScore) {
-        this.messageService.show('Scores must be between 0 and 100,000.');
+      // Validate reporting mode is selected
+      if (!this.reportingMode) {
+        this.messageService.show('Please select a reporting method (W-L-D Stats or Songs).');
         this.isSubmitting = false;
         this.loadingService.setIsLoading(false);
         return;
       }
 
-      // Extract songs with player scores
-      const songsData = formValue.songs
-        .map((songEntry: any, songIndex: number) => {
-          const songObj = songEntry.song;
-          const songId = songObj?.id || songObj?.song_id;
-          if (!songObj || songObj === '' || !songId) {
-            return null;
-          }
-          
-          const playerScoresFormArray = this.getPlayerScoresFormArray(songIndex);
-          const playerScores = playerScoresFormArray.controls
-            .map((scoreControl: any, playerIndex: number) => {
-              const player = playersData[playerIndex];
-              if (!player) return null;
-              const scoreValue = scoreControl.value;
-              const parsedScore = scoreValue !== null && scoreValue !== undefined && scoreValue !== '' 
-                ? parseInt(scoreValue, 10) 
-                : undefined;
-              if (parsedScore !== undefined && (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100000)) {
-                return null;
-              }
-              return {
-                player_id: player.player_id,
-                score: parsedScore
-              };
-            })
-            .filter((entry: any) => entry !== null);
-
-          // Get chart_id from the form
-          const chartObj = songEntry.chart;
-          const chartId = chartObj && typeof chartObj === 'object' ? chartObj.id : (chartObj || null);
-
-          return {
-            song_id: songId,
-            chart_id: chartId,
-            player_scores: playerScores
-          };
-        })
-        .filter((entry: any) => entry !== null);
-
-      // Extract W-L-D stats from form
-      const playerStats = formValue.players
-        .map((playerEntry: any, index: number) => {
-          const playerObj = playerEntry.player;
-          if (!playerObj || playerObj === '' || !playerObj.player_id) {
-            return null;
-          }
-          return {
-            player_id: playerObj.player_id,
-            wins: playerEntry.wins || 0,
-            losses: playerEntry.losses || 0,
-            draws: playerEntry.draws || 0
-          };
-        })
-        .filter((stat: any) => stat !== null);
-
-      const matchData = {
+      // Determine which data to send based on reporting mode
+      let matchData: any = {
         event_id: event.id!,
         player_ids: playerIds,
-        songs: songsData.length > 0 ? songsData : undefined,
-        player_stats: songsData.length === 0 ? playerStats : undefined, // Only send player_stats if no songs
         winner_id: winner && winner.player_id ? winner.player_id : undefined
       };
+
+      if (this.reportingMode === 'songs') {
+        // Validate score fields before processing
+        let hasInvalidScore = false;
+        this.songsFormArray.controls.forEach((songControl: any, songIndex: number) => {
+          const playerScoresFormArray = this.getPlayerScoresFormArray(songIndex);
+          playerScoresFormArray.controls.forEach((scoreControl: any, playerIndex: number) => {
+            const scoreValue = scoreControl.value;
+            if (scoreValue !== null && scoreValue !== undefined && scoreValue !== '') {
+              const parsedScore = parseInt(scoreValue, 10);
+              if (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100000) {
+                hasInvalidScore = true;
+              }
+            }
+          });
+        });
+        if (hasInvalidScore) {
+          this.messageService.show('Scores must be between 0 and 100,000.');
+          this.isSubmitting = false;
+          this.loadingService.setIsLoading(false);
+          return;
+        }
+
+        // Extract songs with player scores
+        const songsData = formValue.songs
+          .map((songEntry: any, songIndex: number) => {
+            const songObj = songEntry.song;
+            const songId = songObj?.id || songObj?.song_id;
+            if (!songObj || songObj === '' || !songId) {
+              return null;
+            }
+            
+            const playerScoresFormArray = this.getPlayerScoresFormArray(songIndex);
+            const playerScores = playerScoresFormArray.controls
+              .map((scoreControl: any, playerIndex: number) => {
+                const player = playersData[playerIndex];
+                if (!player) return null;
+                const scoreValue = scoreControl.value;
+                const parsedScore = scoreValue !== null && scoreValue !== undefined && scoreValue !== '' 
+                  ? parseInt(scoreValue, 10) 
+                  : undefined;
+                if (parsedScore !== undefined && (isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100000)) {
+                  return null;
+                }
+                return {
+                  player_id: player.player_id,
+                  score: parsedScore
+                };
+              })
+              .filter((entry: any) => entry !== null);
+
+            // Get chart_id from the form
+            const chartObj = songEntry.chart;
+            const chartId = chartObj && typeof chartObj === 'object' ? chartObj.id : (chartObj || null);
+
+            return {
+              song_id: songId,
+              chart_id: chartId,
+              player_scores: playerScores
+            };
+          })
+          .filter((entry: any) => entry !== null);
+        
+        matchData.songs = songsData.length > 0 ? songsData : undefined;
+      } else if (this.reportingMode === 'wld') {
+        // Extract W-L-D stats from form
+        const playerStats = formValue.players
+          .map((playerEntry: any, index: number) => {
+            const playerObj = playerEntry.player;
+            if (!playerObj || playerObj === '' || !playerObj.player_id) {
+              return null;
+            }
+            return {
+              player_id: playerObj.player_id,
+              wins: playerEntry.wins || 0,
+              losses: playerEntry.losses || 0,
+              draws: playerEntry.draws || 0
+            };
+          })
+          .filter((stat: any) => stat !== null);
+        
+        matchData.player_stats = playerStats;
+      }
 
       console.log('Match data being sent:', JSON.stringify(matchData, null, 2));
 
@@ -666,8 +730,8 @@ export class AddEventMatchDialogComponent implements OnInit {
           if (match.songs && match.songs.length > 0) {
             this.calculateWLDFromSongs();
           }
-        } else {
-          // If no songs, add one empty song field
+        } else if (this.reportingMode === 'songs') {
+          // If no songs but in songs mode, add one empty song field
           this.addSong();
         }
       });
