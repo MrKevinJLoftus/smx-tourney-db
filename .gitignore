@@ -1,3 +1,5 @@
 node_modules/
 .env
 .idea/
+*.csv
+api/database/start_gg_match_list_response.json

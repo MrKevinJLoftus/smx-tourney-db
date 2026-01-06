@@ -31,6 +31,100 @@ const determineSongWinner = (playerScores) => {
   return winners.length === 1 ? new Set([winners[0].player_id]) : new Set();
 };
 
+/**
+ * Calculates W-L-D stats from songs for all players.
+ * @param {Array} songs - Array of song objects with player_scores
+ * @param {Set} playerIds - Set of all player IDs in the match
+ * @returns {Map} Map of player_id -> {wins, losses, draws}
+ */
+const calculateWLDFromSongs = (songs, playerIds) => {
+  const stats = new Map();
+  
+  // Initialize stats for all players
+  playerIds.forEach(playerId => {
+    stats.set(playerId, { wins: 0, losses: 0, draws: 0 });
+  });
+
+  if (!songs || songs.length === 0) {
+    return stats;
+  }
+
+  // Process each song
+  songs.forEach(song => {
+    if (!song || !song.player_scores || !Array.isArray(song.player_scores)) {
+      return;
+    }
+
+    // Filter valid scores
+    const validScores = song.player_scores.filter(ps => 
+      ps && ps.player_id && ps.score !== null && ps.score !== undefined
+    );
+
+    if (validScores.length === 0) {
+      return;
+    }
+
+    // Find max and min scores
+    const scores = validScores.map(ps => Number(ps.score));
+    const maxScore = Math.max(...scores);
+    const minScore = Math.min(...scores);
+
+    // Find players with max score (winners or draws)
+    const maxScorePlayers = validScores.filter(ps => Number(ps.score) === maxScore).map(ps => ps.player_id);
+    // Find players with min score (losers, unless they also have max score)
+    const minScorePlayers = validScores.filter(ps => Number(ps.score) === minScore).map(ps => ps.player_id);
+
+    // If all players have the same score, it's a draw for all
+    if (maxScore === minScore) {
+      maxScorePlayers.forEach(playerId => {
+        const playerStats = stats.get(playerId);
+        if (playerStats) {
+          playerStats.draws++;
+        }
+      });
+    } else {
+      // If only one winner, they win; others lose (or draw if tied for second)
+      if (maxScorePlayers.length === 1) {
+        const winnerId = maxScorePlayers[0];
+        const winnerStats = stats.get(winnerId);
+        if (winnerStats) {
+          winnerStats.wins++;
+        }
+
+        // All other players lose (unless they tied for second place)
+        validScores.forEach(ps => {
+          if (ps.player_id !== winnerId) {
+            const playerStats = stats.get(ps.player_id);
+            if (playerStats) {
+              playerStats.losses++;
+            }
+          }
+        });
+      } else {
+        // Multiple players tied for highest score - all get a draw
+        maxScorePlayers.forEach(playerId => {
+          const playerStats = stats.get(playerId);
+          if (playerStats) {
+            playerStats.draws++;
+          }
+        });
+
+        // Players with lower scores lose
+        validScores.forEach(ps => {
+          if (!maxScorePlayers.includes(ps.player_id)) {
+            const playerStats = stats.get(ps.player_id);
+            if (playerStats) {
+              playerStats.losses++;
+            }
+          }
+        });
+      }
+    }
+  });
+
+  return stats;
+};
+
 const transformMatchResult = async (match) => {
   if (!match) return null;
   
@@ -112,13 +206,24 @@ const transformMatchResult = async (match) => {
     }
   }
 
+  // Fetch W-L-D stats for this match
+  const playerStats = await dbconn.executeMysqlQuery(queries.GET_PLAYER_STATS_BY_MATCH, [match.id]);
+  const playerStatsArray = playerStats.map(stat => ({
+    player_id: stat.player_id,
+    wins: stat.wins || 0,
+    losses: stat.losses || 0,
+    draws: stat.draws || 0,
+    gamertag: stat.gamertag
+  }));
+
   return {
     match_id: match.id,
     event_id: match.event_id,
     created_at: match.created_at,
     players: playersArray,
     winner: winner,
-    songs: songsArray
+    songs: songsArray,
+    player_stats: playerStatsArray
   };
 };
 
@@ -142,7 +247,7 @@ exports.getMatchById = async (req, res) => {
 };
 
 exports.createMatch = async (req, res) => {
-  const { event_id, player_ids, songs, winner_id } = req.body;
+  const { event_id, player_ids, songs, winner_id, player_stats } = req.body;
   console.log(`Creating new match for event: ${event_id}`);
   
   if (!event_id) {
@@ -151,10 +256,12 @@ exports.createMatch = async (req, res) => {
   
   // Validate players based on whether songs are provided
   let uniquePlayerIds = new Set();
+  let validSongsCount = 0;
   if (songs && Array.isArray(songs) && songs.length > 0) {
     // Extract unique player IDs from song player_scores (only from songs with song_id, matching insertion logic)
     for (const songData of songs) {
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
+        validSongsCount++;
         for (const playerScore of songData.player_scores) {
           if (playerScore && playerScore.player_id) {
             uniquePlayerIds.add(Number(playerScore.player_id));
@@ -240,6 +347,60 @@ exports.createMatch = async (req, res) => {
     }
   }
   
+  // Handle W-L-D stats
+  let wldStats = new Map();
+  const playerIdsArray = Array.from(uniquePlayerIds);
+  
+  if (validSongsCount > 0) {
+    // If songs exist, calculate W-L-D from songs (mandatory)
+    wldStats = calculateWLDFromSongs(songs, uniquePlayerIds);
+    
+    // Validate that W-L-D sums match number of songs
+    for (const playerId of playerIdsArray) {
+      const stats = wldStats.get(playerId);
+      if (stats) {
+        const total = stats.wins + stats.losses + stats.draws;
+        if (total !== validSongsCount) {
+          return res.status(400).json({ 
+            message: `W-L-D totals for player ${playerId} (${total}) do not match number of songs (${validSongsCount})` 
+          });
+        }
+      }
+    }
+  } else if (player_stats && Array.isArray(player_stats) && player_stats.length > 0) {
+    // If no songs, use provided player_stats
+    for (const stat of player_stats) {
+      if (stat && stat.player_id) {
+        const playerId = Number(stat.player_id);
+        if (uniquePlayerIds.has(playerId)) {
+          wldStats.set(playerId, {
+            wins: stat.wins || 0,
+            losses: stat.losses || 0,
+            draws: stat.draws || 0
+          });
+        }
+      }
+    }
+  } else {
+    // No songs and no player_stats - initialize with zeros
+    playerIdsArray.forEach(playerId => {
+      wldStats.set(playerId, { wins: 0, losses: 0, draws: 0 });
+    });
+  }
+  
+  // Insert W-L-D stats into database
+  for (const playerId of playerIdsArray) {
+    const stats = wldStats.get(playerId) || { wins: 0, losses: 0, draws: 0 };
+    await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_STATS, [
+      matchId,
+      playerId,
+      stats.wins,
+      stats.losses,
+      stats.draws,
+      createdBy
+    ]);
+  }
+  
   const newMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
   console.log(JSON.stringify(newMatch));
   const transformedMatch = await transformMatchResult(newMatch[0]);
@@ -248,7 +409,7 @@ exports.createMatch = async (req, res) => {
 
 exports.updateMatch = async (req, res) => {
   const matchId = req.params.id;
-  const { event_id, player_ids, songs, winner_id } = req.body;
+  const { event_id, player_ids, songs, winner_id, player_stats } = req.body;
   console.log(`Updating match with id: ${matchId}`);
   
   if (!event_id) {
@@ -263,10 +424,12 @@ exports.updateMatch = async (req, res) => {
   
   // Validate players based on whether songs are provided
   let uniquePlayerIds = new Set();
+  let validSongsCount = 0;
   if (songs && Array.isArray(songs) && songs.length > 0) {
     // Extract unique player IDs from song player_scores (only from songs with song_id, matching insertion logic)
     for (const songData of songs) {
       if (songData && songData.song_id && songData.player_scores && Array.isArray(songData.player_scores)) {
+        validSongsCount++;
         for (const playerScore of songData.player_scores) {
           if (playerScore && playerScore.player_id) {
             uniquePlayerIds.add(Number(playerScore.player_id));
@@ -350,6 +513,63 @@ exports.updateMatch = async (req, res) => {
         createdBy
       ]);
     }
+  }
+  
+  // Handle W-L-D stats
+  let wldStats = new Map();
+  const playerIdsArray = Array.from(uniquePlayerIds);
+  
+  if (validSongsCount > 0) {
+    // If songs exist, calculate W-L-D from songs (mandatory)
+    wldStats = calculateWLDFromSongs(songs, uniquePlayerIds);
+    
+    // Validate that W-L-D sums match number of songs
+    for (const playerId of playerIdsArray) {
+      const stats = wldStats.get(playerId);
+      if (stats) {
+        const total = stats.wins + stats.losses + stats.draws;
+        if (total !== validSongsCount) {
+          return res.status(400).json({ 
+            message: `W-L-D totals for player ${playerId} (${total}) do not match number of songs (${validSongsCount})` 
+          });
+        }
+      }
+    }
+  } else if (player_stats && Array.isArray(player_stats) && player_stats.length > 0) {
+    // If no songs, use provided player_stats
+    for (const stat of player_stats) {
+      if (stat && stat.player_id) {
+        const playerId = Number(stat.player_id);
+        if (uniquePlayerIds.has(playerId)) {
+          wldStats.set(playerId, {
+            wins: stat.wins || 0,
+            losses: stat.losses || 0,
+            draws: stat.draws || 0
+          });
+        }
+      }
+    }
+  } else {
+    // No songs and no player_stats - initialize with zeros
+    playerIdsArray.forEach(playerId => {
+      wldStats.set(playerId, { wins: 0, losses: 0, draws: 0 });
+    });
+  }
+  
+  // Delete existing W-L-D stats and insert new ones
+  await dbconn.executeMysqlQuery(queries.DELETE_MATCH_PLAYER_STATS, [matchId]);
+  
+  // Insert W-L-D stats into database
+  for (const playerId of playerIdsArray) {
+    const stats = wldStats.get(playerId) || { wins: 0, losses: 0, draws: 0 };
+    await dbconn.executeMysqlQuery(queries.CREATE_MATCH_PLAYER_STATS, [
+      matchId,
+      playerId,
+      stats.wins,
+      stats.losses,
+      stats.draws,
+      createdBy
+    ]);
   }
   
   const updatedMatch = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);

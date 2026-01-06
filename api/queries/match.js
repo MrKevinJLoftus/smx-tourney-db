@@ -29,6 +29,15 @@ module.exports = {
   CREATE_MATCH_PLAYER_SONG: `INSERT INTO match_x_player_x_song (match_id, player_id, song_id, song_order, chart_id, score, win, created_by) 
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   DELETE_MATCH_PLAYER_SONGS: `DELETE FROM match_x_player_x_song WHERE match_id = ?`,
+  GET_PLAYER_STATS_BY_MATCH: `SELECT mps.match_id, mps.player_id, mps.wins, mps.losses, mps.draws, p.username as gamertag
+    FROM match_x_player_stats mps
+    LEFT JOIN player p ON mps.player_id = p.id
+    WHERE mps.match_id = ?
+    ORDER BY mps.player_id ASC`,
+  CREATE_MATCH_PLAYER_STATS: `INSERT INTO match_x_player_stats (match_id, player_id, wins, losses, draws, created_by) 
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE wins = VALUES(wins), losses = VALUES(losses), draws = VALUES(draws)`,
+  DELETE_MATCH_PLAYER_STATS: `DELETE FROM match_x_player_stats WHERE match_id = ?`,
   UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ? 
     WHERE id = ?`,
   DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`

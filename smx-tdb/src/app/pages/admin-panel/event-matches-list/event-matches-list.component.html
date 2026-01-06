@@ -101,6 +101,17 @@
                         }
                       </div>
                     </mat-expansion-panel>
+                  } @else if (match.player_stats && match.player_stats.length > 0) {
+                    <div class="player-stats">
+                      @for (stat of match.player_stats; track stat.player_id) {
+                        <div class="stat-item">
+                          <span class="player-name">{{ stat.gamertag || 'Player ' + stat.player_id }}:</span>
+                          <span class="wld-stats">
+                            {{ stat.wins }}-{{ stat.losses }}-{{ stat.draws }} (W-L-D)
+                          </span>
+                        </div>
+                      }
+                    </div>
                   }
                 </div>
               </div>

@@ -34,6 +34,12 @@ export class MatchService {
         score?: number;
       }>;
     }>;
+    player_stats?: Array<{
+      player_id: number;
+      wins: number;
+      losses: number;
+      draws: number;
+    }>;
     winner_id?: number;
     round?: string;
   }): Observable<MatchWithDetails> {
@@ -55,6 +61,12 @@ export class MatchService {
         player_id: number;
         score?: number;
       }>;
+    }>;
+    player_stats?: Array<{
+      player_id: number;
+      wins: number;
+      losses: number;
+      draws: number;
     }>;
     winner_id?: number;
     round?: string;

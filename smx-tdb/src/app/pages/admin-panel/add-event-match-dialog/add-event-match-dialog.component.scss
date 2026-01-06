@@ -10,7 +10,9 @@
   gap: 16px;
   width: 100%;
   min-width: 600px;
+  max-width: 100%;
   padding-top: 16px;
+  box-sizing: border-box;
 }
 
 mat-form-field {
@@ -20,10 +22,63 @@ mat-form-field {
 mat-dialog-content {
   max-height: 70vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 mat-dialog-actions {
   padding: 16px 24px;
+}
+
+.reporting-mode-section {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 16px;
+  padding: 16px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.reporting-mode-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  margin-bottom: 12px;
+}
+
+.reporting-mode-toggle-group {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+.mode-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  min-width: 0;
+  box-sizing: border-box;
+  
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  
+  span {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .songs-section {
@@ -114,6 +169,13 @@ mat-dialog-actions {
 
 .player-entry-content {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.player-field-row {
+  display: flex;
   align-items: center;
   gap: 8px;
   width: 100%;
@@ -121,12 +183,26 @@ mat-dialog-actions {
 
 .player-field {
   flex: 1;
-  min-width: 0;
+  min-width: 200px;
 }
 
 .player-entry-content button {
   margin-top: 0;
   flex-shrink: 0;
+}
+
+.wld-fields {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-left: 0;
+}
+
+.wld-field {
+  flex: 1;
+  min-width: 100px;
+  max-width: 150px;
 }
 
 .scores-container {
