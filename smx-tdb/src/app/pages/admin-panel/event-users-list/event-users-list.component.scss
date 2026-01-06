@@ -139,3 +139,35 @@ mat-list {
   display: inline-block;
 }
 
+.import-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.import-spinner-container {
+  background-color: white;
+  padding: 32px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
+
+  p {
+    margin: 0;
+    color: #212121;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+}
+

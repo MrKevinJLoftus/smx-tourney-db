@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef } from '@angular/core';
 import { SharedModule } from '../../../shared/shared.module';
 import { PlayerService } from '../../../services/player.service';
 import { EventPlayerService } from '../../../services/eventPlayer.service';
@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from '../../../services/message.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { AddEventUserDialogComponent } from '../add-event-user-dialog/add-event-user-dialog.component';
-import { Event } from '../../../models/event';
+import { Event as EventModel } from '../../../models/event';
 
 @Component({
   selector: 'app-event-users-list',
@@ -19,11 +19,13 @@ import { Event } from '../../../models/event';
 })
 export class EventUsersListComponent implements OnInit, OnChanges {
   @Input() eventId?: number;
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   players$: Observable<any[]> = of([]);
-  events$: Observable<Event[]>;
+  events$: Observable<EventModel[]>;
   isLoading = false;
+  isImporting = false;
   selectedEventId?: number;
-  selectedEvent: Event | null = null;
+  selectedEvent: EventModel | null = null;
 
   constructor(
     private playerService: PlayerService,
@@ -55,7 +57,7 @@ export class EventUsersListComponent implements OnInit, OnChanges {
     }
   }
 
-  onEventChange(event: Event | null): void {
+  onEventChange(event: EventModel | null): void {
     this.selectedEvent = event;
     if (event) {
       this.selectedEventId = event.id;
@@ -141,6 +143,87 @@ export class EventUsersListComponent implements OnInit, OnChanges {
             this.messageService.show('Error removing player from event. Please try again.');
           }
         });
+      }
+    });
+  }
+
+  triggerFileInput(): void {
+    this.fileInput.nativeElement.click();
+  }
+
+  onFileSelected(fileEvent: Event): void {
+    const input = fileEvent.target as HTMLInputElement;
+    const file = input.files?.[0];
+    
+    if (!file) {
+      return;
+    }
+
+    // Validate file type
+    const validTypes = ['text/csv', 'application/vnd.ms-excel'];
+    const isValidType = validTypes.includes(file.type) || file.name.toLowerCase().endsWith('.csv');
+    
+    if (!isValidType) {
+      this.messageService.show('Invalid file type. Please select a CSV file.');
+      // Reset file input
+      input.value = '';
+      return;
+    }
+
+    const eventIdToUse = this.selectedEventId || this.eventId;
+    if (!eventIdToUse) {
+      this.messageService.show('Please select an event first.');
+      input.value = '';
+      return;
+    }
+
+    // Confirm import
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Import Players from CSV',
+        message: `Are you sure you want to import players from "${file.name}"? This will add all players from the CSV to the selected event.`,
+        confirmText: 'Import',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.isImporting = true;
+        this.messageService.show(`Starting import of "${file.name}"...`, 'Dismiss');
+        this.eventPlayerService.bulkImportPlayers(eventIdToUse, file).subscribe({
+          next: (response) => {
+            this.isImporting = false;
+            const summary = response.summary;
+            let message = `Import completed! `;
+            message += `${summary.playersAddedToEvent} player(s) added to event`;
+            if (summary.playersCreated > 0) {
+              message += `, ${summary.playersCreated} new player(s) created`;
+            }
+            if (summary.rowsSkipped > 0) {
+              message += `, ${summary.rowsSkipped} row(s) skipped`;
+            }
+            if (summary.errors > 0) {
+              message += `, ${summary.errors} error(s) occurred`;
+            }
+            this.messageService.show(message);
+            this.loadPlayers();
+            // Reset file input
+            input.value = '';
+          },
+          error: (error) => {
+            this.isImporting = false;
+            console.error('Error importing players:', error);
+            const errorMessage = error?.error?.message || 'Error importing players. Please check the CSV format and try again.';
+            this.messageService.show(errorMessage);
+            // Reset file input
+            input.value = '';
+          }
+        });
+      } else {
+        // Reset file input if cancelled
+        input.value = '';
       }
     });
   }
