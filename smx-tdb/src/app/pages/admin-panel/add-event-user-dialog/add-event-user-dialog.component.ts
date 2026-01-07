@@ -294,7 +294,7 @@ export class AddEventUserDialogComponent implements OnInit, OnDestroy {
           });
         } else {
           // Invalid state
-          this.messageService.show('Please select or enter a player name.');
+          this.messageService.show('Please select or enter a player gamertag.');
           this.isSubmitting = false;
           this.loadingService.setIsLoading(false);
         }

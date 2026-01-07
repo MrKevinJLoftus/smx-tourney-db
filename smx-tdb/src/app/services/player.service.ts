@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Player } from '../models/player';
+import { Event } from '../models/event';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
@@ -72,6 +73,10 @@ export class PlayerService {
 
   getPlayersByEvent(eventId: number): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/player/event/${eventId}`);
+  }
+
+  getEventsByPlayer(playerId: number): Observable<Event[]> {
+    return this.http.get<Event[]>(`${environment.apiUrl}/player/${playerId}/events`);
   }
 }
 

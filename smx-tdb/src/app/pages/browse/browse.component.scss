@@ -1,0 +1,224 @@
+.browse-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin: 0 0 2rem 0;
+    color: rgba(255, 255, 255, 0.95);
+  }
+}
+
+::ng-deep .mat-mdc-tab-group {
+  .mat-mdc-tab-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mat-mdc-tab-label {
+    color: rgba(255, 255, 255, 0.7);
+    
+    &.mdc-tab--active {
+      color: rgba(255, 255, 255, 0.95);
+    }
+  }
+}
+
+.tab-content {
+  padding: 2rem 0;
+}
+
+.filter-section {
+  margin-bottom: 2rem;
+
+  .filter-field {
+    width: 100%;
+    max-width: 600px;
+
+    ::ng-deep {
+      // Ensure the form field wrapper has proper width
+      .mat-mdc-text-field-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+
+        .mat-mdc-form-field-flex {
+          width: 100%;
+          box-sizing: border-box;
+
+          .mat-mdc-form-field-input-control {
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+
+            input {
+              width: 100% !important;
+              box-sizing: border-box;
+              padding-left: 0.5rem !important;
+              min-width: 0;
+            }
+          }
+        }
+      }
+
+      // Ensure prefix icon has proper spacing and doesn't cause overflow
+      .mat-mdc-form-field-icon-prefix {
+        padding-right: 0.75rem !important;
+        flex-shrink: 0;
+      }
+
+      // Fix mat-label clipping - ensure label has proper positioning and space
+      .mat-mdc-form-field-label {
+        width: 100% !important;
+        max-width: calc(100% - 3rem) !important; // Account for prefix icon and padding
+        overflow: visible !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+      }
+
+      // Ensure floating label has proper positioning
+      .mdc-floating-label {
+        max-width: calc(100% - 3rem) !important;
+        overflow: visible !important;
+        text-overflow: ellipsis !important;
+      }
+
+      // Target MDC input directly
+      .mdc-text-field__input {
+        padding-left: 0.5rem !important;
+        width: 100% !important;
+        box-sizing: border-box;
+      }
+
+      // Ensure the input control wrapper doesn't overflow
+      .mdc-text-field {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
+  }
+}
+
+.loading-section,
+.error-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+
+  mat-spinner {
+    margin-bottom: 1rem;
+  }
+
+  .error-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.list-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .list-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+
+    .list-item-primary {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+    }
+
+    .list-item-secondary {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .list-item-icon {
+    color: rgba(255, 255, 255, 0.5);
+    margin-left: 1rem;
+  }
+}
+
+.empty-message {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(255, 255, 255, 0.6);
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .browse-container {
+    padding: 1rem 0.5rem;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .tab-content {
+    padding: 1rem 0;
+  }
+
+  .filter-section {
+    margin-bottom: 1.5rem;
+
+    .filter-field {
+      max-width: 100%;
+    }
+  }
+
+  .list-item {
+    padding: 0.75rem 1rem;
+  }
+}
+
+

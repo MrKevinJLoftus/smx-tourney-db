@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Event } from '../models/event';
@@ -41,6 +41,14 @@ export class EventService {
 
   getEventById(id: number): Observable<Event> {
     return this.http.get<Event>(`${environment.apiUrl}/event/${id}`);
+  }
+
+  searchEvents(query: string): Observable<Event[]> {
+    let params = new HttpParams();
+    if (query.trim()) {
+      params = params.set('q', query.trim());
+    }
+    return this.http.get<Event[]>(`${environment.apiUrl}/event/search`, { params });
   }
 
   createEvent(event: { 

@@ -7,5 +7,7 @@ export interface Event {
   organizers?: string;
   created_at?: string;
   updated_at?: string;
+  placement?: string | number; // Placement in event (only available when fetched by player)
+  seed?: number | string; // Seed in event (only available when fetched by player)
 }
 

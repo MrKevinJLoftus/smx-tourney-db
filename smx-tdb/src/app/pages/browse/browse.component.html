@@ -1,0 +1,175 @@
+<div class="browse-container">
+  <h1>Browse</h1>
+
+  <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
+    <mat-tab label="Players">
+      <div class="tab-content">
+        <div class="filter-section">
+          <mat-form-field appearance="outline" class="filter-field">
+            <input 
+              matInput 
+              [formControl]="filterControl"
+              placeholder="Enter player gamertag">
+            <mat-icon matPrefix>search</mat-icon>
+            <button 
+              *ngIf="filterControl.value" 
+              matSuffix 
+              mat-icon-button 
+              (click)="filterControl.setValue('')"
+              aria-label="Clear filter">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-section">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Loading players...</p>
+        </div>
+
+        <div *ngIf="error" class="error-section">
+          <mat-icon class="error-icon">error</mat-icon>
+          <p>{{ error }}</p>
+        </div>
+
+        <div *ngIf="!isLoading && !error" class="list-section">
+          <div *ngIf="filteredPlayers.length === 0" class="empty-message">
+            <mat-icon>person_off</mat-icon>
+            <p>No players found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
+          </div>
+          
+          <a 
+            *ngFor="let player of filteredPlayers" 
+            [routerLink]="['/player', player.id]"
+            class="list-item clickable"
+          >
+            <div class="list-item-content">
+              <span class="list-item-primary">{{ player.username }}</span>
+              <span class="list-item-secondary" *ngIf="player.pronouns">
+                {{ player.pronouns }}
+              </span>
+            </div>
+            <mat-icon class="list-item-icon">chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Events">
+      <div class="tab-content">
+        <div class="filter-section">
+          <mat-form-field appearance="outline" class="filter-field">
+            <input 
+              matInput 
+              [formControl]="filterControl"
+              placeholder="Filter by name, location, or organizers">
+            <mat-icon matPrefix>search</mat-icon>
+            <button 
+              *ngIf="filterControl.value" 
+              matSuffix 
+              mat-icon-button 
+              (click)="filterControl.setValue('')"
+              aria-label="Clear filter">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-section">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Loading events...</p>
+        </div>
+
+        <div *ngIf="error" class="error-section">
+          <mat-icon class="error-icon">error</mat-icon>
+          <p>{{ error }}</p>
+        </div>
+
+        <div *ngIf="!isLoading && !error" class="list-section">
+          <div *ngIf="filteredEvents.length === 0" class="empty-message">
+            <mat-icon>event_busy</mat-icon>
+            <p>No events found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
+          </div>
+          
+          <a 
+            *ngFor="let event of filteredEvents" 
+            [routerLink]="['/event', event.id]"
+            class="list-item clickable"
+          >
+            <div class="list-item-content">
+              <span class="list-item-primary">{{ event.name }}</span>
+              <span class="list-item-secondary" *ngIf="event.date">
+                {{ formatDate(event.date) }}
+              </span>
+              <span class="list-item-secondary" *ngIf="event.location">
+                {{ event.location }}
+              </span>
+            </div>
+            <mat-icon class="list-item-icon">chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Matches">
+      <div class="tab-content">
+        <div class="filter-section">
+          <mat-form-field appearance="outline" class="filter-field">
+            <input 
+              matInput 
+              [formControl]="filterControl"
+              placeholder="Filter by round, event, or player">
+            <mat-icon matPrefix>search</mat-icon>
+            <button 
+              *ngIf="filterControl.value" 
+              matSuffix 
+              mat-icon-button 
+              (click)="filterControl.setValue('')"
+              aria-label="Clear filter">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="isLoading" class="loading-section">
+          <mat-spinner diameter="50"></mat-spinner>
+          <p>Loading matches...</p>
+        </div>
+
+        <div *ngIf="error" class="error-section">
+          <mat-icon class="error-icon">error</mat-icon>
+          <p>{{ error }}</p>
+        </div>
+
+        <div *ngIf="!isLoading && !error" class="list-section">
+          <div *ngIf="filteredMatches.length === 0" class="empty-message">
+            <mat-icon>sports_esports</mat-icon>
+            <p>No matches found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
+          </div>
+          
+          <a 
+            *ngFor="let match of filteredMatches" 
+            [routerLink]="['/match', match.match_id]"
+            class="list-item clickable"
+          >
+            <div class="list-item-content">
+              <span class="list-item-primary" *ngIf="match.players && match.players.length > 0">
+               {{ formatMatchPlayers(match) }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.event">
+                {{ match.event.name }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.round">
+                Round: {{ match.round }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.winner">
+                Winner: {{ match.winner.gamertag }}
+              </span>
+            </div>
+            <mat-icon class="list-item-icon">chevron_right</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

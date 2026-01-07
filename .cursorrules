@@ -1,3 +1,9 @@
+# Project Cursor Rules
+
+- Angular (v19+): Prefer standalone components. New Angular components should be created as `standalone: true` and declare their own `imports` rather than relying on NgModules.
+- Shared UI primitives should be implemented as standalone components and, if needed by NgModules, included via the NgModule `imports` and re-exported from `exports`.
+- Avoid declaring standalone components in `declarations` of any NgModule. Standalone components must be added to the NgModule `imports` (and `exports` if they should be available to consumers).
+
 # Cursor Rules for SMX Tournament Database
 
 ## General Guidelines
@@ -30,6 +36,7 @@
 - Use Material Design components where appropriate
 - Implement proper form validation
 - Handle loading states appropriately
+- **DO NOT use arrow functions in Angular template files** - Angular templates do not support arrow functions. Instead, create component methods to handle any complex logic or transformations needed in templates
 
 ## Backend (Node.js/Express)
 

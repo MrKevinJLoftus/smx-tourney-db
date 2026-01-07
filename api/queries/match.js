@@ -3,6 +3,16 @@ module.exports = {
     FROM \`match\` m
     WHERE m.event_id = ?
     ORDER BY m.created_at DESC`,
+  SEARCH_MATCHES: `SELECT DISTINCT m.*
+    FROM \`match\` m
+    LEFT JOIN event e ON m.event_id = e.id
+    LEFT JOIN match_x_player_x_song mps ON m.id = mps.match_id
+    LEFT JOIN player p ON mps.player_id = p.id
+    WHERE m.round LIKE ?
+    OR e.name LIKE ?
+    OR p.username LIKE ?
+    ORDER BY m.created_at DESC
+    LIMIT 50`,
   GET_MATCH_BY_ID: `SELECT m.*
     FROM \`match\` m
     WHERE m.id = ?`,
@@ -40,6 +50,11 @@ module.exports = {
   DELETE_MATCH_PLAYER_STATS: `DELETE FROM match_x_player_stats WHERE match_id = ?`,
   UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ?, round = ? 
     WHERE id = ?`,
-  DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`
+  DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`,
+  GET_MATCHES_BY_PLAYER: `SELECT DISTINCT m.*
+    FROM \`match\` m
+    INNER JOIN match_x_player_x_song mps ON m.id = mps.match_id
+    WHERE mps.player_id = ?
+    ORDER BY m.created_at DESC`
 };
 

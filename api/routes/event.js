@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/", asyncWrapper(eventController.getAllEvents));
+router.get("/search", asyncWrapper(eventController.searchEvents));
 router.get("/:id", asyncWrapper(eventController.getEventById));
 
 // Admin-only routes

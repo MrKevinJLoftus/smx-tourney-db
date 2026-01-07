@@ -216,6 +216,22 @@ const transformMatchResult = async (match) => {
     gamertag: stat.gamertag
   }));
 
+  // Fetch event information
+  let event = null;
+  if (match.event_id) {
+    const eventData = await dbconn.executeMysqlQuery(
+      'SELECT id as event_id, name, date FROM event WHERE id = ?',
+      [match.event_id]
+    );
+    if (eventData && eventData.length > 0) {
+      event = {
+        event_id: eventData[0].event_id,
+        name: eventData[0].name,
+        date: eventData[0].date
+      };
+    }
+  }
+
   return {
     match_id: match.id,
     event_id: match.event_id,
@@ -224,7 +240,8 @@ const transformMatchResult = async (match) => {
     players: playersArray,
     winner: winner,
     songs: songsArray,
-    player_stats: playerStatsArray
+    player_stats: playerStatsArray,
+    event: event
   };
 };
 
@@ -245,6 +262,25 @@ exports.getMatchById = async (req, res) => {
   }
   const transformedMatch = await transformMatchResult(matches[0]);
   res.status(200).json(transformedMatch);
+};
+
+exports.searchMatches = async (req, res) => {
+  const query = req.query.q || req.query.query || '';
+  console.log(`Searching matches with query: ${query}`);
+  if (!query || query.trim().length === 0) {
+    // If no query, return empty array
+    res.status(200).json([]);
+    return;
+  }
+  const searchTerm = `%${query.trim()}%`;
+  const matches = await dbconn.executeMysqlQuery(queries.SEARCH_MATCHES, [
+    searchTerm,
+    searchTerm,
+    searchTerm
+  ]);
+  // Transform matches to include full details
+  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  res.status(200).json(transformedMatches);
 };
 
 exports.createMatch = async (req, res) => {
@@ -589,5 +625,14 @@ exports.deleteMatch = async (req, res) => {
   }
   await dbconn.executeMysqlQuery(queries.DELETE_MATCH, [matchId]);
   res.status(200).json({ message: 'Match deleted successfully' });
+};
+
+exports.getMatchesByPlayer = async (req, res) => {
+  const playerId = req.params.playerId;
+  console.log(`Fetching matches for player: ${playerId}`);
+  const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_PLAYER, [playerId]);
+  // Transform matches to include full details
+  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  res.status(200).json(transformedMatches);
 };
 

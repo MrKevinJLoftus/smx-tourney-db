@@ -1,0 +1,14 @@
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  color: #f57c00;
+
+  mat-icon {
+    color: #f57c00;
+    margin-right: 0.25rem;
+  }
+}
+
+

@@ -1,0 +1,94 @@
+<div class="player-detail-container">
+  <app-back-to-search></app-back-to-search>
+
+  <div *ngIf="isLoading" class="loading-section">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading player...</p>
+  </div>
+
+  <div *ngIf="error" class="error-section">
+    <mat-icon class="error-icon">error</mat-icon>
+    <h2>Error</h2>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="router.navigate(['/'])">
+      Return to Home
+    </button>
+  </div>
+
+  <div *ngIf="!isLoading && !error && player" class="player-detail-content">
+    <div class="header-section">
+      <mat-icon class="header-icon">person</mat-icon>
+      <h1>{{ player.username }}({{ player.pronouns }})</h1>
+    </div>
+
+        <!-- Matches Section -->
+        <mat-card class="detail-card" *ngIf="matches.length > 0">
+          <mat-card-header>
+            <mat-card-title>
+              Matches Played ({{ matches.length }})
+              <span class="record">Record: {{ getMatchRecordString() }}</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="matches-list">
+              <div *ngFor="let match of matches" class="match-item clickable" (click)="navigateToMatch(getMatchId(match))">
+                <mat-icon class="match-icon">sports_esports</mat-icon>
+                <div class="match-info">
+                  <h3 *ngIf="match.event">{{ match.event.name }}</h3>
+                  <div class="match-details">
+                    <span *ngIf="match.round" class="match-round">Round: {{ match.round }}</span>
+                    <span *ngIf="match.players && match.players.length > 0" class="match-players">
+                      vs. {{ getOpponentNames(match) }}
+                    </span>
+                    <span *ngIf="match.winner" class="match-winner" [class.is-winner]="match.winner.player_id === getPlayerId()">
+                      <mat-icon class="small-icon">emoji_events</mat-icon>
+                      Winner: {{ match.winner.gamertag }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+    <!-- Events Section -->
+    <mat-card class="detail-card" *ngIf="events.length > 0">
+      <mat-card-header>
+        <mat-card-title>Events ({{ events.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        
+        <div class="events-list">
+          <div *ngFor="let event of events" class="event-item clickable" (click)="navigateToEvent(event.id)">
+            <mat-icon class="event-icon">event</mat-icon>
+            <div class="event-info">
+              <h3>{{ event.name }}</h3>
+              <div class="event-details">
+                <ng-container *ngIf="getPlacementNumber(event) as placement">
+                  <span class="event-placement">
+                    <mat-icon class="small-icon">emoji_events</mat-icon>
+                    {{ placement | ordinal }} Place
+                  </span>
+                </ng-container>
+                <span *ngIf="event.date" class="event-date">
+                  <mat-icon class="small-icon">calendar_today</mat-icon>
+                  {{ formatDate(event.date) }}
+                </span>
+                <span *ngIf="event.location" class="event-location">
+                  <mat-icon class="small-icon">location_on</mat-icon>
+                  {{ event.location }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="placeholder-section" *ngIf="events.length === 0 && matches.length === 0 && !isLoading">
+      <mat-icon>info</mat-icon>
+      <p>No events or matches found for this player.</p>
+    </div>
+  </div>
+</div>
+
