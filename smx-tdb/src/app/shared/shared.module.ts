@@ -25,6 +25,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
+import { BackToSearchComponent } from './components/back-to-search/back-to-search.component';
 
 const MODULES = [
   CommonModule,
@@ -60,7 +61,7 @@ const COMPONENTS = [
 
 @NgModule({
   declarations: [...COMPONENTS],
-  imports: [...MODULES],
-  exports: [...MODULES, ...COMPONENTS]
+  imports: [...MODULES, BackToSearchComponent],
+  exports: [...MODULES, ...COMPONENTS, BackToSearchComponent]
 })
 export class SharedModule { }

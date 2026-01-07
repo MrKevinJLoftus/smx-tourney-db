@@ -1,8 +1,5 @@
 <div class="event-detail-container">
-  <button mat-icon-button class="back-button" (click)="router.navigate(['/'])">
-    <mat-icon>arrow_back</mat-icon>
-    <span>Back to Search</span>
-  </button>
+  <app-back-to-search></app-back-to-search>
 
   <div *ngIf="isLoading" class="loading-section">
     <mat-spinner diameter="50"></mat-spinner>

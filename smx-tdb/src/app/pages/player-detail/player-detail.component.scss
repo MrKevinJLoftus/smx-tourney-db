@@ -8,13 +8,15 @@
 
 .back-button {
   margin-bottom: 1.5rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   color: rgba(255, 255, 255, 0.9);
+  white-space: nowrap;
 
   mat-icon {
     color: rgba(255, 255, 255, 0.9);
+    margin-right: 0.25rem;
   }
 
   span {
@@ -89,6 +91,13 @@
       font-size: 1.5rem;
       font-weight: 400;
       color: rgba(255, 255, 255, 0.95);
+
+      .record {
+        margin-left: 0.75rem;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+      }
     }
   }
 

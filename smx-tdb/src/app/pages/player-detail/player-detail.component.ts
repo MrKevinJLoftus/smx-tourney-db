@@ -122,5 +122,32 @@ export class PlayerDetailComponent implements OnInit {
   getMatchId(match: MatchWithDetails): number | undefined {
     return (match as any).id || match.match_id;
   }
+
+  getMatchRecord(): { wins: number; losses: number; draws: number } {
+    const playerId = this.getPlayerId();
+    if (!playerId || !this.matches) {
+      return { wins: 0, losses: 0, draws: 0 };
+    }
+    let wins = 0;
+    let losses = 0;
+    let draws = 0;
+    for (const match of this.matches) {
+      if (match && match.winner && match.winner.player_id !== undefined && match.winner.player_id !== null) {
+        if (Number(match.winner.player_id) === Number(playerId)) {
+          wins++;
+        } else {
+          losses++;
+        }
+      } else {
+        draws++;
+      }
+    }
+    return { wins, losses, draws };
+  }
+
+  getMatchRecordString(): string {
+    const r = this.getMatchRecord();
+    return `${r.wins}-${r.losses}`;
+  }
 }
 
