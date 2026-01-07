@@ -10,6 +10,11 @@ module.exports = {
     FROM event_x_player ep 
     INNER JOIN player p ON ep.player_id = p.id 
     WHERE ep.event_id = ? 
-    ORDER BY ep.seed ASC, ep.placement ASC`
+    ORDER BY ep.seed ASC, ep.placement ASC`,
+  GET_EVENTS_BY_PLAYER: `SELECT DISTINCT e.* 
+    FROM event_x_player ep 
+    INNER JOIN event e ON ep.event_id = e.id 
+    WHERE ep.player_id = ? 
+    ORDER BY e.date DESC`
 };
 

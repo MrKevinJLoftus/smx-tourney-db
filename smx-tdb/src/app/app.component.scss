@@ -57,6 +57,8 @@
 ::ng-deep .main-content {
   height: 95vh;
   width: 100vw;
+  overflow-y: auto;
+  overflow-x: hidden;
   * :not(.material-icons) {
     font-family: "Titillium Web", "Arial", "Times New Roman", "serif" !important;
   }

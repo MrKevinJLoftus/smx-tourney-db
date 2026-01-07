@@ -138,9 +138,23 @@
 }
 
 .result-card {
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 
-  &:hover {
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &:hover:not(.clickable) {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
   }
 
@@ -203,6 +217,7 @@
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

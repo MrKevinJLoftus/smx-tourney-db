@@ -50,6 +50,11 @@ module.exports = {
   DELETE_MATCH_PLAYER_STATS: `DELETE FROM match_x_player_stats WHERE match_id = ?`,
   UPDATE_MATCH: `UPDATE \`match\` SET event_id = ?, winner_id = ?, round = ? 
     WHERE id = ?`,
-  DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`
+  DELETE_MATCH: `DELETE FROM \`match\` WHERE id = ?`,
+  GET_MATCHES_BY_PLAYER: `SELECT DISTINCT m.*
+    FROM \`match\` m
+    INNER JOIN match_x_player_x_song mps ON m.id = mps.match_id
+    WHERE mps.player_id = ?
+    ORDER BY m.created_at DESC`
 };
 

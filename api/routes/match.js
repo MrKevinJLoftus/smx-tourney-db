@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/search", asyncWrapper(matchController.searchMatches));
+router.get("/player/:playerId", asyncWrapper(matchController.getMatchesByPlayer));
 router.get("/event/:eventId", asyncWrapper(matchController.getMatchesByEvent));
 router.get("/:id", asyncWrapper(matchController.getMatchById));
 

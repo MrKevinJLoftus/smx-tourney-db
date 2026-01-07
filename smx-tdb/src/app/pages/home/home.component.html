@@ -60,7 +60,7 @@
         Players ({{ players.length }})
       </h2>
       <div class="results-grid">
-        <mat-card *ngFor="let player of players" class="result-card">
+        <mat-card *ngFor="let player of players" class="result-card clickable" (click)="navigateToPlayer(player)">
           <mat-card-content>
             <div class="card-header">
               <mat-icon class="card-icon">person</mat-icon>
@@ -82,7 +82,7 @@
         Events ({{ events.length }})
       </h2>
       <div class="results-grid">
-        <mat-card *ngFor="let event of events" class="result-card">
+        <mat-card *ngFor="let event of events" class="result-card clickable" (click)="navigateToEvent(event)">
           <mat-card-content>
             <div class="card-header">
               <mat-icon class="card-icon">event</mat-icon>
@@ -113,7 +113,7 @@
         Matches ({{ matches.length }})
       </h2>
       <div class="results-grid">
-        <mat-card *ngFor="let match of matches" class="result-card">
+        <mat-card *ngFor="let match of matches" class="result-card clickable" (click)="navigateToMatch(match)">
           <mat-card-content>
             <div class="card-header">
               <mat-icon class="card-icon">sports_esports</mat-icon>

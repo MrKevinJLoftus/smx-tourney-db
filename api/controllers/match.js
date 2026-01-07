@@ -627,3 +627,12 @@ exports.deleteMatch = async (req, res) => {
   res.status(200).json({ message: 'Match deleted successfully' });
 };
 
+exports.getMatchesByPlayer = async (req, res) => {
+  const playerId = req.params.playerId;
+  console.log(`Fetching matches for player: ${playerId}`);
+  const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_PLAYER, [playerId]);
+  // Transform matches to include full details
+  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  res.status(200).json(transformedMatches);
+};
+

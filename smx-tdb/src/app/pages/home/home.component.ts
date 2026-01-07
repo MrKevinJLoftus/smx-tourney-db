@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
@@ -32,7 +33,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private playerService: PlayerService,
     private eventService: EventService,
-    private matchService: MatchService
+    private matchService: MatchService,
+    private router: Router
   ) {
     // Create autocomplete options stream with debouncing
     this.autocompleteOptions$ = this.searchControl.valueChanges.pipe(
@@ -162,11 +164,40 @@ export class HomeComponent implements OnInit {
   }
 
   onOptionSelected(option: { type: 'player' | 'event' | 'match', item: any, display: string }): void {
-    // Set the search query to the selected option's display value
-    this.searchControl.setValue(option.display, { emitEvent: false });
-    // Perform full search with the selected option's item
-    this.searchQuery = option.display;
-    this.performSearch();
+    // Navigate directly to the detail page for the selected item
+    if (option.type === 'player') {
+      const playerId = option.item.id || option.item.player_id;
+      if (playerId) {
+        this.router.navigate(['/player', playerId]);
+      }
+    } else if (option.type === 'event' && option.item.id) {
+      this.router.navigate(['/event', option.item.id]);
+    } else if (option.type === 'match') {
+      const matchId = option.item.id || option.item.match_id;
+      if (matchId) {
+        this.router.navigate(['/match', matchId]);
+      }
+    }
+  }
+
+  navigateToPlayer(player: Player): void {
+    const playerId = (player as any).id || player.player_id;
+    if (playerId) {
+      this.router.navigate(['/player', playerId]);
+    }
+  }
+
+  navigateToEvent(event: Event): void {
+    if (event.id) {
+      this.router.navigate(['/event', event.id]);
+    }
+  }
+
+  navigateToMatch(match: MatchWithDetails): void {
+    const matchId = (match as any).id || match.match_id;
+    if (matchId) {
+      this.router.navigate(['/match', matchId]);
+    }
   }
 
   formatDate(date: string | Date): string {

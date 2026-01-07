@@ -31,6 +31,10 @@ export class MatchService {
     return this.http.get<MatchWithDetails[]>(`${environment.apiUrl}/match/search`, { params });
   }
 
+  getMatchesByPlayer(playerId: number): Observable<MatchWithDetails[]> {
+    return this.http.get<MatchWithDetails[]>(`${environment.apiUrl}/match/player/${playerId}`);
+  }
+
   createMatch(match: {
     event_id: number;
     player_ids: number[];

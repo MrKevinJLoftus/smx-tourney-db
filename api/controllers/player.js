@@ -64,6 +64,13 @@ exports.getPlayersByEvent = async (req, res) => {
   res.status(200).json(players);
 };
 
+exports.getEventsByPlayer = async (req, res) => {
+  const playerId = req.params.id;
+  console.log(`Fetching events for player: ${playerId}`);
+  const events = await dbconn.executeMysqlQuery(queries.GET_EVENTS_BY_PLAYER, [playerId]);
+  res.status(200).json(events);
+};
+
 exports.updatePlayer = async (req, res) => {
   const playerId = req.params.id;
   const { gamertag, pronouns, user_id } = req.body;
