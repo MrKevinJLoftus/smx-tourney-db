@@ -17,6 +17,25 @@ exports.getEventById = async (req, res) => {
   res.status(200).json(events[0]);
 };
 
+exports.searchEvents = async (req, res) => {
+  const query = req.query.q || req.query.query || '';
+  console.log(`Searching events with query: ${query}`);
+  if (!query || query.trim().length === 0) {
+    // If no query, return recent events (limited)
+    const events = await dbconn.executeMysqlQuery(queries.GET_ALL_EVENTS, []);
+    res.status(200).json(events.slice(0, 50)); // Limit to 50 for performance
+    return;
+  }
+  const searchTerm = `%${query.trim()}%`;
+  const events = await dbconn.executeMysqlQuery(queries.SEARCH_EVENTS, [
+    searchTerm,
+    searchTerm,
+    searchTerm,
+    searchTerm
+  ]);
+  res.status(200).json(events);
+};
+
 exports.createEvent = async (req, res) => {
   const { name, date, description, location, organizers } = req.body;
   console.log(`Creating new event: ${name}`);

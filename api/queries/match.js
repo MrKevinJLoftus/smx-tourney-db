@@ -3,6 +3,16 @@ module.exports = {
     FROM \`match\` m
     WHERE m.event_id = ?
     ORDER BY m.created_at DESC`,
+  SEARCH_MATCHES: `SELECT DISTINCT m.*
+    FROM \`match\` m
+    LEFT JOIN event e ON m.event_id = e.id
+    LEFT JOIN match_x_player_x_song mps ON m.id = mps.match_id
+    LEFT JOIN player p ON mps.player_id = p.id
+    WHERE m.round LIKE ?
+    OR e.name LIKE ?
+    OR p.username LIKE ?
+    ORDER BY m.created_at DESC
+    LIMIT 50`,
   GET_MATCH_BY_ID: `SELECT m.*
     FROM \`match\` m
     WHERE m.id = ?`,

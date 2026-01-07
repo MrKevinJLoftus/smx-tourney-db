@@ -1,3 +1,153 @@
-<h2>SMX Tournament DB</h2>
-<p>App in development.</p>
-<p>Please search for a player or event.</p>
+<div class="home-container">
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search...</mat-label>
+      <input 
+        matInput 
+        [formControl]="searchControl"
+        [matAutocomplete]="auto"
+        (keyup.enter)="performSearch()"
+        placeholder="Enter player name, event name, or match details">
+      <mat-icon matPrefix>search</mat-icon>
+      <button 
+        *ngIf="searchControl.value" 
+        matSuffix 
+        mat-icon-button 
+        (click)="clearSearch()"
+        aria-label="Clear search">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onOptionSelected($event.option.value)">
+      <mat-option *ngFor="let option of (autocompleteOptions$ | async)" [value]="option">
+        <div class="autocomplete-option">
+          <mat-icon class="option-icon">
+            {{ option.type === 'player' ? 'person' : option.type === 'event' ? 'event' : 'sports_esports' }}
+          </mat-icon>
+          <span>{{ option.display }}</span>
+          <span class="option-type">{{ option.type }}</span>
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="performSearch()"
+      [disabled]="isLoading">
+      <mat-icon>search</mat-icon>
+      Search
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-section">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Searching...</p>
+  </div>
+
+  <div *ngIf="!isLoading && hasSearched && searchQuery" class="results-section">
+    <div *ngIf="players.length === 0 && events.length === 0 && matches.length === 0" class="no-results">
+      <mat-icon>search_off</mat-icon>
+      <h3>No results found</h3>
+      <p>Try searching for a different term.</p>
+    </div>
+
+    <!-- Players Section -->
+    <div *ngIf="players.length > 0" class="results-group">
+      <h2 class="section-title">
+        <mat-icon>people</mat-icon>
+        Players ({{ players.length }})
+      </h2>
+      <div class="results-grid">
+        <mat-card *ngFor="let player of players" class="result-card">
+          <mat-card-content>
+            <div class="card-header">
+              <mat-icon class="card-icon">person</mat-icon>
+              <h3>{{ player.username }}</h3>
+            </div>
+            <p *ngIf="player.pronouns" class="card-detail">
+              <mat-icon class="small-icon">info</mat-icon>
+              {{ player.pronouns }}
+            </p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Events Section -->
+    <div *ngIf="events.length > 0" class="results-group">
+      <h2 class="section-title">
+        <mat-icon>event</mat-icon>
+        Events ({{ events.length }})
+      </h2>
+      <div class="results-grid">
+        <mat-card *ngFor="let event of events" class="result-card">
+          <mat-card-content>
+            <div class="card-header">
+              <mat-icon class="card-icon">event</mat-icon>
+              <h3>{{ event.name }}</h3>
+            </div>
+            <p *ngIf="event.date" class="card-detail">
+              <mat-icon class="small-icon">calendar_today</mat-icon>
+              {{ formatDate(event.date) }}
+            </p>
+            <p *ngIf="event.location" class="card-detail">
+              <mat-icon class="small-icon">location_on</mat-icon>
+              {{ event.location }}
+            </p>
+            <p *ngIf="event.description" class="card-description">{{ event.description }}</p>
+            <p *ngIf="event.organizers" class="card-detail">
+              <mat-icon class="small-icon">people</mat-icon>
+              Organized by: {{ event.organizers }}
+            </p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Matches Section -->
+    <div *ngIf="matches.length > 0" class="results-group">
+      <h2 class="section-title">
+        <mat-icon>sports_esports</mat-icon>
+        Matches ({{ matches.length }})
+      </h2>
+      <div class="results-grid">
+        <mat-card *ngFor="let match of matches" class="result-card">
+          <mat-card-content>
+            <div class="card-header">
+              <mat-icon class="card-icon">sports_esports</mat-icon>
+              <h3>{{ getMatchDisplayText(match) }}</h3>
+            </div>
+            <div *ngIf="match.event" class="card-detail">
+              <mat-icon class="small-icon">event</mat-icon>
+              <span>{{ match.event.name }}</span>
+              <span *ngIf="match.event.date"> - {{ formatDate(match.event.date) }}</span>
+            </div>
+            <div *ngIf="match.players && match.players.length > 0" class="card-detail">
+              <mat-icon class="small-icon">people</mat-icon>
+              <span>{{ getPlayerNames(match) }}</span>
+            </div>
+            <div *ngIf="match.winner" class="card-detail winner">
+              <mat-icon class="small-icon">emoji_events</mat-icon>
+              <span>Winner: {{ match.winner.gamertag }}</span>
+            </div>
+            <div *ngIf="match.player_stats && match.player_stats.length > 0" class="card-detail">
+              <div class="stats-list">
+                <span *ngFor="let stat of match.player_stats" class="stat-item">
+                  {{ stat.gamertag }}: {{ stat.wins }}-{{ stat.losses }}-{{ stat.draws }}
+                </span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!hasSearched && !isLoading" class="welcome-section">
+    <mat-icon class="welcome-icon">search</mat-icon>
+    <h2>Welcome to SMX Tournament DB</h2>
+    <p>Use the search bar above to find players, events, or matches.</p>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Match, MatchWithDetails } from '../models/match';
 import { environment } from '../../environments/environment';
@@ -21,6 +21,14 @@ export class MatchService {
 
   getMatchById(id: number): Observable<MatchWithDetails> {
     return this.http.get<MatchWithDetails>(`${environment.apiUrl}/match/${id}`);
+  }
+
+  searchMatches(query: string): Observable<MatchWithDetails[]> {
+    let params = new HttpParams();
+    if (query.trim()) {
+      params = params.set('q', query.trim());
+    }
+    return this.http.get<MatchWithDetails[]>(`${environment.apiUrl}/match/search`, { params });
   }
 
   createMatch(match: {

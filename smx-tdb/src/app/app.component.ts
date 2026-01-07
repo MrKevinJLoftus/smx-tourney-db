@@ -55,7 +55,14 @@ export class AppComponent {
       // subscribe to auth changes
       this.authService.getAuthStatusListener().subscribe(res => {
         this.isAuthenticated = res;
-        this.accessibleRoutes = this.isAuthenticated ? [...this.routes, ...this.protectedRoutes] : [...this.routes]
+        if (this.isAuthenticated) {
+          // When authenticated: show Home + protected routes, but exclude Login
+          const publicRoutesWithoutLogin = this.routes.filter(route => route.url !== '/login');
+          this.accessibleRoutes = [...publicRoutesWithoutLogin, ...this.protectedRoutes];
+        } else {
+          // When not authenticated: show all public routes including Login
+          this.accessibleRoutes = [...this.routes];
+        }
       });
       // attempt to auto-auth user
       this.authService.autoAuthUser();
