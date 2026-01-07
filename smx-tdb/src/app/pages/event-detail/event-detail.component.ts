@@ -9,11 +9,12 @@ import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { OrdinalPipe } from '../../shared/pipes/ordinal.pipe';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule],
+  imports: [CommonModule, RouterModule, SharedModule, OrdinalPipe],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.scss'
 })

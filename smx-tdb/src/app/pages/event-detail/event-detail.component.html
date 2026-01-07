@@ -30,14 +30,6 @@
       </mat-card-header>
       <mat-card-content>
         <div class="info-grid">
-          <div class="info-item">
-            <mat-icon class="info-icon">event</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Event Name</span>
-              <span class="info-value">{{ event.name }}</span>
-            </div>
-          </div>
-
           <div class="info-item" *ngIf="event.date">
             <mat-icon class="info-icon">calendar_today</mat-icon>
             <div class="info-content">
@@ -96,12 +88,9 @@
             class="list-item clickable"
           >
             <div class="list-item-content">
-              <span class="list-item-primary">{{ participant.username }}</span>
-              <span class="list-item-secondary" *ngIf="participant.seed !== null && participant.seed !== undefined">
+              <span class="list-item-primary">{{participant.placement | ordinal}} - {{ participant.username }}</span>
+              <span class="list-item-secondary" *ngIf="participant.seed !== null && participant.seed !== undefined && participant.seed > -1">
                 Seed: {{ participant.seed }}
-              </span>
-              <span class="list-item-secondary" *ngIf="participant.placement !== null && participant.placement !== undefined">
-                Place: {{ participant.placement }}
               </span>
             </div>
             <mat-icon class="list-item-icon">chevron_right</mat-icon>
