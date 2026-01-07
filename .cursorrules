@@ -36,6 +36,7 @@
 - Use Material Design components where appropriate
 - Implement proper form validation
 - Handle loading states appropriately
+- **DO NOT use arrow functions in Angular template files** - Angular templates do not support arrow functions. Instead, create component methods to handle any complex logic or transformations needed in templates
 
 ## Backend (Node.js/Express)
 

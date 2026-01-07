@@ -20,7 +20,7 @@
       <mat-icon class="header-icon">event</mat-icon>
       <div class="header-text">
         <h1>{{ event.name }}</h1>
-        <p *ngIf="event.date" class="header-date">{{ formatDateShort(event.date) }}</p>
+        <p *ngIf="event.date" class="header-date">{{ formatDate(event.date) }}</p>
       </div>
     </div>
 
@@ -41,7 +41,7 @@
           <div class="info-item" *ngIf="event.date">
             <mat-icon class="info-icon">calendar_today</mat-icon>
             <div class="info-content">
-              <span class="info-label">Date & Time</span>
+              <span class="info-label">Date</span>
               <span class="info-value">{{ formatDate(event.date) }}</span>
             </div>
           </div>
@@ -59,22 +59,6 @@
             <div class="info-content">
               <span class="info-label">Organizers</span>
               <span class="info-value">{{ event.organizers }}</span>
-            </div>
-          </div>
-
-          <div class="info-item" *ngIf="event.id">
-            <mat-icon class="info-icon">tag</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Event ID</span>
-              <span class="info-value">#{{ event.id }}</span>
-            </div>
-          </div>
-
-          <div class="info-item" *ngIf="event.created_at">
-            <mat-icon class="info-icon">calendar_today</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Created</span>
-              <span class="info-value">{{ formatDate(event.created_at) }}</span>
             </div>
           </div>
 
@@ -97,7 +81,74 @@
       </mat-card-content>
     </mat-card>
 
-    <div class="placeholder-section" *ngIf="!event.description && !event.location && !event.organizers">
+    <mat-accordion class="expansion-panels">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>people</mat-icon>
+            <span>Participants ({{ participants.length }})</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="list-container" *ngIf="participants.length > 0; else noParticipants">
+          <a 
+            *ngFor="let participant of participants" 
+            [routerLink]="['/player', participant.id]"
+            class="list-item clickable"
+          >
+            <div class="list-item-content">
+              <span class="list-item-primary">{{ participant.username }}</span>
+              <span class="list-item-secondary" *ngIf="participant.seed !== null && participant.seed !== undefined">
+                Seed: {{ participant.seed }}
+              </span>
+              <span class="list-item-secondary" *ngIf="participant.placement !== null && participant.placement !== undefined">
+                Place: {{ participant.placement }}
+              </span>
+            </div>
+            <mat-icon class="list-item-icon">chevron_right</mat-icon>
+          </a>
+        </div>
+        <ng-template #noParticipants>
+          <p class="empty-message">No participants found for this event.</p>
+        </ng-template>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>sports_esports</mat-icon>
+            <span>Matches ({{ matches.length }})</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="list-container" *ngIf="matches.length > 0; else noMatches">
+          <a 
+            *ngFor="let match of matches" 
+            [routerLink]="['/match', match.match_id]"
+            class="list-item clickable"
+          >
+            <div class="list-item-content">
+              <span class="list-item-primary" *ngIf="match.round">
+                {{ match.round }}
+              </span>
+              <span class="list-item-primary" *ngIf="!match.round">
+                Match #{{ match.match_id }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.players && match.players.length > 0">
+                {{ formatMatchPlayers(match) }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.winner">
+                Winner: {{ match.winner.gamertag }}
+              </span>
+            </div>
+            <mat-icon class="list-item-icon">chevron_right</mat-icon>
+          </a>
+        </div>
+        <ng-template #noMatches>
+          <p class="empty-message">No matches found for this event.</p>
+        </ng-template>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="placeholder-section" *ngIf="!event.description && !event.location && !event.organizers && participants.length === 0 && matches.length === 0">
       <mat-icon>info</mat-icon>
       <p>Additional information will be displayed here as it becomes available.</p>
     </div>
