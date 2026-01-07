@@ -9,7 +9,7 @@
             <input 
               matInput 
               [formControl]="filterControl"
-              placeholder="Enter player name or pronouns">
+              placeholder="Enter player name">
             <mat-icon matPrefix>search</mat-icon>
             <button 
               *ngIf="filterControl.value" 
@@ -40,7 +40,7 @@
           
           <a 
             *ngFor="let player of filteredPlayers" 
-            [routerLink]="['/player', player.player_id]"
+            [routerLink]="['/player', player.id]"
             class="list-item clickable"
           >
             <div class="list-item-content">

@@ -115,14 +115,14 @@
             class="list-item clickable"
           >
             <div class="list-item-content">
-              <span class="list-item-primary" *ngIf="match.round">
-                {{ match.round }}
+              <span class="list-item-primary" *ngIf="match.players && match.players.length > 0">
+                {{ formatMatchPlayers(match) }}
               </span>
-              <span class="list-item-primary" *ngIf="!match.round">
+              <span class="list-item-primary" *ngIf="!match.players || match.players.length === 0">
                 Match #{{ match.match_id }}
               </span>
-              <span class="list-item-secondary" *ngIf="match.players && match.players.length > 0">
-                {{ formatMatchPlayers(match) }}
+              <span class="list-item-secondary" *ngIf="match.round">
+                Round: {{ match.round }}
               </span>
               <span class="list-item-secondary" *ngIf="match.winner">
                 Winner: {{ match.winner.gamertag }}

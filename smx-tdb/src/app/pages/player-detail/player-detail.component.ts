@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
+import { OrdinalPipe } from '../../shared/pipes/ordinal.pipe';
 import { PlayerService } from '../../services/player.service';
 import { MatchService } from '../../services/match.service';
 import { Player } from '../../models/player';
@@ -13,7 +14,7 @@ import { catchError } from 'rxjs/operators';
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule],
+  imports: [CommonModule, RouterModule, SharedModule, OrdinalPipe],
   templateUrl: './player-detail.component.html',
   styleUrl: './player-detail.component.scss'
 })
@@ -148,6 +149,12 @@ export class PlayerDetailComponent implements OnInit {
   getMatchRecordString(): string {
     const r = this.getMatchRecord();
     return `${r.wins}-${r.losses}`;
+  }
+
+  getPlacementNumber(event: Event): number | null {
+    if (!event.placement) return null;
+    const placement = typeof event.placement === 'string' ? parseInt(event.placement, 10) : event.placement;
+    return isNaN(placement) ? null : placement;
   }
 }
 
