@@ -1,6 +1,6 @@
 .app-container {
   display: grid;
-  grid-template-rows: 5vh 1fr; // Toolbar takes 5vh, content fills the rest
+  grid-template-rows: auto 1fr; // Toolbar takes its natural height, content fills the rest
   height: 100vh;
   width: 100vw;
   overflow: hidden;
@@ -68,9 +68,27 @@
   grid-row: 1;
   height: 5vh;
   min-height: 5vh;
+  max-height: 5vh;
   flex-shrink: 0;
   display: flex;
+  align-items: center;
+  overflow: visible;
+  padding: 0 1rem;
   z-index: 100;
+  
+  h1 {
+    margin: 0;
+    line-height: 1.2;
+    font-size: 1.25rem;
+    white-space: nowrap;
+    overflow: visible;
+    padding: 0;
+    height: auto;
+  }
+  
+  button {
+    flex-shrink: 0;
+  }
 }
 
 .mat-sidenav-container {
