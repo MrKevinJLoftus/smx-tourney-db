@@ -7,7 +7,7 @@
         [formControl]="searchControl"
         [matAutocomplete]="auto"
         (keyup.enter)="performSearch()"
-        placeholder="Enter player name, event name, or match details">
+        placeholder="Enter player gamertag, event name, or match details">
       <mat-icon matPrefix>search</mat-icon>
       <button 
         *ngIf="searchControl.value" 
