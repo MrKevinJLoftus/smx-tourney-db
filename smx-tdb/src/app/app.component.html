@@ -17,16 +17,20 @@
           [routerLink]="[route.url]"
           (click)="sidenav.toggle()"
         >
-          <mat-icon>{{ route.icon }}</mat-icon
-          ><span class="routeText">{{ route.text }}</span>
+        <div class="list-item-content">
+          <mat-icon>{{ route.icon }}</mat-icon>
+          <span class="routeText">{{ route.text }}</span>
+        </div>
         </a>
         <a
           *ngIf="isAuthenticated"
           mat-list-item
           (click)="logout(); sidenav.toggle();"
         >
-        <mat-icon>exit_to_app</mat-icon>
-        <span class="routeText">Logout</span>
+        <div class="list-item-content">
+          <mat-icon>exit_to_app</mat-icon>
+          <span class="routeText">Logout</span>
+        </div>
       </a>
       </mat-nav-list>
     </mat-sidenav>

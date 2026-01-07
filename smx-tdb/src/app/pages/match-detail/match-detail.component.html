@@ -35,14 +35,6 @@
       </mat-card-header>
       <mat-card-content>
         <div class="info-grid">
-          <div class="info-item" *ngIf="match.match_id">
-            <mat-icon class="info-icon">tag</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Match ID</span>
-              <span class="info-value">#{{ match.match_id }}</span>
-            </div>
-          </div>
-
           <div class="info-item" *ngIf="match.round">
             <mat-icon class="info-icon">tournament</mat-icon>
             <div class="info-content">
@@ -61,29 +53,6 @@
                 </a>
               </span>
             </div>
-          </div>
-
-          <div class="info-item" *ngIf="match.created_at">
-            <mat-icon class="info-icon">calendar_today</mat-icon>
-            <div class="info-content">
-              <span class="info-label">Created</span>
-              <span class="info-value">{{ formatDate(match.created_at) }}</span>
-            </div>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Players Section -->
-    <mat-card class="detail-card" *ngIf="match.players && match.players.length > 0">
-      <mat-card-header>
-        <mat-card-title>Players</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="players-list">
-          <div *ngFor="let player of match.players" class="player-item">
-            <mat-icon class="player-icon">person</mat-icon>
-            <a (click)="navigateToPlayer(player.player_id)" class="player-link">{{ player.gamertag }}</a>
           </div>
         </div>
       </mat-card-content>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
 import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
@@ -13,7 +13,7 @@ import { debounceTime, distinctUntilChanged, switchMap, catchError, map, startWi
 
 @Component({
   selector: 'app-home',
-  imports: [SharedModule],
+  imports: [SharedModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })

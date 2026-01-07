@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
+import { BrowseComponent } from './pages/browse/browse.component';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel.component';
 import { UpdatePasswordComponent } from './pages/update-password/update-password.component';
 import { SuperAdminPanelComponent } from './pages/super-admin-panel/super-admin-panel.component';
@@ -10,6 +11,7 @@ import { AuthGuard } from './shared/auth/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
+  { path: 'browse', component: BrowseComponent, data: { title: 'Browse' } },
   { path: 'player/:id', component: PlayerDetailComponent, data: { title: 'Player' } },
   { path: 'event/:id', component: EventDetailComponent, data: { title: 'Event' } },
   { path: 'match/:id', component: MatchDetailComponent, data: { title: 'Match' } },

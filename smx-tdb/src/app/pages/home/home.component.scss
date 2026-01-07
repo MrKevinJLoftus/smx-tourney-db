@@ -2,6 +2,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .header-section {
@@ -262,6 +265,17 @@
     font-size: 1.1rem;
     margin: 0;
     color: rgba(255, 255, 255, 0.8);
+
+    .link {
+      color: rgba(255, 255, 255, 0.9);
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
   }
 }
 
