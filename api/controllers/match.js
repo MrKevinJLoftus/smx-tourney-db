@@ -859,32 +859,28 @@ const normalizeGamertag = (gamertag) => {
 };
 
 /**
- * Resolves a player by gamertag, creating if it doesn't exist
+ * Resolves a player by gamertag, creating a new player record if one doesn't exist.
  * @param {string} gamertag - The player's gamertag
  * @param {number|null} createdBy - The user ID creating the record
  * @param {Map} playerCache - Cache of normalized gamertag -> playerId mappings
- * @returns {Promise<number>} The player ID
+ * @returns {Promise<{ playerId: number, created: boolean }>} The player ID and whether a new player was created
  */
 const resolvePlayer = async (gamertag, createdBy, playerCache) => {
   if (!gamertag || gamertag.trim() === '') {
     throw new Error('Gamertag is required');
   }
 
-  // Clean the gamertag (remove clan tags)
   const cleanedGamertag = cleanGamertag(gamertag);
   if (cleanedGamertag === '') {
     throw new Error('Gamertag is required after cleaning');
   }
-  
-  // Normalize for cache lookup (lowercase)
+
   const normalizedGamertag = normalizeGamertag(cleanedGamertag);
-  
-  // Check cache first
+
   if (playerCache && playerCache.has(normalizedGamertag)) {
-    return playerCache.get(normalizedGamertag);
+    return { playerId: playerCache.get(normalizedGamertag), created: false };
   }
-  
-  // Try to find existing player (case-insensitive)
+
   const players = await dbconn.executeMysqlQuery(
     'SELECT * FROM player WHERE LOWER(username) = LOWER(?)',
     [cleanedGamertag]
@@ -892,29 +888,24 @@ const resolvePlayer = async (gamertag, createdBy, playerCache) => {
 
   if (players && players.length > 0) {
     const playerId = players[0].id;
-    // Update cache with normalized key
     if (playerCache) {
       playerCache.set(normalizedGamertag, playerId);
     }
-    return playerId;
+    return { playerId, created: false };
   }
 
-  // Create new player - handle potential race condition
   try {
     const result = await dbconn.executeMysqlQuery(
       playerQueries.CREATE_PLAYER,
       [cleanedGamertag, null, createdBy]
     );
     const playerId = result.insertId;
-    // Update cache
     if (playerCache) {
       playerCache.set(normalizedGamertag, playerId);
     }
-    return playerId;
+    return { playerId, created: true };
   } catch (error) {
-    // If duplicate key error (race condition), try to find the player again
     if (error.code === 'ER_DUP_ENTRY' || error.message?.includes('Duplicate entry')) {
-      // Retry lookup after potential race condition
       const retryPlayers = await dbconn.executeMysqlQuery(
         'SELECT * FROM player WHERE LOWER(username) = LOWER(?)',
         [cleanedGamertag]
@@ -924,7 +915,7 @@ const resolvePlayer = async (gamertag, createdBy, playerCache) => {
         if (playerCache) {
           playerCache.set(normalizedGamertag, playerId);
         }
-        return playerId;
+        return { playerId, created: false };
       }
     }
     throw error;
@@ -986,10 +977,11 @@ const calculateStatsFromMatchScores = (playerScores, winnerId) => {
 
 /**
  * Builds payload for one match (validation, resolve players, duplicate check, no DB inserts).
- * Used by bulk import to collect all rows then run 3 batch inserts.
- * @returns {Promise<Object>} { ok: true, matchRow, playerSongRows, statsRows } or { ok: false, skipped, duplicate?, error }
+ * Resolves players by gamertag and creates new player records when they don't exist.
+ * @returns {Promise<Object>} { ok: true, matchRow, playerSongRows, statsRows, playersCreated } or { ok: false, skipped, duplicate?, error, playersCreated? }
  */
 const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
+  let playersCreated = 0;
   try {
     if (!setData.id) {
       return { ok: false, skipped: true, error: { matchId: setData.id || 'unknown', message: 'Match ID is required', data: setData } };
@@ -1012,7 +1004,8 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
       const rawGamertag = slot.entrant.name.trim();
       const cleanedGamertag = cleanGamertag(rawGamertag);
       const score = slot.standing?.stats?.score?.value ?? 0;
-      const playerId = await resolvePlayer(cleanedGamertag, createdBy, playerCache);
+      const { playerId, created } = await resolvePlayer(cleanedGamertag, createdBy, playerCache);
+      if (created) playersCreated++;
       playerIds.push(playerId);
       playerScores.push({ playerId, score });
     }
@@ -1024,7 +1017,7 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
     const round = setData.fullRoundText || setData.identifier || null;
     const isDuplicate = await checkDuplicateMatch(eventId, round, playerIds);
     if (isDuplicate) {
-      return { ok: false, skipped: true, duplicate: true, error: { matchId: setData.id, message: `Duplicate match found (round: ${round}, players: ${playerIds.join(', ')})`, data: setData } };
+      return { ok: false, skipped: true, duplicate: true, playersCreated, error: { matchId: setData.id, message: `Duplicate match found (round: ${round}, players: ${playerIds.join(', ')})`, data: setData } };
     }
 
     let winnerId = null;
@@ -1032,7 +1025,9 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
       const winnerSlot = slots.find(slot => slot.entrant?.id === setData.winnerId);
       if (winnerSlot?.entrant?.name) {
         const cleanedWinnerGamertag = cleanGamertag(winnerSlot.entrant.name.trim());
-        winnerId = await resolvePlayer(cleanedWinnerGamertag, createdBy, playerCache);
+        const resolved = await resolvePlayer(cleanedWinnerGamertag, createdBy, playerCache);
+        winnerId = resolved.playerId;
+        if (resolved.created) playersCreated++;
       }
     }
     if (!winnerId && playerScores.length === 2) {
@@ -1044,7 +1039,6 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
 
     const stats = calculateStatsFromMatchScores(playerScores, winnerId);
     const matchRow = [eventId, winnerId, round, createdBy];
-    // Rows without match_id; match_id will be set to firstInsertId + matchIndex when batching
     const playerSongRows = playerIds.map(playerId => [
       playerId,
       null, null, null, null,
@@ -1055,10 +1049,10 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
     for (const [playerId, playerStats] of stats.entries()) {
       statsRows.push([playerId, playerStats.wins, playerStats.losses, playerStats.draws, createdBy]);
     }
-    return { ok: true, matchRow, playerSongRows, statsRows };
+    return { ok: true, matchRow, playerSongRows, statsRows, playersCreated };
   } catch (error) {
     console.error(`Error building payload for match ${setData.id}:`, error);
-    return { ok: false, skipped: true, error: { matchId: setData.id, message: error.message, data: setData } };
+    return { ok: false, skipped: true, playersCreated, error: { matchId: setData.id, message: error.message, data: setData } };
   }
 };
 
@@ -1138,19 +1132,21 @@ exports.bulkImportMatches = async (req, res) => {
     // Continue anyway - cache will be built as we go
   }
 
-  // Pass 1: build payloads for each set (resolve players, check duplicates); collect rows for batch insert
+  // Pass 1: build payloads for each set (resolve players—creating new players as needed—check duplicates); collect rows for batch insert
   const matchRows = [];
-  const payloads = []; // { playerSongRows, statsRows } per match (without match_id)
+  const payloads = [];
   const summary = {
     totalMatches: sets.length,
     matchesCreated: 0,
     matchesSkipped: 0,
     duplicatesSkipped: 0,
+    playersCreated: 0,
     errors: []
   };
 
   for (const set of sets) {
     const payload = await buildMatchPayload(set, eventId, createdBy, playerCache);
+    summary.playersCreated += payload.playersCreated || 0;
     if (payload.ok) {
       matchRows.push(payload.matchRow);
       payloads.push({ playerSongRows: payload.playerSongRows, statsRows: payload.statsRows });
@@ -1205,6 +1201,7 @@ exports.bulkImportMatches = async (req, res) => {
       matchesCreated: summary.matchesCreated,
       matchesSkipped: summary.matchesSkipped,
       duplicatesSkipped: summary.duplicatesSkipped,
+      playersCreated: summary.playersCreated,
       errors: summary.errors.length
     },
     errors: summary.errors.length > 0 ? summary.errors : undefined
