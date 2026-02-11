@@ -1,0 +1,2310 @@
+[
+    {
+        "data": {
+            "event": {
+                "id": 941019,
+                "sets": {
+                    "pageInfo": {
+                        "page": 4,
+                        "total": 71,
+                        "perPage": 15,
+                        "totalPages": 5,
+                        "sortBy": "weightedState DESC, phaseWeight DESC, stateAwareStartAtWeight ASC, stateAwareRoundOrder ASC, identifier ASC, raceStandingWeight DESC, startedAt DESC, createdAt DESC",
+                        "__typename": "PageInfo"
+                    },
+                    "nodes": [
+                        {
+                            "id": 68494568,
+                            "isReportable": true,
+                            "identifier": "J",
+                            "fullRoundText": "Winners Quarter-Final",
+                            "winnerId": 14685151,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494568",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702079661.7775,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494568-0",
+                                        "slotIndex": 0,
+                                        "seedId": 27296752,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 15030512,
+                                            "name": "damefortuna",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27296752,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494568,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494563,
+                                            "identifier": "E",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27296752_sets_68494568",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494568-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26791927,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14685151,
+                                            "name": "PrimoVictorian",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26791927,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494568,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494564,
+                                            "identifier": "F",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26791927_sets_68494568",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494615,
+                            "isReportable": true,
+                            "identifier": "J",
+                            "fullRoundText": "Winners Quarter-Final",
+                            "winnerId": 15078724,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494615",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702076713.1815,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494615-0",
+                                        "slotIndex": 0,
+                                        "seedId": 27367493,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 15078724,
+                                            "name": "ATB",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27367493,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494615,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494610,
+                                            "identifier": "E",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27367493_sets_68494615",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494615-1",
+                                        "slotIndex": 1,
+                                        "seedId": 25476480,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 13778527,
+                                            "name": "MasterJack1225",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25476480,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494615,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494611,
+                                            "identifier": "F",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25476480_sets_68494615",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494594,
+                            "isReportable": true,
+                            "identifier": "R",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 15030512,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494594",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702081216.4291,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494594-0",
+                                        "slotIndex": 0,
+                                        "seedId": 27296752,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 15030512,
+                                            "name": "damefortuna",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27296752,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494594,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494568,
+                                            "identifier": "J",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27296752_sets_68494594",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494594-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26972181,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14811071,
+                                            "name": "AARP | Big Matt",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26972181,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494594,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494590,
+                                            "identifier": "AT",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26972181_sets_68494594",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 1,
+                                                    "displayValue": "1",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494641,
+                            "isReportable": true,
+                            "identifier": "R",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 13778527,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494641",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702078290.2593,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494641-0",
+                                        "slotIndex": 0,
+                                        "seedId": 25476480,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 13778527,
+                                            "name": "MasterJack1225",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25476480,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494641,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494615,
+                                            "identifier": "J",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25476480_sets_68494641",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494641-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26838766,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14718195,
+                                            "name": "OtakuBot",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26838766,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494641,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494637,
+                                            "identifier": "AT",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26838766_sets_68494641",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494642,
+                            "isReportable": true,
+                            "identifier": "S",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 14448411,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494642",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702081746.778,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494642-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26452299,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 14448411,
+                                            "name": "datcoreedoe",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26452299,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494642,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494614,
+                                            "identifier": "I",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26452299_sets_68494642",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494642-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26116602,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14194572,
+                                            "name": "CHI XU",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26116602,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494642,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494638,
+                                            "identifier": "P",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26116602_sets_68494642",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494595,
+                            "isReportable": true,
+                            "identifier": "S",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 13755741,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494595",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702079990.4733,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494595-0",
+                                        "slotIndex": 0,
+                                        "seedId": 25439879,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 13755741,
+                                            "name": "Malia",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439879,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494595,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494567,
+                                            "identifier": "I",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439879_sets_68494595",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494595-1",
+                                        "slotIndex": 1,
+                                        "seedId": 27320811,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 15047112,
+                                            "name": "Arrow Eclipse | GODDISH",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27320811,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494595,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494591,
+                                            "identifier": "P",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27320811_sets_68494595",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494643,
+                            "isReportable": true,
+                            "identifier": "T",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 14451523,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494643",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702083570.5598,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494643-0",
+                                        "slotIndex": 0,
+                                        "seedId": 25442846,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 13757970,
+                                            "name": "Shinobee",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25442846,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494643,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494613,
+                                            "identifier": "H",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25442846_sets_68494643",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494643-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26456151,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14451523,
+                                            "name": "Daniel Van Eden",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26456151,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494643,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494639,
+                                            "identifier": "AU",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26456151_sets_68494643",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494596,
+                            "isReportable": true,
+                            "identifier": "T",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 14625724,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494596",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702079707.9758,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494596-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26799345,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 14690440,
+                                            "name": "MisterGuy_",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26799345,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494596,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494566,
+                                            "identifier": "H",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26799345_sets_68494596",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494596-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26708922,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14625724,
+                                            "name": "Dims.Ai$",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26708922,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494596,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494592,
+                                            "identifier": "AU",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26708922_sets_68494596",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494597,
+                            "isReportable": true,
+                            "identifier": "U",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 14514164,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494597",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702086673.3616,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494597-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26546144,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 14514164,
+                                            "name": "beewizzard",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26546144,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494597,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494565,
+                                            "identifier": "G",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26546144_sets_68494597",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494597-1",
+                                        "slotIndex": 1,
+                                        "seedId": 25439274,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 13755355,
+                                            "name": "Litenang",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439274,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494597,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494593,
+                                            "identifier": "Q",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439274_sets_68494597",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494644,
+                            "isReportable": true,
+                            "identifier": "U",
+                            "fullRoundText": "Losers Round 2",
+                            "winnerId": 14696267,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494644",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702078683.2133,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494644-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26807296,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 2,
+                                        "entrant": {
+                                            "id": 14696267,
+                                            "name": "FzP | Pilot",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26807296,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494644,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494612,
+                                            "identifier": "G",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26807296_sets_68494644",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": null,
+                                                    "displayValue": null,
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494644-1",
+                                        "slotIndex": 1,
+                                        "seedId": 25439200,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 13755285,
+                                            "name": "Arrow Eclipse | Sneezle",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439200,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494644,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494640,
+                                            "identifier": "Q",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439200_sets_68494644",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": -1,
+                                                    "displayValue": "-1",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494638,
+                            "isReportable": true,
+                            "identifier": "P",
+                            "fullRoundText": "Losers Round 1",
+                            "winnerId": 14194572,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494638",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702080434.8461,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494638-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26972663,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14811294,
+                                            "name": "StormTaker21",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26972663,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494638,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494631,
+                                            "identifier": "AN",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26972663_sets_68494638",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494638-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26116602,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14194572,
+                                            "name": "CHI XU",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26116602,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494638,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494632,
+                                            "identifier": "AO",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26116602_sets_68494638",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494591,
+                            "isReportable": true,
+                            "identifier": "P",
+                            "fullRoundText": "Losers Round 1",
+                            "winnerId": 15047112,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494591",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702077371.0296,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494591-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26047424,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14145249,
+                                            "name": "PRACC40 \/ 40HR",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26047424,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494591,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494584,
+                                            "identifier": "AN",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26047424_sets_68494591",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 1,
+                                                    "displayValue": "1",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494591-1",
+                                        "slotIndex": 1,
+                                        "seedId": 27320811,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 15047112,
+                                            "name": "Arrow Eclipse | GODDISH",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27320811,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494591,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494585,
+                                            "identifier": "AO",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27320811_sets_68494591",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494593,
+                            "isReportable": true,
+                            "identifier": "Q",
+                            "fullRoundText": "Losers Round 1",
+                            "winnerId": 13755355,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494593",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702078850.1907,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494593-0",
+                                        "slotIndex": 0,
+                                        "seedId": 27261297,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 15008358,
+                                            "name": "Seth",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 27261297,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494593,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494588,
+                                            "identifier": "AR",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_27261297_sets_68494593",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494593-1",
+                                        "slotIndex": 1,
+                                        "seedId": 25439274,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 13755355,
+                                            "name": "Litenang",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439274,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494593,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494589,
+                                            "identifier": "AS",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439274_sets_68494593",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2273622,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ2",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494640,
+                            "isReportable": true,
+                            "identifier": "Q",
+                            "fullRoundText": "Losers Round 1",
+                            "winnerId": 13755285,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494640",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702076725.0845,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494640-0",
+                                        "slotIndex": 0,
+                                        "seedId": 26761828,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 14663555,
+                                            "name": "thedarklord",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26761828,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494640,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494635,
+                                            "identifier": "AR",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26761828_sets_68494640",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494640-1",
+                                        "slotIndex": 1,
+                                        "seedId": 25439200,
+                                        "prereqType": "set",
+                                        "prereqPlacement": 1,
+                                        "entrant": {
+                                            "id": 13755285,
+                                            "name": "Arrow Eclipse | Sneezle",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439200,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494640,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": {
+                                            "id": 68494636,
+                                            "identifier": "AS",
+                                            "__typename": "Set"
+                                        },
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439200_sets_68494640",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        },
+                        {
+                            "id": 68494605,
+                            "isReportable": true,
+                            "identifier": "A",
+                            "fullRoundText": "Winners Round 1",
+                            "winnerId": 13755572,
+                            "startAt": 1702051200,
+                            "createdAt": 1702071703,
+                            "state": 3,
+                            "setLink": "\/tournament\/eclipse-2023\/events\/eclipse-2023-stepmaniax\/set\/68494605",
+                            "filledSlots": 2,
+                            "stationNumber": null,
+                            "vodUrl": null,
+                            "updatedAtMicro": 1702073837.8042,
+                            "userTasks": null,
+                            "paginatedSlots": {
+                                "pageInfo": {
+                                    "total": 2,
+                                    "__typename": "PageInfo"
+                                },
+                                "nodes": [
+                                    {
+                                        "id": "68494605-0",
+                                        "slotIndex": 0,
+                                        "seedId": 25439599,
+                                        "prereqType": "seed",
+                                        "prereqPlacement": null,
+                                        "entrant": {
+                                            "id": 13755572,
+                                            "name": "SnowStorm",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 25439599,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494605,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": null,
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_25439599_sets_68494605",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 2,
+                                                    "displayValue": "2",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    },
+                                    {
+                                        "id": "68494605-1",
+                                        "slotIndex": 1,
+                                        "seedId": 26838766,
+                                        "prereqType": "seed",
+                                        "prereqPlacement": null,
+                                        "entrant": {
+                                            "id": 14718195,
+                                            "name": "OtakuBot",
+                                            "networkIdDisplayName": "",
+                                            "__typename": "Entrant"
+                                        },
+                                        "seed": {
+                                            "id": 26838766,
+                                            "isBye": false,
+                                            "__typename": "Seed"
+                                        },
+                                        "set": {
+                                            "id": 68494605,
+                                            "event": {
+                                                "id": 941019,
+                                                "videogame": {
+                                                    "id": 33834,
+                                                    "name": "StepmaniaX",
+                                                    "__typename": "Videogame"
+                                                },
+                                                "__typename": "Event"
+                                            },
+                                            "__typename": "Set"
+                                        },
+                                        "originSet": null,
+                                        "originProgression": null,
+                                        "__typename": "SetSlot",
+                                        "standing": {
+                                            "id": "placeholder_standing_seeds_26838766_sets_68494605",
+                                            "stats": {
+                                                "score": {
+                                                    "label": "Score",
+                                                    "value": 0,
+                                                    "displayValue": "0",
+                                                    "__typename": "Score"
+                                                },
+                                                "__typename": "StandingStats"
+                                            },
+                                            "__typename": "Standing"
+                                        }
+                                    }
+                                ],
+                                "__typename": "SetSlotConnection"
+                            },
+                            "phaseGroup": {
+                                "id": 2134401,
+                                "bracketType": "DOUBLE_ELIMINATION",
+                                "displayIdentifier": "SOQ1",
+                                "phase": {
+                                    "id": 1407805,
+                                    "name": "Bracket",
+                                    "__typename": "Phase"
+                                },
+                                "__typename": "PhaseGroup"
+                            },
+                            "stream": null,
+                            "tournament": {
+                                "id": 529608,
+                                "timezone": "America\/New_York",
+                                "__typename": "Tournament"
+                            },
+                            "event": {
+                                "id": 941019,
+                                "slug": "tournament\/eclipse-2023\/event\/eclipse-2023-stepmaniax",
+                                "isOnline": false,
+                                "isSingleBracket": false,
+                                "__typename": "Event"
+                            },
+                            "__typename": "Set"
+                        }
+                    ],
+                    "__typename": "SetConnection"
+                },
+                "__typename": "Event"
+            }
+        },
+        "extensions": {
+            "cacheControl": {
+                "version": 1,
+                "hints": [
+                    {
+                        "path": [
+                            "event"
+                        ],
+                        "maxAge": 60,
+                        "scope": "PRIVATE"
+                    }
+                ]
+            },
+            "queryComplexity": 0
+        }
+    }
+]
