@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS `event` (
     `location` VARCHAR(200),
     `organizers` VARCHAR(200),
     `created_by` INT,
+    `start_gg_event_id` BIGINT UNSIGNED NULL DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `uniq_event_start_gg_event_id` (`start_gg_event_id`),
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

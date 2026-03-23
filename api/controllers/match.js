@@ -1,7 +1,13 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/match');
-const playerQueries = require('../queries/player');
 const eventQueries = require('../queries/event');
+const {
+  cleanGamertag,
+  normalizeGamertag,
+  resolvePlayer,
+  prePopulatePlayerCache,
+} = require('../services/playerResolver');
+const { augmentStartGgSetForMatchImport } = require('../services/startGgRoundLabel');
 
 /**
  * Determines the winner(s) of a song based on scores.
@@ -821,122 +827,21 @@ exports.getMatchesByPlayer = async (req, res) => {
 };
 
 /**
- * Cleans a gamertag by removing clan tags (splits on "|" and takes part after pipe)
- * @param {string} gamertag - The raw gamertag
- * @returns {string} The cleaned gamertag
- */
-const cleanGamertag = (gamertag) => {
-  if (!gamertag || typeof gamertag !== 'string') {
-    return '';
-  }
-  
-  const trimmed = gamertag.trim();
-  if (trimmed === '') {
-    return '';
-  }
-  
-  // Split on pipe character and take the part after it
-  const parts = trimmed.split('|');
-  if (parts.length > 1) {
-    // Take the part after the pipe and trim it
-    return parts[parts.length - 1].trim();
-  }
-  
-  // No pipe found, return trimmed original
-  return trimmed;
-};
-
-/**
- * Normalizes a gamertag for consistent lookup (lowercase)
- * @param {string} gamertag - The gamertag to normalize
- * @returns {string} The normalized (lowercase) gamertag
- */
-const normalizeGamertag = (gamertag) => {
-  if (!gamertag || typeof gamertag !== 'string') {
-    return '';
-  }
-  return gamertag.toLowerCase().trim();
-};
-
-/**
- * Resolves a player by gamertag, creating a new player record if one doesn't exist.
- * @param {string} gamertag - The player's gamertag
- * @param {number|null} createdBy - The user ID creating the record
- * @param {Map} playerCache - Cache of normalized gamertag -> playerId mappings
- * @returns {Promise<{ playerId: number, created: boolean }>} The player ID and whether a new player was created
- */
-const resolvePlayer = async (gamertag, createdBy, playerCache) => {
-  if (!gamertag || gamertag.trim() === '') {
-    throw new Error('Gamertag is required');
-  }
-
-  const cleanedGamertag = cleanGamertag(gamertag);
-  if (cleanedGamertag === '') {
-    throw new Error('Gamertag is required after cleaning');
-  }
-
-  const normalizedGamertag = normalizeGamertag(cleanedGamertag);
-
-  if (playerCache && playerCache.has(normalizedGamertag)) {
-    return { playerId: playerCache.get(normalizedGamertag), created: false };
-  }
-
-  const players = await dbconn.executeMysqlQuery(
-    'SELECT * FROM player WHERE LOWER(username) = LOWER(?)',
-    [cleanedGamertag]
-  );
-
-  if (players && players.length > 0) {
-    const playerId = players[0].id;
-    if (playerCache) {
-      playerCache.set(normalizedGamertag, playerId);
-    }
-    return { playerId, created: false };
-  }
-
-  try {
-    const result = await dbconn.executeMysqlQuery(
-      playerQueries.CREATE_PLAYER,
-      [cleanedGamertag, null, createdBy]
-    );
-    const playerId = result.insertId;
-    if (playerCache) {
-      playerCache.set(normalizedGamertag, playerId);
-    }
-    return { playerId, created: true };
-  } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY' || error.message?.includes('Duplicate entry')) {
-      const retryPlayers = await dbconn.executeMysqlQuery(
-        'SELECT * FROM player WHERE LOWER(username) = LOWER(?)',
-        [cleanedGamertag]
-      );
-      if (retryPlayers && retryPlayers.length > 0) {
-        const playerId = retryPlayers[0].id;
-        if (playerCache) {
-          playerCache.set(normalizedGamertag, playerId);
-        }
-        return { playerId, created: false };
-      }
-    }
-    throw error;
-  }
-};
-
-/**
  * Checks if a match already exists with the same round and players
  * @param {number} eventId - The event ID
  * @param {string} round - The round name
  * @param {Array<number>} playerIds - Array of player IDs (must be exactly 2)
  * @returns {Promise<boolean>} True if duplicate exists
  */
-const checkDuplicateMatch = async (eventId, round, playerIds) => {
+const checkDuplicateMatch = async (eventId, round, playerIds, connection) => {
   if (!playerIds || playerIds.length !== 2) {
     return false;
   }
 
   const existing = await dbconn.executeMysqlQuery(
     queries.CHECK_DUPLICATE_MATCH,
-    [eventId, round, playerIds[0], playerIds[1]]
+    [eventId, round, playerIds[0], playerIds[1]],
+    connection
   );
 
   return existing && existing.length > 0;
@@ -980,7 +885,7 @@ const calculateStatsFromMatchScores = (playerScores, winnerId) => {
  * Resolves players by gamertag and creates new player records when they don't exist.
  * @returns {Promise<Object>} { ok: true, matchRow, playerSongRows, statsRows, playersCreated } or { ok: false, skipped, duplicate?, error, playersCreated? }
  */
-const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
+const buildMatchPayload = async (setData, eventId, createdBy, playerCache, connection) => {
   let playersCreated = 0;
   try {
     if (!setData.id) {
@@ -990,7 +895,10 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
       return { ok: false, skipped: true, error: { matchId: setData.id, message: `Match not completed (state: ${setData.state})`, data: setData } };
     }
 
-    const slots = setData.paginatedSlots?.nodes || [];
+    const rawSlots = setData.paginatedSlots?.nodes || setData.slots || [];
+    const slots = [...rawSlots].sort(
+      (a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0)
+    );
     if (slots.length < 2) {
       return { ok: false, skipped: true, error: { matchId: setData.id, message: 'Match must have at least 2 players', data: setData } };
     }
@@ -1004,7 +912,7 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
       const rawGamertag = slot.entrant.name.trim();
       const cleanedGamertag = cleanGamertag(rawGamertag);
       const score = slot.standing?.stats?.score?.value ?? 0;
-      const { playerId, created } = await resolvePlayer(cleanedGamertag, createdBy, playerCache);
+      const { playerId, created } = await resolvePlayer(cleanedGamertag, createdBy, playerCache, connection);
       if (created) playersCreated++;
       playerIds.push(playerId);
       playerScores.push({ playerId, score });
@@ -1015,7 +923,7 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
     }
 
     const round = setData.fullRoundText || setData.identifier || null;
-    const isDuplicate = await checkDuplicateMatch(eventId, round, playerIds);
+    const isDuplicate = await checkDuplicateMatch(eventId, round, playerIds, connection);
     if (isDuplicate) {
       return { ok: false, skipped: true, duplicate: true, playersCreated, error: { matchId: setData.id, message: `Duplicate match found (round: ${round}, players: ${playerIds.join(', ')})`, data: setData } };
     }
@@ -1025,7 +933,7 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
       const winnerSlot = slots.find(slot => slot.entrant?.id === setData.winnerId);
       if (winnerSlot?.entrant?.name) {
         const cleanedWinnerGamertag = cleanGamertag(winnerSlot.entrant.name.trim());
-        const resolved = await resolvePlayer(cleanedWinnerGamertag, createdBy, playerCache);
+        const resolved = await resolvePlayer(cleanedWinnerGamertag, createdBy, playerCache, connection);
         winnerId = resolved.playerId;
         if (resolved.created) playersCreated++;
       }
@@ -1054,6 +962,92 @@ const buildMatchPayload = async (setData, eventId, createdBy, playerCache) => {
     console.error(`Error building payload for match ${setData.id}:`, error);
     return { ok: false, skipped: true, playersCreated, error: { matchId: setData.id, message: error.message, data: setData } };
   }
+};
+
+async function executeMatchPayloadBatchInsert(matchRows, payloads, connection) {
+  if (matchRows.length === 0) {
+    return;
+  }
+  const matchResult = await dbconn.executeMysqlQuery(
+    queries.CREATE_MATCH_BATCH(matchRows.length),
+    matchRows.flat(),
+    connection
+  );
+  const firstInsertId = matchResult.insertId;
+
+  const allPlayerSongRows = [];
+  const allStatsRows = [];
+  for (let i = 0; i < payloads.length; i++) {
+    const matchId = firstInsertId + i;
+    const { playerSongRows, statsRows } = payloads[i];
+    for (const row of playerSongRows) {
+      allPlayerSongRows.push([matchId, ...row]);
+    }
+    for (const row of statsRows) {
+      allStatsRows.push([matchId, ...row]);
+    }
+  }
+
+  if (allPlayerSongRows.length > 0) {
+    await dbconn.executeMysqlQuery(
+      queries.CREATE_MATCH_PLAYER_SONGS_BATCH(allPlayerSongRows.length),
+      allPlayerSongRows.flat(),
+      connection
+    );
+  }
+  if (allStatsRows.length > 0) {
+    await dbconn.executeMysqlQuery(
+      queries.CREATE_MATCH_PLAYER_STATS_BATCH(allStatsRows.length),
+      allStatsRows.flat(),
+      connection
+    );
+  }
+}
+
+/**
+ * Import completed sets from start.gg (bracket-aware round labels). Used by start.gg full import.
+ * @param {Array<object>} sets
+ * @param {number} eventId
+ * @param {number|null} createdBy
+ */
+/**
+ * @param {import('mysql').Connection} [connection] when provided, all DB work uses this transaction
+ */
+exports.importMatchesFromStartGgSets = async (sets, eventId, createdBy, connection) => {
+  const playerCache = new Map();
+  await prePopulatePlayerCache(playerCache, connection);
+
+  const matchRows = [];
+  const payloads = [];
+  const summary = {
+    totalMatches: sets.length,
+    matchesCreated: 0,
+    matchesSkipped: 0,
+    duplicatesSkipped: 0,
+    playersCreated: 0,
+    errors: [],
+  };
+
+  for (const set of sets) {
+    const augmented = augmentStartGgSetForMatchImport(set);
+    const payload = await buildMatchPayload(augmented, eventId, createdBy, playerCache, connection);
+    summary.playersCreated += payload.playersCreated || 0;
+    if (payload.ok) {
+      matchRows.push(payload.matchRow);
+      payloads.push({ playerSongRows: payload.playerSongRows, statsRows: payload.statsRows });
+    } else {
+      summary.matchesSkipped++;
+      if (payload.duplicate) summary.duplicatesSkipped++;
+      if (payload.error) summary.errors.push(payload.error);
+    }
+  }
+
+  if (matchRows.length > 0) {
+    await executeMatchPayloadBatchInsert(matchRows, payloads, connection);
+    summary.matchesCreated = matchRows.length;
+  }
+
+  return summary;
 };
 
 /**
@@ -1111,26 +1105,7 @@ exports.bulkImportMatches = async (req, res) => {
 
   const createdBy = req.userData?.userId || null;
   const playerCache = new Map(); // Cache normalized gamertag -> playerId mappings
-  
-  // Pre-populate cache with existing players to prevent duplicates
-  // This helps avoid race conditions when processing matches in parallel
-  try {
-    const existingPlayers = await dbconn.executeMysqlQuery(
-      'SELECT id, username FROM player',
-      []
-    );
-    existingPlayers.forEach(player => {
-      if (player.username) {
-        const cleaned = cleanGamertag(player.username);
-        const normalized = normalizeGamertag(cleaned);
-        playerCache.set(normalized, player.id);
-      }
-    });
-    console.log(`Pre-populated player cache with ${playerCache.size} existing players`);
-  } catch (error) {
-    console.error('Error pre-populating player cache:', error);
-    // Continue anyway - cache will be built as we go
-  }
+  await prePopulatePlayerCache(playerCache);
 
   // Pass 1: build payloads for each set (resolve players—creating new players as needed—check duplicates); collect rows for batch insert
   const matchRows = [];
@@ -1145,7 +1120,7 @@ exports.bulkImportMatches = async (req, res) => {
   };
 
   for (const set of sets) {
-    const payload = await buildMatchPayload(set, eventId, createdBy, playerCache);
+    const payload = await buildMatchPayload(set, eventId, createdBy, playerCache, undefined);
     summary.playersCreated += payload.playersCreated || 0;
     if (payload.ok) {
       matchRows.push(payload.matchRow);
@@ -1159,38 +1134,7 @@ exports.bulkImportMatches = async (req, res) => {
 
   // Pass 2: one batch insert per table (only if we have matches to insert)
   if (matchRows.length > 0) {
-    const matchResult = await dbconn.executeMysqlQuery(
-      queries.CREATE_MATCH_BATCH(matchRows.length),
-      matchRows.flat()
-    );
-    const firstInsertId = matchResult.insertId;
-
-    const allPlayerSongRows = [];
-    const allStatsRows = [];
-    for (let i = 0; i < payloads.length; i++) {
-      const matchId = firstInsertId + i;
-      const { playerSongRows, statsRows } = payloads[i];
-      for (const row of playerSongRows) {
-        allPlayerSongRows.push([matchId, ...row]);
-      }
-      for (const row of statsRows) {
-        allStatsRows.push([matchId, ...row]);
-      }
-    }
-
-    if (allPlayerSongRows.length > 0) {
-      await dbconn.executeMysqlQuery(
-        queries.CREATE_MATCH_PLAYER_SONGS_BATCH(allPlayerSongRows.length),
-        allPlayerSongRows.flat()
-      );
-    }
-    if (allStatsRows.length > 0) {
-      await dbconn.executeMysqlQuery(
-        queries.CREATE_MATCH_PLAYER_STATS_BATCH(allStatsRows.length),
-        allStatsRows.flat()
-      );
-    }
-
+    await executeMatchPayloadBatchInsert(matchRows, payloads, undefined);
     summary.matchesCreated = matchRows.length;
   }
 

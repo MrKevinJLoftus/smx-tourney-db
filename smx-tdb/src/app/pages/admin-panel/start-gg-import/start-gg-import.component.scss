@@ -1,0 +1,137 @@
+.start-gg-import {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 960px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-size: 14px;
+  line-height: 1.5;
+
+  code {
+    font-size: 0.9em;
+  }
+}
+
+.url-field {
+  width: 100%;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.error-card {
+  border-color: var(--mat-sys-error, #b3261e);
+
+  mat-card-content {
+    color: var(--mat-sys-error, #b3261e);
+  }
+}
+
+.result-card,
+.import-result-card {
+  margin-top: 8px;
+}
+
+.import-result-card {
+  border-left: 4px solid var(--mat-sys-primary, #6750a4);
+}
+
+.summary-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 0 0 16px;
+
+  dt {
+    margin: 0;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 16px 0 8px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  th,
+  td {
+    border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+    padding: 8px 12px 8px 0;
+    text-align: left;
+  }
+
+  th {
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  }
+}
+
+.sets-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+  }
+
+  .round-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .round {
+    font-weight: 500;
+  }
+
+  .bracket-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.55));
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.06));
+  }
+
+  .versus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .vs {
+    opacity: 0.65;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}

@@ -1,0 +1,176 @@
+<div class="start-gg-import">
+  <p class="hint">
+    Paste a start.gg event URL. The path should include
+    <code>tournament/…/event/…</code>
+    (for example the event’s Overview or Brackets page).
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline" class="url-field">
+      <mat-label>start.gg event URL</mat-label>
+      <input matInput formControlName="url" type="url" autocomplete="off" placeholder="https://www.start.gg/tournament/…/event/…" />
+      @if (form.get('url')?.invalid && form.get('url')?.touched) {
+        <mat-error>A valid URL is required.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting || isImporting || form.invalid">
+        @if (isSubmitting) {
+          <span>Loading…</span>
+        } @else {
+          <span>Preview (fetch)</span>
+        }
+      </button>
+      <button
+        mat-stroked-button
+        color="primary"
+        type="button"
+        (click)="onImport()"
+        [disabled]="isSubmitting || isImporting || form.invalid"
+      >
+        @if (isImporting) {
+          <span>Importing…</span>
+        } @else {
+          <span>Import into database</span>
+        }
+      </button>
+      @if (preview || importResult || errorMessage) {
+        <button mat-button type="button" (click)="clearResult()">Clear</button>
+      }
+    </div>
+  </form>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (importResult) {
+    <mat-card class="import-result-card">
+      <mat-card-header>
+        <mat-card-title>Import complete</mat-card-title>
+        <mat-card-subtitle>
+          Local event id {{ importResult.localEventId }}
+          · start.gg event id {{ importResult.startGgEventId }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="summary-dl">
+          <dt>Standings rows</dt>
+          <dd>{{ importResult.summary.standingsRows }}</dd>
+          <dt>Event players added</dt>
+          <dd>{{ importResult.summary.eventPlayersAdded }}</dd>
+          <dt>Event players skipped (duplicate)</dt>
+          <dd>{{ importResult.summary.eventPlayersSkipped }}</dd>
+          <dt>Players created (from standings)</dt>
+          <dd>{{ importResult.summary.playersCreatedFromStandings }}</dd>
+          <dt>Sets fetched</dt>
+          <dd>{{ importResult.summary.setsFetched }}</dd>
+          <dt>Matches created</dt>
+          <dd>{{ importResult.summary.matches.matchesCreated }} / {{ importResult.summary.matches.totalMatches }}</dd>
+          <dt>Matches skipped</dt>
+          <dd>{{ importResult.summary.matches.matchesSkipped }}</dd>
+          <dt>Duplicate matches skipped</dt>
+          <dd>{{ importResult.summary.matches.duplicatesSkipped }}</dd>
+          <dt>Players created (from matches)</dt>
+          <dd>{{ importResult.summary.matches.playersCreated }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (preview) {
+    <mat-card class="result-card">
+      <mat-card-header>
+        <mat-card-title>{{ preview.summary.eventName }}</mat-card-title>
+        <mat-card-subtitle>
+          start.gg event id: {{ preview.startGgEventId }}
+          · slug: {{ preview.slug }}
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="summary-dl">
+          @if (preview.summary.tournamentName) {
+            <dt>Tournament</dt>
+            <dd>{{ preview.summary.tournamentName }}</dd>
+          }
+          @if (preview.summary.city) {
+            <dt>City</dt>
+            <dd>{{ preview.summary.city }}</dd>
+          }
+          @if (preview.summary.suggestedLocalDate) {
+            <dt>Suggested date (local)</dt>
+            <dd>{{ preview.summary.suggestedLocalDate }}</dd>
+          }
+          @if (preview.summary.numEntrants != null) {
+            <dt>Entrants (start.gg)</dt>
+            <dd>{{ preview.summary.numEntrants }}</dd>
+          }
+          @if (preview.summary.standingsTotal != null) {
+            <dt>Standings rows</dt>
+            <dd>{{ preview.summary.standingsTotal }}</dd>
+          }
+          @if (preview.summary.setsTotal != null) {
+            <dt>Sets (matches)</dt>
+            <dd>{{ preview.summary.setsTotal }}</dd>
+          }
+        </dl>
+
+        @if (preview.standingsPreview?.nodes?.length) {
+          <h3 class="section-title">Standings preview</h3>
+          <div class="table-wrap">
+            <table class="preview-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Entrant</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of preview.standingsPreview!.nodes; track row.entrant.id) {
+                  <tr>
+                    <td>{{ row.placement }}</td>
+                    <td>{{ row.entrant.name }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (preview.setsPreview?.nodes?.length) {
+          <h3 class="section-title">Sets preview (first page)</h3>
+          <ul class="sets-list">
+            @for (set of preview.setsPreview!.nodes; track set.id) {
+              <li>
+                @let br = bracketContextLabel(set);
+                <div class="round-line">
+                  <span class="round">{{ set.fullRoundText || set.identifier || 'Set' }}</span>
+                  @if (br) {
+                    <span
+                      class="bracket-label"
+                      [matTooltip]="bracketContextTitle(set)"
+                      matTooltipShowDelay="200"
+                    >{{ br }}</span>
+                  }
+                </div>
+                @if (set.slots && set.slots.length) {
+                  <span class="versus">
+                    @for (slot of set.slots; track slot.slotIndex) {
+                      <span>{{ slot.entrant?.name || '—' }}</span>
+                      @if (!$last) {
+                        <span class="vs">vs</span>
+                      }
+                    }
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>
