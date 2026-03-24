@@ -33,6 +33,25 @@ const GET_EVENT_FOR_IMPORT_QUERY = `
       name
       startAt
       numEntrants
+      slug
+      tournament {
+        id
+        name
+        city
+        startAt
+      }
+    }
+  }
+`;
+
+const GET_EVENT_FOR_IMPORT_BY_ID_QUERY = `
+  query GetEventForImportById($id: ID!) {
+    event(id: $id) {
+      id
+      name
+      startAt
+      numEntrants
+      slug
       tournament {
         id
         name
@@ -174,6 +193,18 @@ async function fetchEventForImport(slugOrUrl) {
 }
 
 /**
+ * Same event payload as slug import; `event.slug` is the full path for re-fetch by slug if needed.
+ * @param {string|number} eventId
+ */
+async function fetchEventForImportById(eventId) {
+  return executeGraphQL({
+    query: GET_EVENT_FOR_IMPORT_BY_ID_QUERY,
+    variables: { id: String(eventId) },
+    operationName: 'GetEventForImportById',
+  });
+}
+
+/**
  * @param {string|number} eventId
  * @param {number} page
  * @param {number} perPage
@@ -278,10 +309,12 @@ module.exports = {
   STANDINGS_PAGE_SIZE,
   SETS_PAGE_SIZE,
   GET_EVENT_FOR_IMPORT_QUERY,
+  GET_EVENT_FOR_IMPORT_BY_ID_QUERY,
   GET_EVENT_STANDINGS_PAGE_QUERY,
   GET_EVENT_SETS_PAGE_QUERY,
   GET_EVENT_ENTRANTS_PAGE_QUERY,
   fetchEventForImport,
+  fetchEventForImportById,
   fetchStandingsPage,
   fetchSetsPage,
   fetchEntrantsPage,

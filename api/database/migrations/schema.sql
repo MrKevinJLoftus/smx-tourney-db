@@ -110,3 +110,12 @@ CREATE TABLE IF NOT EXISTS `match_x_song` (
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Table 10: start.gg StepManiaX discovery watermark (single row id=1)
+CREATE TABLE IF NOT EXISTS `start_gg_discovery_state` (
+    `id` TINYINT UNSIGNED NOT NULL PRIMARY KEY DEFAULT 1,
+    `last_max_event_start_at` INT UNSIGNED NULL DEFAULT NULL,
+    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO `start_gg_discovery_state` (`id`, `last_max_event_start_at`) VALUES (1, NULL);
+

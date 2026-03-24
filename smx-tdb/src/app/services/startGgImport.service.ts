@@ -53,6 +53,30 @@ export interface StartGgImportPreviewResponse {
   } | null;
 }
 
+export interface StartGgStepmaniaCandidate {
+  startGgEventId: number;
+  eventName: string;
+  eventSlug: string;
+  eventStartAt: number | null;
+  numEntrants: number | null;
+  tournamentId: number;
+  tournamentName: string;
+}
+
+export interface StartGgStepmaniaRefreshResponse {
+  candidates: StartGgStepmaniaCandidate[];
+  meta: {
+    videogameId: string;
+    previousWatermark: number | null;
+    newWatermark: number | null;
+    pagesFetched: number;
+    tournamentsTotalPages: number;
+    eventsSeen: number;
+    candidateCount: number;
+    resetWatermark: boolean;
+  };
+}
+
 export interface StartGgImportFullResponse {
   message: string;
   slug: string;
@@ -103,6 +127,40 @@ export class StartGgImportService {
     return this.http.post<StartGgImportFullResponse>(
       `${environment.apiUrl}/startgg-import/import`,
       { url: url.trim() },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+  }
+
+  /**
+   * Past StepManiaX events on start.gg not yet imported locally (button-triggered only).
+   * Optional `resetWatermark` ignores the DB watermark for this request.
+   */
+  refreshStepmaniaDiscovery(
+    resetWatermark = false
+  ): Observable<StartGgStepmaniaRefreshResponse> {
+    const token = this.authService.getToken();
+    return this.http.post<StartGgStepmaniaRefreshResponse>(
+      `${environment.apiUrl}/startgg-import/stepmania/refresh`,
+      { resetWatermark },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+  }
+
+  importEventByStartGgId(
+    startGgEventId: number
+  ): Observable<StartGgImportFullResponse> {
+    const token = this.authService.getToken();
+    return this.http.post<StartGgImportFullResponse>(
+      `${environment.apiUrl}/startgg-import/import-by-id`,
+      { startGgEventId },
       {
         headers: {
           Authorization: `Bearer ${token}`
