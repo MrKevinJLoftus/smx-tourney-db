@@ -11,6 +11,7 @@ const playerRoutes = require('./routes/player');
 const eventPlayerRoutes = require('./routes/eventPlayer');
 const matchRoutes = require('./routes/match');
 const songRoutes = require('./routes/song');
+const startGgImportRoutes = require('./routes/startGgImport');
 
 // middleware
 const requestLogger = require('./middleware/request-logger');
@@ -37,6 +38,7 @@ app.use("/api/player", playerRoutes);
 app.use("/api/eventPlayer", eventPlayerRoutes);
 app.use("/api/match", matchRoutes);
 app.use("/api/song", songRoutes);
+app.use("/api/startgg-import", startGgImportRoutes);
 
 
 app.use((req, res, next) => {

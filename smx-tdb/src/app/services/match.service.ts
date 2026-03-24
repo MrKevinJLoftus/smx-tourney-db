@@ -99,5 +99,45 @@ export class MatchService {
       }
     });
   }
+
+  bulkImportMatches(eventId: number, jsonFile: File): Observable<{
+    message: string;
+    summary: {
+      totalMatches: number;
+      matchesCreated: number;
+      matchesSkipped: number;
+      duplicatesSkipped: number;
+      errors: number;
+    };
+    errors?: Array<{
+      matchId: string | number;
+      message: string;
+      data?: any;
+    }>;
+  }> {
+    const token = this.authService.getToken();
+    const formData = new FormData();
+    formData.append('file', jsonFile);
+
+    return this.http.post<{
+      message: string;
+      summary: {
+        totalMatches: number;
+        matchesCreated: number;
+        matchesSkipped: number;
+        duplicatesSkipped: number;
+        errors: number;
+      };
+      errors?: Array<{
+        matchId: string | number;
+        message: string;
+        data?: any;
+      }>;
+    }>(`${environment.apiUrl}/match/bulk-import/${eventId}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
 }
 

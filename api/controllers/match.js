@@ -1,5 +1,13 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/match');
+const eventQueries = require('../queries/event');
+const {
+  cleanGamertag,
+  normalizeGamertag,
+  resolvePlayer,
+  prePopulatePlayerCache,
+} = require('../services/playerResolver');
+const { augmentStartGgSetForMatchImport } = require('../services/startGgRoundLabel');
 
 /**
  * Determines the winner(s) of a song based on scores.
@@ -71,9 +79,7 @@ const calculateWLDFromSongs = (songs, playerIds) => {
 
     // Find players with max score (winners or draws)
     const maxScorePlayers = validScores.filter(ps => Number(ps.score) === maxScore).map(ps => ps.player_id);
-    // Find players with min score (losers, unless they also have max score)
-    const minScorePlayers = validScores.filter(ps => Number(ps.score) === minScore).map(ps => ps.player_id);
-
+    
     // If all players have the same score, it's a draw for all
     if (maxScore === minScore) {
       maxScorePlayers.forEach(playerId => {
@@ -123,6 +129,189 @@ const calculateWLDFromSongs = (songs, playerIds) => {
   });
 
   return stats;
+};
+
+/**
+ * Transforms multiple matches in batch, minimizing database queries
+ * @param {Array} matches - Array of match objects from database
+ * @returns {Promise<Array>} Array of transformed match objects
+ */
+const transformMatchesBatch = async (matches) => {
+  if (!matches || matches.length === 0) {
+    return [];
+  }
+
+  const matchIds = matches.map(m => m.id);
+  const winnerIds = matches
+    .map(m => m.winner_id)
+    .filter(id => id !== null && id !== undefined);
+  const eventIds = [...new Set(matches.map(m => m.event_id).filter(id => id !== null && id !== undefined))];
+
+  // Fetch all related data in parallel using batch queries
+  const [
+    allPlayers,
+    allPlayerSongScores,
+    allPlayerStats,
+    allWinners,
+    allEvents
+  ] = await Promise.all([
+    // Get all players for all matches
+    matchIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_PLAYERS_BY_MATCHES(matchIds),
+      matchIds
+    ) : Promise.resolve([]),
+    // Get all player-song-scores for all matches
+    matchIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_PLAYER_SONG_SCORES_BY_MATCHES(matchIds),
+      matchIds
+    ) : Promise.resolve([]),
+    // Get all player stats for all matches
+    matchIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_PLAYER_STATS_BY_MATCHES(matchIds),
+      matchIds
+    ) : Promise.resolve([]),
+    // Get all winners (only if not already in players list)
+    winnerIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_WINNERS_BY_IDS(winnerIds),
+      winnerIds
+    ) : Promise.resolve([]),
+    // Get all events
+    eventIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_EVENTS_BY_IDS(eventIds),
+      eventIds
+    ) : Promise.resolve([])
+  ]);
+
+  // Build indexes/maps for efficient lookup
+  const playersByMatchId = new Map();
+  allPlayers.forEach(player => {
+    if (!playersByMatchId.has(player.match_id)) {
+      playersByMatchId.set(player.match_id, []);
+    }
+    playersByMatchId.get(player.match_id).push({
+      player_id: player.player_id,
+      gamertag: player.gamertag
+    });
+  });
+
+  const playerSongScoresByMatchId = new Map();
+  allPlayerSongScores.forEach(entry => {
+    if (!playerSongScoresByMatchId.has(entry.match_id)) {
+      playerSongScoresByMatchId.set(entry.match_id, []);
+    }
+    playerSongScoresByMatchId.get(entry.match_id).push(entry);
+  });
+
+  const playerStatsByMatchId = new Map();
+  allPlayerStats.forEach(stat => {
+    if (!playerStatsByMatchId.has(stat.match_id)) {
+      playerStatsByMatchId.set(stat.match_id, []);
+    }
+    playerStatsByMatchId.get(stat.match_id).push({
+      player_id: stat.player_id,
+      wins: stat.wins || 0,
+      losses: stat.losses || 0,
+      draws: stat.draws || 0,
+      gamertag: stat.gamertag
+    });
+  });
+
+  const winnersById = new Map();
+  allWinners.forEach(winner => {
+    winnersById.set(winner.player_id, {
+      player_id: winner.player_id,
+      gamertag: winner.gamertag
+    });
+  });
+
+  const eventsById = new Map();
+  allEvents.forEach(event => {
+    eventsById.set(event.event_id, {
+      event_id: event.event_id,
+      name: event.name,
+      date: event.date
+    });
+  });
+
+  // Transform each match using pre-fetched data
+  return matches.map(match => {
+    const playersArray = playersByMatchId.get(match.id) || [];
+    
+    // Process songs from player-song-scores
+    const playerSongScores = playerSongScoresByMatchId.get(match.id) || [];
+    const songsMap = new Map();
+    const songOrderMap = new Map();
+    
+    playerSongScores.forEach(entry => {
+      if (!entry.song_id) return; // Skip entries without songs
+      
+      if (!songsMap.has(entry.song_id)) {
+        songsMap.set(entry.song_id, {
+          song_id: entry.song_id,
+          chart_id: entry.chart_id,
+          chart_mode: entry.chart_mode,
+          chart_difficulty: entry.chart_difficulty,
+          chart_display: entry.chart_mode && entry.chart_difficulty ? `${entry.chart_mode} ${entry.chart_difficulty}` : null,
+          title: entry.song_title,
+          artist: entry.song_artist,
+          player_scores: []
+        });
+        if (entry.song_order !== null && entry.song_order !== undefined) {
+          songOrderMap.set(entry.song_id, entry.song_order);
+        }
+      }
+      
+      const song = songsMap.get(entry.song_id);
+      song.player_scores.push({
+        player_id: entry.player_id,
+        score: entry.score,
+        win: entry.win,
+        player_gamertag: entry.player_gamertag
+      });
+    });
+    
+    // Convert songs map to sorted array
+    const songsArray = Array.from(songsMap.entries())
+      .map(([songId, song]) => ({ ...song, _order: songOrderMap.get(songId) ?? songId }))
+      .sort((a, b) => {
+        const orderA = a._order ?? a.song_id;
+        const orderB = b._order ?? b.song_id;
+        return orderA - orderB;
+      })
+      .map(({ _order, ...song }) => song);
+
+    // Determine winner
+    let winner = null;
+    if (match.winner_id) {
+      const winnerPlayer = playersArray.find(p => p.player_id === match.winner_id);
+      if (winnerPlayer) {
+        winner = {
+          player_id: winnerPlayer.player_id,
+          gamertag: winnerPlayer.gamertag
+        };
+      } else if (winnersById.has(match.winner_id)) {
+        winner = winnersById.get(match.winner_id);
+      }
+    }
+
+    // Get player stats
+    const playerStatsArray = playerStatsByMatchId.get(match.id) || [];
+
+    // Get event
+    const event = match.event_id ? (eventsById.get(match.event_id) || null) : null;
+
+    return {
+      match_id: match.id,
+      event_id: match.event_id,
+      round: match.round || null,
+      created_at: match.created_at,
+      players: playersArray,
+      winner: winner,
+      songs: songsArray,
+      player_stats: playerStatsArray,
+      event: event
+    };
+  });
 };
 
 const transformMatchResult = async (match) => {
@@ -249,7 +438,8 @@ exports.getMatchesByEvent = async (req, res) => {
   const eventId = req.params.eventId;
   console.log(`Fetching matches for event: ${eventId}`);
   const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_EVENT, [eventId]);
-  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  // Use batch transform to minimize database queries
+  const transformedMatches = await transformMatchesBatch(matches);
   res.status(200).json(transformedMatches);
 };
 
@@ -278,8 +468,8 @@ exports.searchMatches = async (req, res) => {
     searchTerm,
     searchTerm
   ]);
-  // Transform matches to include full details
-  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  // Transform matches in batch (5 queries total instead of ~5 per match)
+  const transformedMatches = await transformMatchesBatch(matches);
   res.status(200).json(transformedMatches);
 };
 
@@ -631,8 +821,334 @@ exports.getMatchesByPlayer = async (req, res) => {
   const playerId = req.params.playerId;
   console.log(`Fetching matches for player: ${playerId}`);
   const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_PLAYER, [playerId]);
-  // Transform matches to include full details
-  const transformedMatches = await Promise.all(matches.map(match => transformMatchResult(match)));
+  // Transform matches in batch (5 queries total instead of ~5 per match)
+  const transformedMatches = await transformMatchesBatch(matches);
   res.status(200).json(transformedMatches);
+};
+
+/**
+ * Checks if a match already exists with the same round and players
+ * @param {number} eventId - The event ID
+ * @param {string} round - The round name
+ * @param {Array<number>} playerIds - Array of player IDs (must be exactly 2)
+ * @returns {Promise<boolean>} True if duplicate exists
+ */
+const checkDuplicateMatch = async (eventId, round, playerIds, connection) => {
+  if (!playerIds || playerIds.length !== 2) {
+    return false;
+  }
+
+  const existing = await dbconn.executeMysqlQuery(
+    queries.CHECK_DUPLICATE_MATCH,
+    [eventId, round, playerIds[0], playerIds[1]],
+    connection
+  );
+
+  return existing && existing.length > 0;
+};
+
+/**
+ * Calculates W-L-D stats from match scores
+ * @param {Array<Object>} playerScores - Array of {playerId, score} objects
+ * @param {number} winnerId - The winner's player ID
+ * @returns {Map} Map of player_id -> {wins, losses, draws}
+ */
+const calculateStatsFromMatchScores = (playerScores, winnerId) => {
+  const stats = new Map();
+
+  // Find winner and loser scores
+  const winnerScore = playerScores.find(ps => ps.playerId === winnerId)?.score || 0;
+  const loserScore = playerScores.find(ps => ps.playerId !== winnerId)?.score || 0;
+
+  // Set stats for each player
+  playerScores.forEach(ps => {
+    if (ps.playerId === winnerId) {
+      stats.set(ps.playerId, {
+        wins: winnerScore,
+        losses: loserScore,
+        draws: 0
+      });
+    } else {
+      stats.set(ps.playerId, {
+        wins: loserScore,
+        losses: winnerScore,
+        draws: 0
+      });
+    }
+  });
+
+  return stats;
+};
+
+/**
+ * Builds payload for one match (validation, resolve players, duplicate check, no DB inserts).
+ * Resolves players by gamertag and creates new player records when they don't exist.
+ * @returns {Promise<Object>} { ok: true, matchRow, playerSongRows, statsRows, playersCreated } or { ok: false, skipped, duplicate?, error, playersCreated? }
+ */
+const buildMatchPayload = async (setData, eventId, createdBy, playerCache, connection) => {
+  let playersCreated = 0;
+  try {
+    if (!setData.id) {
+      return { ok: false, skipped: true, error: { matchId: setData.id || 'unknown', message: 'Match ID is required', data: setData } };
+    }
+    if (setData.state !== 3) {
+      return { ok: false, skipped: true, error: { matchId: setData.id, message: `Match not completed (state: ${setData.state})`, data: setData } };
+    }
+
+    const rawSlots = setData.paginatedSlots?.nodes || setData.slots || [];
+    const slots = [...rawSlots].sort(
+      (a, b) => (a.slotIndex ?? 0) - (b.slotIndex ?? 0)
+    );
+    if (slots.length < 2) {
+      return { ok: false, skipped: true, error: { matchId: setData.id, message: 'Match must have at least 2 players', data: setData } };
+    }
+
+    const playerIds = [];
+    const playerScores = [];
+    for (const slot of slots) {
+      if (!slot.entrant || !slot.entrant.name) {
+        return { ok: false, skipped: true, error: { matchId: setData.id, message: 'Player entrant name is required', data: setData } };
+      }
+      const rawGamertag = slot.entrant.name.trim();
+      const cleanedGamertag = cleanGamertag(rawGamertag);
+      const score = slot.standing?.stats?.score?.value ?? 0;
+      const { playerId, created } = await resolvePlayer(cleanedGamertag, createdBy, playerCache, connection);
+      if (created) playersCreated++;
+      playerIds.push(playerId);
+      playerScores.push({ playerId, score });
+    }
+
+    if (playerIds.length !== 2) {
+      return { ok: false, skipped: true, error: { matchId: setData.id, message: `Expected exactly 2 players, found ${playerIds.length}`, data: setData } };
+    }
+
+    const round = setData.fullRoundText || setData.identifier || null;
+    const isDuplicate = await checkDuplicateMatch(eventId, round, playerIds, connection);
+    if (isDuplicate) {
+      return { ok: false, skipped: true, duplicate: true, playersCreated, error: { matchId: setData.id, message: `Duplicate match found (round: ${round}, players: ${playerIds.join(', ')})`, data: setData } };
+    }
+
+    let winnerId = null;
+    if (setData.winnerId) {
+      const winnerSlot = slots.find(slot => slot.entrant?.id === setData.winnerId);
+      if (winnerSlot?.entrant?.name) {
+        const cleanedWinnerGamertag = cleanGamertag(winnerSlot.entrant.name.trim());
+        const resolved = await resolvePlayer(cleanedWinnerGamertag, createdBy, playerCache, connection);
+        winnerId = resolved.playerId;
+        if (resolved.created) playersCreated++;
+      }
+    }
+    if (!winnerId && playerScores.length === 2) {
+      const score1 = playerScores[0].score;
+      const score2 = playerScores[1].score;
+      if (score1 > score2) winnerId = playerScores[0].playerId;
+      else if (score2 > score1) winnerId = playerScores[1].playerId;
+    }
+
+    const stats = calculateStatsFromMatchScores(playerScores, winnerId);
+    const matchRow = [eventId, winnerId, round, createdBy];
+    const playerSongRows = playerIds.map(playerId => [
+      playerId,
+      null, null, null, null,
+      winnerId && Number(winnerId) === Number(playerId) ? 1 : 0,
+      createdBy
+    ]);
+    const statsRows = [];
+    for (const [playerId, playerStats] of stats.entries()) {
+      statsRows.push([playerId, playerStats.wins, playerStats.losses, playerStats.draws, createdBy]);
+    }
+    return { ok: true, matchRow, playerSongRows, statsRows, playersCreated };
+  } catch (error) {
+    console.error(`Error building payload for match ${setData.id}:`, error);
+    return { ok: false, skipped: true, playersCreated, error: { matchId: setData.id, message: error.message, data: setData } };
+  }
+};
+
+async function executeMatchPayloadBatchInsert(matchRows, payloads, connection) {
+  if (matchRows.length === 0) {
+    return;
+  }
+  const matchResult = await dbconn.executeMysqlQuery(
+    queries.CREATE_MATCH_BATCH(matchRows.length),
+    matchRows.flat(),
+    connection
+  );
+  const firstInsertId = matchResult.insertId;
+
+  const allPlayerSongRows = [];
+  const allStatsRows = [];
+  for (let i = 0; i < payloads.length; i++) {
+    const matchId = firstInsertId + i;
+    const { playerSongRows, statsRows } = payloads[i];
+    for (const row of playerSongRows) {
+      allPlayerSongRows.push([matchId, ...row]);
+    }
+    for (const row of statsRows) {
+      allStatsRows.push([matchId, ...row]);
+    }
+  }
+
+  if (allPlayerSongRows.length > 0) {
+    await dbconn.executeMysqlQuery(
+      queries.CREATE_MATCH_PLAYER_SONGS_BATCH(allPlayerSongRows.length),
+      allPlayerSongRows.flat(),
+      connection
+    );
+  }
+  if (allStatsRows.length > 0) {
+    await dbconn.executeMysqlQuery(
+      queries.CREATE_MATCH_PLAYER_STATS_BATCH(allStatsRows.length),
+      allStatsRows.flat(),
+      connection
+    );
+  }
+}
+
+/**
+ * Import completed sets from start.gg (bracket-aware round labels). Used by start.gg full import.
+ * @param {Array<object>} sets
+ * @param {number} eventId
+ * @param {number|null} createdBy
+ */
+/**
+ * @param {import('mysql').Connection} [connection] when provided, all DB work uses this transaction
+ */
+exports.importMatchesFromStartGgSets = async (sets, eventId, createdBy, connection) => {
+  const playerCache = new Map();
+  await prePopulatePlayerCache(playerCache, connection);
+
+  const matchRows = [];
+  const payloads = [];
+  const summary = {
+    totalMatches: sets.length,
+    matchesCreated: 0,
+    matchesSkipped: 0,
+    duplicatesSkipped: 0,
+    playersCreated: 0,
+    errors: [],
+  };
+
+  for (const set of sets) {
+    const augmented = augmentStartGgSetForMatchImport(set);
+    const payload = await buildMatchPayload(augmented, eventId, createdBy, playerCache, connection);
+    summary.playersCreated += payload.playersCreated || 0;
+    if (payload.ok) {
+      matchRows.push(payload.matchRow);
+      payloads.push({ playerSongRows: payload.playerSongRows, statsRows: payload.statsRows });
+    } else {
+      summary.matchesSkipped++;
+      if (payload.duplicate) summary.duplicatesSkipped++;
+      if (payload.error) summary.errors.push(payload.error);
+    }
+  }
+
+  if (matchRows.length > 0) {
+    await executeMatchPayloadBatchInsert(matchRows, payloads, connection);
+    summary.matchesCreated = matchRows.length;
+  }
+
+  return summary;
+};
+
+/**
+ * Bulk import matches from Start.gg JSON response
+ */
+exports.bulkImportMatches = async (req, res) => {
+  const eventId = req.params.eventId;
+  console.log(`Bulk importing matches for event ${eventId}`);
+
+  // Validate event exists
+  const event = await dbconn.executeMysqlQuery(eventQueries.GET_EVENT_BY_ID, [eventId]);
+  if (!event || event.length < 1) {
+    return res.status(404).json({ message: 'Event not found' });
+  }
+
+  // Check if file was uploaded
+  if (!req.file) {
+    return res.status(400).json({ message: 'JSON file is required' });
+  }
+
+  let jsonData;
+  try {
+    // Parse JSON file
+    const fileContent = req.file.buffer.toString('utf8');
+    jsonData = JSON.parse(fileContent);
+  } catch (error) {
+    console.error('JSON parsing error:', error);
+    return res.status(400).json({ message: 'Invalid JSON file format', error: error.message });
+  }
+
+  // Extract sets from Start.gg response structure
+  // The structure is: [{data: {event: {sets: {nodes: [...]}}}}]
+  let sets = [];
+  if (Array.isArray(jsonData) && jsonData.length > 0) {
+    const firstItem = jsonData[0];
+    if (firstItem?.data?.event?.sets?.nodes) {
+      sets = firstItem.data.event.sets.nodes;
+    } else if (firstItem?.data?.event?.sets && Array.isArray(firstItem.data.event.sets)) {
+      sets = firstItem.data.event.sets;
+    }
+  } else if (jsonData?.data?.event?.sets?.nodes) {
+    sets = jsonData.data.event.sets.nodes;
+  } else if (jsonData?.data?.event?.sets && Array.isArray(jsonData.data.event.sets)) {
+    sets = jsonData.data.event.sets;
+  } else if (Array.isArray(jsonData)) {
+    // Assume it's a direct array of sets
+    sets = jsonData;
+  }
+
+  if (!sets || sets.length === 0) {
+    return res.status(400).json({ 
+      message: 'No match data found in JSON file. Expected structure: [{data: {event: {sets: {nodes: [...]}}}}]' 
+    });
+  }
+
+  const createdBy = req.userData?.userId || null;
+  const playerCache = new Map(); // Cache normalized gamertag -> playerId mappings
+  await prePopulatePlayerCache(playerCache);
+
+  // Pass 1: build payloads for each set (resolve players—creating new players as needed—check duplicates); collect rows for batch insert
+  const matchRows = [];
+  const payloads = [];
+  const summary = {
+    totalMatches: sets.length,
+    matchesCreated: 0,
+    matchesSkipped: 0,
+    duplicatesSkipped: 0,
+    playersCreated: 0,
+    errors: []
+  };
+
+  for (const set of sets) {
+    const payload = await buildMatchPayload(set, eventId, createdBy, playerCache, undefined);
+    summary.playersCreated += payload.playersCreated || 0;
+    if (payload.ok) {
+      matchRows.push(payload.matchRow);
+      payloads.push({ playerSongRows: payload.playerSongRows, statsRows: payload.statsRows });
+    } else {
+      summary.matchesSkipped++;
+      if (payload.duplicate) summary.duplicatesSkipped++;
+      if (payload.error) summary.errors.push(payload.error);
+    }
+  }
+
+  // Pass 2: one batch insert per table (only if we have matches to insert)
+  if (matchRows.length > 0) {
+    await executeMatchPayloadBatchInsert(matchRows, payloads, undefined);
+    summary.matchesCreated = matchRows.length;
+  }
+
+  res.status(200).json({
+    message: 'Bulk import completed',
+    summary: {
+      totalMatches: summary.totalMatches,
+      matchesCreated: summary.matchesCreated,
+      matchesSkipped: summary.matchesSkipped,
+      duplicatesSkipped: summary.duplicatesSkipped,
+      playersCreated: summary.playersCreated,
+      errors: summary.errors.length
+    },
+    errors: summary.errors.length > 0 ? summary.errors : undefined
+  });
 };
 

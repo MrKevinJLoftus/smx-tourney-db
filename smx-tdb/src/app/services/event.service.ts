@@ -39,6 +39,11 @@ export class EventService {
     });
   }
 
+  /** Reload the events list (e.g. after start.gg import creates an event). */
+  reloadEvents(): void {
+    this.refreshEvents();
+  }
+
   getEventById(id: number): Observable<Event> {
     return this.http.get<Event>(`${environment.apiUrl}/event/${id}`);
   }

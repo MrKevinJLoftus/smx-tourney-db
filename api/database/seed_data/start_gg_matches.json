@@ -1,0 +1,2221 @@
+{
+    "data": {
+        "phaseGroup": {
+            "id": 1974000,
+            "bracketType": "ROUND_ROBIN",
+            "phase": {
+                "id": 1289706,
+                "event": {
+                    "id": 848840,
+                    "__typename": "Event"
+                },
+                "__typename": "Phase"
+            },
+            "sets": {
+                "pageInfo": {
+                    "page": 1,
+                    "total": 21,
+                    "perPage": 15,
+                    "totalPages": 2,
+                    "sortBy": "weightedState DESC, phaseWeight DESC, stateAwareStartAtWeight ASC, stateAwareRoundOrder ASC, identifier ASC, raceStandingWeight DESC, startedAt DESC, createdAt DESC",
+                    "__typename": "PageInfo"
+                },
+                "nodes": [
+                    {
+                        "id": 61116205,
+                        "isReportable": true,
+                        "identifier": "S",
+                        "fullRoundText": "Round 7",
+                        "winnerId": 13184024,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116205",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685835862.7119,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116205-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581497,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184024,
+                                        "name": "HWW | Daaanty",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581497,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116205,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581497_sets_61116205",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116205-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581546,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184042,
+                                        "name": "ParanoiaBoi",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581546,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116205,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581546_sets_61116205",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 2,
+                                                "displayValue": "2",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116206,
+                        "isReportable": true,
+                        "identifier": "T",
+                        "fullRoundText": "Round 7",
+                        "winnerId": 13184020,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116206",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685838443.6204,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116206-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581542,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184038,
+                                        "name": "ODDR | Skeeter",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581542,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116206,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581542_sets_61116206",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116206-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581478,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184020,
+                                        "name": "JellySlosh",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581478,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116206,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581478_sets_61116206",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116207,
+                        "isReportable": true,
+                        "identifier": "U",
+                        "fullRoundText": "Round 7",
+                        "winnerId": 13184047,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116207",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685838455.6928,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116207-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581552,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184047,
+                                        "name": "watersalads",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581552,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116207,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581552_sets_61116207",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116207-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581537,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184033,
+                                        "name": "miklowcic",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581537,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116207,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581537_sets_61116207",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116202,
+                        "isReportable": true,
+                        "identifier": "P",
+                        "fullRoundText": "Round 6",
+                        "winnerId": 13184024,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116202",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685831534.0947,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116202-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581497,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184024,
+                                        "name": "HWW | Daaanty",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581497,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116202,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581497_sets_61116202",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116202-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581533,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184030,
+                                        "name": "andy457",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581533,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116202,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581533_sets_61116202",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116203,
+                        "isReportable": true,
+                        "identifier": "Q",
+                        "fullRoundText": "Round 6",
+                        "winnerId": 13184042,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116203",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685833198.2543,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116203-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581542,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184038,
+                                        "name": "ODDR | Skeeter",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581542,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116203,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581542_sets_61116203",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116203-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581546,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184042,
+                                        "name": "ParanoiaBoi",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581546,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116203,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581546_sets_61116203",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116204,
+                        "isReportable": true,
+                        "identifier": "R",
+                        "fullRoundText": "Round 6",
+                        "winnerId": 13184020,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116204",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685834290.9416,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116204-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581537,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184033,
+                                        "name": "miklowcic",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581537,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116204,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581537_sets_61116204",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 2,
+                                                "displayValue": "2",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116204-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581478,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184020,
+                                        "name": "JellySlosh",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581478,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116204,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581478_sets_61116204",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116199,
+                        "isReportable": true,
+                        "identifier": "M",
+                        "fullRoundText": "Round 5",
+                        "winnerId": 13184024,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116199",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685826704.771,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116199-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581497,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184024,
+                                        "name": "HWW | Daaanty",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581497,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116199,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581497_sets_61116199",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116199-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581542,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184038,
+                                        "name": "ODDR | Skeeter",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581542,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116199,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581542_sets_61116199",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 0,
+                                                "displayValue": "0",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116200,
+                        "isReportable": true,
+                        "identifier": "N",
+                        "fullRoundText": "Round 5",
+                        "winnerId": 13184047,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116200",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685828004.7112,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116200-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581552,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184047,
+                                        "name": "watersalads",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581552,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116200,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581552_sets_61116200",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116200-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581533,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184030,
+                                        "name": "andy457",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581533,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116200,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581533_sets_61116200",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116201,
+                        "isReportable": true,
+                        "identifier": "O",
+                        "fullRoundText": "Round 5",
+                        "winnerId": 13184042,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116201",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685829856.9737,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116201-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581537,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184033,
+                                        "name": "miklowcic",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581537,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116201,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581537_sets_61116201",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 3,
+                                                "displayValue": "3",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116201-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581546,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184042,
+                                        "name": "ParanoiaBoi",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581546,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116201,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581546_sets_61116201",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116196,
+                        "isReportable": true,
+                        "identifier": "J",
+                        "fullRoundText": "Round 4",
+                        "winnerId": 13184047,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116196",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685838695.3855,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116196-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581497,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184024,
+                                        "name": "HWW | Daaanty",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581497,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116196,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581497_sets_61116196",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 2,
+                                                "displayValue": "2",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116196-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581552,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184047,
+                                        "name": "watersalads",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581552,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116196,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581552_sets_61116196",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116197,
+                        "isReportable": true,
+                        "identifier": "K",
+                        "fullRoundText": "Round 4",
+                        "winnerId": 13184038,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116197",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685812248.7227,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116197-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581537,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184033,
+                                        "name": "miklowcic",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581537,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116197,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581537_sets_61116197",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 0,
+                                                "displayValue": "0",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116197-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581542,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184038,
+                                        "name": "ODDR | Skeeter",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581542,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116197,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581542_sets_61116197",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116198,
+                        "isReportable": true,
+                        "identifier": "L",
+                        "fullRoundText": "Round 4",
+                        "winnerId": 13184030,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116198",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685815190.0601,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116198-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581478,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184020,
+                                        "name": "JellySlosh",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581478,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116198,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581478_sets_61116198",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116198-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581533,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184030,
+                                        "name": "andy457",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581533,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116198,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581533_sets_61116198",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116193,
+                        "isReportable": true,
+                        "identifier": "G",
+                        "fullRoundText": "Round 3",
+                        "winnerId": 13184024,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116193",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685822484.1105,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116193-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581497,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184024,
+                                        "name": "HWW | Daaanty",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581497,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116193,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581497_sets_61116193",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116193-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581537,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184033,
+                                        "name": "miklowcic",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581537,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116193,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581537_sets_61116193",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 0,
+                                                "displayValue": "0",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116194,
+                        "isReportable": true,
+                        "identifier": "H",
+                        "fullRoundText": "Round 3",
+                        "winnerId": 13184047,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116194",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685823556.3722,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116194-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581478,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184020,
+                                        "name": "JellySlosh",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581478,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116194,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581478_sets_61116194",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 1,
+                                                "displayValue": "1",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116194-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581552,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184047,
+                                        "name": "watersalads",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581552,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116194,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581552_sets_61116194",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    },
+                    {
+                        "id": 61116195,
+                        "isReportable": true,
+                        "identifier": "I",
+                        "fullRoundText": "Round 3",
+                        "winnerId": 13184042,
+                        "startAt": null,
+                        "createdAt": 1685697316,
+                        "state": 3,
+                        "setLink": "\/tournament\/how-we-win-the-salad-bowl\/events\/stepmaniax-wild-tournament\/set\/61116195",
+                        "filledSlots": 2,
+                        "stationNumber": null,
+                        "vodUrl": null,
+                        "updatedAtMicro": 1685825209.9035,
+                        "userTasks": null,
+                        "paginatedSlots": {
+                            "pageInfo": {
+                                "total": 2,
+                                "__typename": "PageInfo"
+                            },
+                            "nodes": [
+                                {
+                                    "id": "61116195-0",
+                                    "slotIndex": 0,
+                                    "seedId": 24581546,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184042,
+                                        "name": "ParanoiaBoi",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581546,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116195,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581546_sets_61116195",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 4,
+                                                "displayValue": "4",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                },
+                                {
+                                    "id": "61116195-1",
+                                    "slotIndex": 1,
+                                    "seedId": 24581533,
+                                    "prereqType": "seed",
+                                    "prereqPlacement": null,
+                                    "entrant": {
+                                        "id": 13184030,
+                                        "name": "andy457",
+                                        "networkIdDisplayName": "",
+                                        "__typename": "Entrant"
+                                    },
+                                    "seed": {
+                                        "id": 24581533,
+                                        "isBye": false,
+                                        "__typename": "Seed"
+                                    },
+                                    "set": {
+                                        "id": 61116195,
+                                        "event": {
+                                            "id": 848840,
+                                            "videogame": {
+                                                "id": 33834,
+                                                "name": "StepmaniaX",
+                                                "__typename": "Videogame"
+                                            },
+                                            "__typename": "Event"
+                                        },
+                                        "__typename": "Set"
+                                    },
+                                    "originSet": null,
+                                    "originProgression": null,
+                                    "__typename": "SetSlot",
+                                    "standing": {
+                                        "id": "placeholder_standing_seeds_24581533_sets_61116195",
+                                        "stats": {
+                                            "score": {
+                                                "label": "Score",
+                                                "value": 2,
+                                                "displayValue": "2",
+                                                "__typename": "Score"
+                                            },
+                                            "__typename": "StandingStats"
+                                        },
+                                        "__typename": "Standing"
+                                    }
+                                }
+                            ],
+                            "__typename": "SetSlotConnection"
+                        },
+                        "phaseGroup": {
+                            "id": 1974000,
+                            "bracketType": "ROUND_ROBIN",
+                            "displayIdentifier": "1",
+                            "phase": {
+                                "id": 1289706,
+                                "name": "Round Robin",
+                                "__typename": "Phase"
+                            },
+                            "__typename": "PhaseGroup"
+                        },
+                        "stream": null,
+                        "tournament": {
+                            "id": 515398,
+                            "timezone": "America\/New_York",
+                            "__typename": "Tournament"
+                        },
+                        "event": {
+                            "id": 848840,
+                            "slug": "tournament\/how-we-win-the-salad-bowl\/event\/stepmaniax-wild-tournament",
+                            "isOnline": false,
+                            "isSingleBracket": true,
+                            "__typename": "Event"
+                        },
+                        "__typename": "Set",
+                        "streamId": null
+                    }
+                ],
+                "__typename": "SetConnection"
+            },
+            "__typename": "PhaseGroup"
+        }
+    },
+    "extensions": {
+        "cacheControl": {
+            "version": 1,
+            "hints": [
+                {
+                    "path": [
+                        "phaseGroup"
+                    ],
+                    "maxAge": 60,
+                    "scope": "PUBLIC"
+                }
+            ]
+        },
+        "queryComplexity": 0
+    },
+    "actionRecords": []
+}

@@ -9,7 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MessageService } from '../../../services/message.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { AddEventMatchDialogComponent } from '../add-event-match-dialog/add-event-match-dialog.component';
-import { Event } from '../../../models/event';
+import { Event as EventModel } from '../../../models/event';
 
 @Component({
   selector: 'app-event-matches-list',
@@ -20,10 +20,10 @@ import { Event } from '../../../models/event';
 export class EventMatchesListComponent implements OnInit, OnChanges {
   @Input() eventId?: number;
   matches$: Observable<MatchWithDetails[]> = of([]);
-  events$: Observable<Event[]>;
+  events$: Observable<EventModel[]>;
   isLoading = false;
   selectedEventId?: number;
-  selectedEvent: Event | null = null;
+  selectedEvent: EventModel | null = null;
 
   constructor(
     private matchService: MatchService,
@@ -54,7 +54,7 @@ export class EventMatchesListComponent implements OnInit, OnChanges {
     }
   }
 
-  onEventChange(event: Event | null): void {
+  onEventChange(event: EventModel | null): void {
     this.selectedEvent = event;
     if (event) {
       this.selectedEventId = event.id;
@@ -136,6 +136,55 @@ export class EventMatchesListComponent implements OnInit, OnChanges {
             this.messageService.show('Error deleting match. Please try again.');
           }
         });
+      }
+    });
+  }
+
+  onFileSelected(fileEvent: Event): void {
+    const input = (fileEvent.target as HTMLInputElement);
+    if (input.files && input.files.length > 0 && this.selectedEventId) {
+      const file = input.files[0];
+      this.bulkImportMatches(file);
+      // Reset the input so the same file can be selected again
+      input.value = '';
+    }
+  }
+
+  bulkImportMatches(file: File): void {
+    if (!this.selectedEventId) {
+      this.messageService.show('Please select an event first');
+      return;
+    }
+
+    this.isLoading = true;
+    this.matchService.bulkImportMatches(this.selectedEventId, file).subscribe({
+      next: (result) => {
+        this.isLoading = false;
+        const summary = result.summary;
+        let message = `Import completed: ${summary.matchesCreated} matches created`;
+        if (summary.duplicatesSkipped > 0) {
+          message += `, ${summary.duplicatesSkipped} duplicates skipped`;
+        }
+        if (summary.matchesSkipped > summary.duplicatesSkipped) {
+          message += `, ${summary.matchesSkipped - summary.duplicatesSkipped} matches skipped`;
+        }
+        if (summary.errors > 0) {
+          message += `, ${summary.errors} errors`;
+        }
+        this.messageService.show(message);
+        this.loadMatches();
+        
+        // Show detailed errors if any
+        if (result.errors && result.errors.length > 0) {
+          console.warn('Import errors:', result.errors);
+          // Optionally show errors in a dialog or expandable section
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Error importing matches:', error);
+        const errorMessage = error.error?.message || 'Error importing matches. Please try again.';
+        this.messageService.show(errorMessage);
       }
     });
   }

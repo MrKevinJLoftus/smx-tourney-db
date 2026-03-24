@@ -1,0 +1,115 @@
+<div class="stepmania-discovery">
+  <p class="hint">
+    Lists completed start.gg tournaments that include StepManiaX and shows events not yet imported here.
+    Data is fetched only when you click Refresh — nothing loads automatically.
+    Incremental runs use the last refresh’s newest event start time; check “Ignore watermark” to scan the same
+    window again (still limited by how many pages the server requests).
+  </p>
+
+  <div class="toolbar">
+    <mat-checkbox
+      [checked]="resetWatermark"
+      (change)="resetWatermark = $event.checked"
+    >Ignore watermark (full window this run)</mat-checkbox>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      (click)="onRefresh()"
+      [disabled]="isRefreshing || importingEventId != null"
+    >
+      @if (isRefreshing) {
+        <span>Refreshing…</span>
+      } @else {
+        <span>Refresh from start.gg</span>
+      }
+    </button>
+    @if (errorMessage || importResult) {
+      <button mat-button type="button" (click)="clearMessages()">Clear status</button>
+    }
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (importResult) {
+    <mat-card class="import-result-card">
+      <mat-card-header>
+        <mat-card-title>Last import</mat-card-title>
+        <mat-card-subtitle>
+          Local event id {{ importResult.localEventId }}
+          · start.gg event id {{ importResult.startGgEventId }}
+        </mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+  }
+
+  @if (lastRefresh) {
+    <div class="meta">
+      <span>Videogame id: {{ lastRefresh.meta.videogameId }}</span>
+      <span>· Pages fetched: {{ lastRefresh.meta.pagesFetched }}</span>
+      <span>· Events seen (all): {{ lastRefresh.meta.eventsSeen }}</span>
+      @if (lastRefresh.meta.previousWatermark != null) {
+        <span>· Previous watermark: {{ lastRefresh.meta.previousWatermark * 1000 | date: 'medium' }}</span>
+      }
+      @if (lastRefresh.meta.newWatermark != null) {
+        <span>· New watermark: {{ lastRefresh.meta.newWatermark * 1000 | date: 'medium' }}</span>
+      }
+    </div>
+
+    @if (lastRefresh.candidates.length) {
+      <div class="table-wrap">
+        <table class="candidates-table">
+          <thead>
+            <tr>
+              <th>Start (start.gg)</th>
+              <th>Event</th>
+              <th>Tournament</th>
+              <th>Entrants</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of lastRefresh.candidates; track c.startGgEventId) {
+              <tr>
+                <td>
+                  @if (c.eventStartAt != null) {
+                    {{ c.eventStartAt * 1000 | date: 'medium' }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  <a [href]="eventPageUrl(c)" target="_blank" rel="noopener noreferrer">{{ c.eventName }}</a>
+                  <span class="subtle"> · id {{ c.startGgEventId }}</span>
+                </td>
+                <td>{{ c.tournamentName }}</td>
+                <td>{{ c.numEntrants ?? '—' }}</td>
+                <td>
+                  <button
+                    mat-stroked-button
+                    color="primary"
+                    type="button"
+                    (click)="onImportRow(c.startGgEventId)"
+                    [disabled]="importingEventId != null || isRefreshing"
+                  >
+                    @if (importingEventId === c.startGgEventId) {
+                      <span>Importing…</span>
+                    } @else {
+                      <span>Import</span>
+                    }
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p class="empty">No matching events to show. Try “Ignore watermark” or import via URL on the other tab.</p>
+    }
+  }
+</div>
