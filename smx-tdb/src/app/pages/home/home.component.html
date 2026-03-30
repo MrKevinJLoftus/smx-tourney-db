@@ -30,15 +30,6 @@
         </div>
       </mat-option>
     </mat-autocomplete>
-
-    <button 
-      mat-raised-button 
-      color="primary" 
-      (click)="performSearch()"
-      [disabled]="isLoading">
-      <mat-icon>search</mat-icon>
-      Search
-    </button>
   </div>
 
   <div *ngIf="isLoading" class="loading-section">
@@ -146,8 +137,78 @@
   </div>
 
   <div *ngIf="!hasSearched && !isLoading" class="welcome-section">
-    <mat-icon class="welcome-icon">search</mat-icon>
-    <h2>Welcome to SMX Tournament DB</h2>
+    <h2>StepManiaX Tournament DB</h2>
     <p>Use the search bar above to find players, events, or matches, or <a routerLink="/browse" class="link">browse</a> all available data.</p>
+  </div>
+
+  <div class="top5-section">
+    <div *ngIf="isTop5Loading" class="top5-loading">
+      <mat-spinner diameter="30"></mat-spinner>
+      <span>Loading home lists...</span>
+    </div>
+    <div *ngIf="top5Error" class="top5-error">
+      <mat-icon>error</mat-icon>
+      <span>{{ top5Error }}</span>
+    </div>
+
+    <div *ngIf="!isTop5Loading && !top5Error" class="top5-grid">
+      <mat-card class="top5-card top5-events-card">
+        <mat-card-title>Most recent events</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="recentEventsTop5.length === 0" class="top5-empty">No events yet.</div>
+          <div *ngIf="recentEventsTop5.length > 0" class="top5-events-list">
+            <ng-container *ngFor="let e of recentEventsTop5; let last = last">
+              <div class="top5-event-item">
+                <a class="top5-link top5-event-name" [routerLink]="['/event', e.id]">{{ e.name }}</a>
+                <div class="top5-event-meta">
+                  <span class="top5-muted">{{ e.date ? formatDate(e.date) : 'N/A' }}</span>
+                  <span class="top5-event-meta-sep" aria-hidden="true">·</span>
+                  <span class="top5-muted top5-event-winner-line">
+                    Winner:
+                    <a *ngIf="e.winner" class="top5-link" [routerLink]="['/player', e.winner.id]">{{ e.winner.username }}</a>
+                    <span *ngIf="!e.winner">N/A</span>
+                  </span>
+                </div>
+              </div>
+              <mat-divider *ngIf="!last" class="top5-event-divider" />
+            </ng-container>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="top5-card">
+        <mat-card-title>Top 10 players (W/L ratio)</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="topPlayersByRatioTop5.length === 0" class="top5-empty">No match stats yet.</div>
+          <mat-list *ngIf="topPlayersByRatioTop5.length > 0">
+            <mat-list-item *ngFor="let p of topPlayersByRatioTop5; index as i">
+              <div class="top5-row">
+                <span class="top5-rank">{{ i + 1 }}</span>
+                <a class="top5-link" [routerLink]="['/player', p.id]">{{ p.username }}</a>
+                <span class="top5-muted">{{ p.wins }}-{{ p.losses }}</span>
+                <span class="top5-muted">Ratio: {{ formatRatio(p.ratio) }}</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="top5-card">
+        <mat-card-title>Top 10 rivalries (most matches)</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="topRivalriesTop5.length === 0" class="top5-empty">No 1v1 matchups yet.</div>
+          <mat-list *ngIf="topRivalriesTop5.length > 0">
+            <mat-list-item *ngFor="let r of topRivalriesTop5">
+              <div class="top5-row">
+                <a class="top5-link" [routerLink]="['/player', r.player1.id]">{{ r.player1.username }}</a>
+                <span class="top5-muted">vs</span>
+                <a class="top5-link" [routerLink]="['/player', r.player2.id]">{{ r.player2.username }}</a>
+                <span class="top5-muted">({{ r.matchCount }} matches)</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>

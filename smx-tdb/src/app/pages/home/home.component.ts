@@ -5,6 +5,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
 import { MatchService } from '../../services/match.service';
+import { BrowseService, Top5PlayerByRatio, Top5RecentEvent, Top5Rivalry } from '../../services/browse.service';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
@@ -24,6 +25,12 @@ export class HomeComponent implements OnInit {
   players: Player[] = [];
   events: Event[] = [];
   matches: MatchWithDetails[] = [];
+
+  recentEventsTop5: Top5RecentEvent[] = [];
+  topPlayersByRatioTop5: Top5PlayerByRatio[] = [];
+  topRivalriesTop5: Top5Rivalry[] = [];
+  isTop5Loading = false;
+  top5Error: string | null = null;
   
   isLoading = false;
   hasSearched = false;
@@ -34,6 +41,7 @@ export class HomeComponent implements OnInit {
     private playerService: PlayerService,
     private eventService: EventService,
     private matchService: MatchService,
+    private browseService: BrowseService,
     private router: Router
   ) {
     // Create autocomplete options stream with debouncing
@@ -100,12 +108,31 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadTop5Lists();
     // Subscribe to search control for full search on Enter or when selecting from autocomplete
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(query => {
       // This will be handled by the performSearch method when user submits
+    });
+  }
+
+  loadTop5Lists(): void {
+    this.isTop5Loading = true;
+    this.top5Error = null;
+    this.browseService.getTop5Lists().subscribe({
+      next: (data) => {
+        this.recentEventsTop5 = data?.recentEvents || [];
+        this.topPlayersByRatioTop5 = data?.topPlayersByWinLossRatio || [];
+        this.topRivalriesTop5 = data?.topRivalries || [];
+        this.isTop5Loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading home lists:', error);
+        this.top5Error = 'Failed to load home lists.';
+        this.isTop5Loading = false;
+      }
     });
   }
 
@@ -204,6 +231,12 @@ export class HomeComponent implements OnInit {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  formatRatio(ratio: number | null): string {
+    if (ratio === null || ratio === undefined) return '∞';
+    if (!Number.isFinite(ratio)) return '∞';
+    return ratio.toFixed(2);
   }
 
   getMatchDisplayText(match: MatchWithDetails): string {
