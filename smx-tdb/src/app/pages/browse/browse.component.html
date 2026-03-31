@@ -41,6 +41,7 @@
           <a 
             *ngFor="let player of filteredPlayers" 
             [routerLink]="['/player', player.id]"
+            [state]="browseDetailNavState('player')"
             class="list-item clickable"
           >
             <div class="list-item-content">
@@ -91,6 +92,7 @@
           <a 
             *ngFor="let event of filteredEvents" 
             [routerLink]="['/event', event.id]"
+            [state]="browseDetailNavState('event')"
             class="list-item clickable"
           >
             <div class="list-item-content">
@@ -147,6 +149,7 @@
           <a 
             *ngFor="let match of filteredMatches" 
             [routerLink]="['/match', match.match_id]"
+            [state]="browseDetailNavState('match')"
             class="list-item clickable"
           >
             <div class="list-item-content">

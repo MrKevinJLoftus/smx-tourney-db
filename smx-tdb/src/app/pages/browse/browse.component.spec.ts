@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
+import { convertToParamMap } from '@angular/router';
 
 import { BrowseComponent } from './browse.component';
 
@@ -8,7 +11,16 @@ describe('BrowseComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BrowseComponent]
+      imports: [BrowseComponent],
+      providers: [
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParamMap: convertToParamMap({}) },
+          },
+        },
+      ],
     })
     .compileComponents();
 
