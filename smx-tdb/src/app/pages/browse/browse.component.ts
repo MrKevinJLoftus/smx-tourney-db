@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { PlayerService } from '../../services/player.service';
@@ -9,8 +9,11 @@ import { MatchService } from '../../services/match.service';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
-import { Observable, combineLatest, of } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap, catchError, startWith, map } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import {
+  BROWSE_RETURN_STATE_KEY,
+  BrowseTabParam,
+} from '../../shared/navigation/detail-return-state';
 
 type BrowseType = 'player' | 'match' | 'event';
 
@@ -40,28 +43,63 @@ export class BrowseComponent implements OnInit {
   constructor(
     private playerService: PlayerService,
     private eventService: EventService,
-    private matchService: MatchService
+    private matchService: MatchService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.applyBrowseQueryParams(this.route.snapshot.queryParamMap.get('tab'), this.route.snapshot.queryParamMap.get('q'));
+
     this.loadData();
-    
-    // Set up filter with debouncing
-    this.filterControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(() => {
+
+    this.filterControl.valueChanges.pipe(startWith(''), debounceTime(300), distinctUntilChanged()).subscribe(() => {
       this.applyFilter();
     });
+
+    this.syncBrowseQueryParams();
+  }
+
+  /**
+   * State passed when opening a detail page so "Back" can restore tab + filter.
+   */
+  browseDetailNavState(tab: BrowseTabParam): Record<string, { tab: BrowseTabParam; q?: string }> {
+    const q = (this.filterControl.value || '').trim();
+    return {
+      [BROWSE_RETURN_STATE_KEY]: q ? { tab, q } : { tab },
+    };
+  }
+
+  private applyBrowseQueryParams(tabParam: string | null, qParam: string | null): void {
+    const tabs: BrowseType[] = ['player', 'event', 'match'];
+    if (tabParam === 'player' || tabParam === 'event' || tabParam === 'match') {
+      this.selectedTab = tabParam;
+      this.selectedTabIndex = tabs.indexOf(tabParam);
+    }
+    if (qParam && qParam.trim()) {
+      this.filterControl.setValue(qParam.trim(), { emitEvent: false });
+    }
   }
 
   onTabChange(index: number): void {
     const tabs: BrowseType[] = ['player', 'event', 'match'];
-    this.selectedTab = tabs[index];
-    this.selectedTabIndex = index;
-    this.filterControl.setValue('');
-    this.loadData();
+    const newTab = tabs[index];
+    if (this.selectedTab !== newTab) {
+      this.selectedTab = newTab;
+      this.selectedTabIndex = index;
+      this.filterControl.setValue('');
+      this.loadData();
+    } else {
+      this.selectedTabIndex = index;
+    }
+    this.syncBrowseQueryParams();
+  }
+
+  private syncBrowseQueryParams(): void {
+    const q = (this.filterControl.value || '').trim();
+    const queryParams: Record<string, string> = { tab: this.selectedTab };
+    if (q) queryParams['q'] = q;
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
   }
 
   getTabType(index: number): BrowseType {

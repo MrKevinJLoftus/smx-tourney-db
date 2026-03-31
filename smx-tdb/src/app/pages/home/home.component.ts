@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { HOME_SEARCH_RETURN_STATE_KEY } from '../../shared/navigation/detail-return-state';
 import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
 import { MatchService } from '../../services/match.service';
@@ -42,7 +43,8 @@ export class HomeComponent implements OnInit {
     private eventService: EventService,
     private matchService: MatchService,
     private browseService: BrowseService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     // Create autocomplete options stream with debouncing
     this.autocompleteOptions$ = this.searchControl.valueChanges.pipe(
@@ -109,6 +111,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTop5Lists();
+    const initialQ = this.route.snapshot.queryParamMap.get('q')?.trim();
+    if (initialQ) {
+      this.searchControl.setValue(initialQ);
+      this.performSearch();
+    }
     // Subscribe to search control for full search on Enter or when selecting from autocomplete
     this.searchControl.valueChanges.pipe(
       debounceTime(300),
@@ -195,14 +202,14 @@ export class HomeComponent implements OnInit {
     if (option.type === 'player') {
       const playerId = option.item.id || option.item.player_id;
       if (playerId) {
-        this.router.navigate(['/player', playerId]);
+        this.router.navigate(['/player', playerId], this.homeSearchDetailNavExtras());
       }
     } else if (option.type === 'event' && option.item.id) {
-      this.router.navigate(['/event', option.item.id]);
+      this.router.navigate(['/event', option.item.id], this.homeSearchDetailNavExtras());
     } else if (option.type === 'match') {
       const matchId = option.item.id || option.item.match_id;
       if (matchId) {
-        this.router.navigate(['/match', matchId]);
+        this.router.navigate(['/match', matchId], this.homeSearchDetailNavExtras());
       }
     }
   }
@@ -210,21 +217,27 @@ export class HomeComponent implements OnInit {
   navigateToPlayer(player: Player): void {
     const playerId = (player as any).id || player.player_id;
     if (playerId) {
-      this.router.navigate(['/player', playerId]);
+      this.router.navigate(['/player', playerId], this.homeSearchDetailNavExtras());
     }
   }
 
   navigateToEvent(event: Event): void {
     if (event.id) {
-      this.router.navigate(['/event', event.id]);
+      this.router.navigate(['/event', event.id], this.homeSearchDetailNavExtras());
     }
   }
 
   navigateToMatch(match: MatchWithDetails): void {
     const matchId = (match as any).id || match.match_id;
     if (matchId) {
-      this.router.navigate(['/match', matchId]);
+      this.router.navigate(['/match', matchId], this.homeSearchDetailNavExtras());
     }
+  }
+
+  private homeSearchDetailNavExtras(): { state?: Record<string, { q: string }> } {
+    const q = (this.searchControl.value || '').trim();
+    if (!q) return {};
+    return { state: { [HOME_SEARCH_RETURN_STATE_KEY]: { q } } };
   }
 
   formatDate(date: string | Date): string {
