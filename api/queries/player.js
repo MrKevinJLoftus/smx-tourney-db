@@ -1,5 +1,17 @@
 module.exports = {
-  GET_ALL_PLAYERS: `SELECT * FROM player ORDER BY username ASC`,
+  // Players with more event appearances first; ties broken alphabetically by gamertag.
+  GET_ALL_PLAYERS: `
+    SELECT
+      p.*,
+      COALESCE(epc.cnt, 0) AS event_count
+    FROM player p
+    LEFT JOIN (
+      SELECT player_id, COUNT(DISTINCT event_id) AS cnt
+      FROM event_x_player
+      GROUP BY player_id
+    ) epc ON epc.player_id = p.id
+    ORDER BY COALESCE(epc.cnt, 0) DESC, p.username ASC
+  `,
   GET_PLAYER_BY_ID: `SELECT * FROM player WHERE id = ?`,
   GET_PLAYER_BY_USERNAME: `SELECT * FROM player WHERE username = ?`,
   SEARCH_PLAYERS: `SELECT * FROM player WHERE username LIKE ? ORDER BY username ASC LIMIT 50`,

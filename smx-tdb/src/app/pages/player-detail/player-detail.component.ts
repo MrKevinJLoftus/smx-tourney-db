@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../shared/shared.module';
 import { OrdinalPipe } from '../../shared/pipes/ordinal.pipe';
 import { PlayerService } from '../../services/player.service';
@@ -9,12 +10,12 @@ import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
 import { combineLatest, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, SharedModule, OrdinalPipe],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, SharedModule, OrdinalPipe],
   templateUrl: './player-detail.component.html',
   styleUrl: './player-detail.component.scss'
 })
@@ -22,6 +23,12 @@ export class PlayerDetailComponent implements OnInit {
   player: Player | null = null;
   events: Event[] = [];
   matches: MatchWithDetails[] = [];
+  filteredEvents: Event[] = [];
+  filteredMatches: MatchWithDetails[] = [];
+
+  eventFilterControl = new FormControl('');
+  matchFilterControl = new FormControl('');
+
   isLoading = true;
   error: string | null = null;
 
@@ -46,6 +53,14 @@ export class PlayerDetailComponent implements OnInit {
       this.isLoading = false;
       return;
     }
+
+    this.eventFilterControl.valueChanges
+      .pipe(startWith(''), debounceTime(200), distinctUntilChanged())
+      .subscribe(() => this.applyEventFilter());
+
+    this.matchFilterControl.valueChanges
+      .pipe(startWith(''), debounceTime(200), distinctUntilChanged())
+      .subscribe(() => this.applyMatchFilter());
 
     this.loadPlayer(playerId);
   }
@@ -72,6 +87,8 @@ export class PlayerDetailComponent implements OnInit {
         this.player = player;
         this.events = events;
         this.matches = matches;
+        this.applyEventFilter();
+        this.applyMatchFilter();
         this.isLoading = false;
       },
       error: (error) => {
@@ -129,16 +146,15 @@ export class PlayerDetailComponent implements OnInit {
     if (!playerId || !this.matches) {
       return { wins: 0, losses: 0, draws: 0 };
     }
+
+    // Match-level record only (match winner), not per-song stats.
     let wins = 0;
     let losses = 0;
     let draws = 0;
     for (const match of this.matches) {
-      if (match && match.winner && match.winner.player_id !== undefined && match.winner.player_id !== null) {
-        if (Number(match.winner.player_id) === Number(playerId)) {
-          wins++;
-        } else {
-          losses++;
-        }
+      if (match?.winner?.player_id !== undefined && match?.winner?.player_id !== null) {
+        if (Number(match.winner.player_id) === Number(playerId)) wins++;
+        else losses++;
       } else {
         draws++;
       }
@@ -148,13 +164,57 @@ export class PlayerDetailComponent implements OnInit {
 
   getMatchRecordString(): string {
     const r = this.getMatchRecord();
-    return `${r.wins}-${r.losses}`;
+    return `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ''}`;
   }
 
   getPlacementNumber(event: Event): number | null {
     if (!event.placement) return null;
     const placement = typeof event.placement === 'string' ? parseInt(event.placement, 10) : event.placement;
     return isNaN(placement) ? null : placement;
+  }
+
+  applyEventFilter(): void {
+    const q = (this.eventFilterControl.value || '').toLowerCase().trim();
+    if (!q) {
+      this.filteredEvents = [...(this.events || [])];
+      return;
+    }
+    this.filteredEvents = (this.events || []).filter(e => {
+      const placement = this.getPlacementNumber(e);
+      const haystack = [
+        e.name,
+        e.location,
+        e.organizers,
+        e.date ? this.formatDate(e.date) : '',
+        placement !== null ? `${placement}` : '',
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  applyMatchFilter(): void {
+    const q = (this.matchFilterControl.value || '').toLowerCase().trim();
+    if (!q) {
+      this.filteredMatches = [...(this.matches || [])];
+      return;
+    }
+    this.filteredMatches = (this.matches || []).filter(m => {
+      const opponents = this.getOpponentNames(m);
+      const haystack = [
+        m.round,
+        m.event?.name,
+        m.event?.date ? this.formatDate(m.event.date) : '',
+        opponents,
+        m.winner?.gamertag,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(q);
+    });
   }
 }
 

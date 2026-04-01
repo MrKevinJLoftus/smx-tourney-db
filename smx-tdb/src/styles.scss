@@ -12,3 +12,24 @@ mat-error {
 .white-text {
   color: white;
 }
+
+/* Expansion panel headers: subtle edge + hover (all routes) */
+.mat-expansion-panel-header {
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--mat-expansion-container-text-color, currentColor) 14%,
+      transparent
+    );
+  border-radius: inherit;
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.mat-expansion-panel-header:hover:not([aria-disabled='true']) {
+  background-color: color-mix(
+    in srgb,
+    var(--mat-expansion-container-text-color, currentColor) 7%,
+    transparent
+  );
+}

@@ -58,6 +58,13 @@ export class MatchDetailComponent implements OnInit {
     });
   }
 
+  /** True if any row has song-level draws (API may return draws as strings). */
+  get hasAnyDraws(): boolean {
+    return (
+      this.match?.player_stats?.some((stat) => Number(stat.draws) > 0) ?? false
+    );
+  }
+
   formatDate(date: string | undefined): string {
     if (!date) return 'N/A';
     const d = new Date(date);
@@ -72,10 +79,8 @@ export class MatchDetailComponent implements OnInit {
 
   getMatchDisplayText(): string {
     if (!this.match) return '';
-    const playerNames = this.match.players?.map(p => p.gamertag).join(', ') || 'Unknown players';
-    const roundText = this.match.round ? ` (${this.match.round})` : '';
-    const eventText = this.match.event?.name ? `${this.match.event.name} - ` : '';
-    return `${eventText}${playerNames}${roundText}`;
+    const playerNames = this.match.players?.map(p => p.gamertag).join(' vs ') || 'Unknown players';
+    return `${playerNames}`;
   }
 
   navigateToPlayer(playerId: number): void {

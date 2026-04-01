@@ -118,6 +118,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1.5rem;
+  padding-top: 1rem;
 }
 
 .info-item {
@@ -196,9 +197,14 @@
 
 .stats-table {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
   gap: 0.75rem;
   margin-top: 0.5rem;
+  // Default: Player | Wins | Losses (no draws column)
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+
+  &--with-draws {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
 }
 
 .stats-header {
@@ -375,18 +381,15 @@
 
   .stats-row {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
     gap: 0.5rem;
     padding: 0.5rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    // Player | W | L
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  }
 
-    &::before {
-      content: attr(data-label);
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.85rem;
-      text-transform: uppercase;
-    }
+  .stats-table--with-draws .stats-row {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
   }
 
   .song-item {
