@@ -1,4 +1,5 @@
 node_modules/
+api/ui/
 .env
 .idea/
 *.csv

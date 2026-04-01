@@ -1,0 +1,36 @@
+:host {
+  display: block;
+}
+
+.mpr {
+  &--inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1rem;
+    align-items: baseline;
+  }
+
+  &--chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+.mpr--chips .mpr__entry {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.mpr--inline .mpr__entry {
+  font-size: inherit;
+  color: inherit;
+}
+
+.mpr__record {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

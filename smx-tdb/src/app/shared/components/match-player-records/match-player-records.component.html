@@ -1,0 +1,14 @@
+<ng-container *ngIf="hasStats">
+  <div
+    class="mpr"
+    [class.mpr--chips]="variant === 'chips'"
+    [class.mpr--inline]="variant === 'inline'"
+    role="list"
+  >
+    <span *ngFor="let stat of stats" class="mpr__entry" role="listitem">
+      <span class="mpr__name">{{ stat.gamertag || 'Player' }}</span>
+      <span class="mpr__sep">: </span>
+      <span class="mpr__record">{{ formatRecord(stat) }}</span>
+    </span>
+  </div>
+</ng-container>

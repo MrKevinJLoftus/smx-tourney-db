@@ -1,0 +1,18 @@
+{
+  "name": "smx-tourney-db",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SMX Tournament DB — Angular UI + Express API (Heroku deploy from repo root)",
+  "workspaces": [
+    "api",
+    "smx-tdb"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "heroku-postbuild": "npm run build -w smx-tdb && node scripts/copy-ui-to-api.js",
+    "start": "node api/server.js",
+    "web": "node api/server.js"
+  }
+}

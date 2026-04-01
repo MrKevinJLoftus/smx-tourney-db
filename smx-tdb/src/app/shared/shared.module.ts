@@ -26,6 +26,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 import { BackToSearchComponent } from './components/back-to-search/back-to-search.component';
+import { MatchPlayerRecordsComponent } from './components/match-player-records/match-player-records.component';
 
 const MODULES = [
   CommonModule,
@@ -61,7 +62,7 @@ const COMPONENTS = [
 
 @NgModule({
   declarations: [...COMPONENTS],
-  imports: [...MODULES, BackToSearchComponent],
-  exports: [...MODULES, ...COMPONENTS, BackToSearchComponent]
+  imports: [...MODULES, BackToSearchComponent, MatchPlayerRecordsComponent],
+  exports: [...MODULES, ...COMPONENTS, BackToSearchComponent, MatchPlayerRecordsComponent]
 })
 export class SharedModule { }

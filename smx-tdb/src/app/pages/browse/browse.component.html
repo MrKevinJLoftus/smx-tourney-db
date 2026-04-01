@@ -1,6 +1,4 @@
 <div class="browse-container">
-  <h1>Browse</h1>
-
   <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedIndexChange)="onTabChange($event)">
     <mat-tab label="Players">
       <div class="tab-content">
@@ -164,6 +162,9 @@
               </span>
               <span class="list-item-secondary" *ngIf="match.winner">
                 Winner: {{ match.winner.gamertag }}
+              </span>
+              <span class="list-item-secondary" *ngIf="match.player_stats?.length">
+                <app-match-player-records [playerStats]="match.player_stats" variant="inline"></app-match-player-records>
               </span>
             </div>
             <mat-icon class="list-item-icon">chevron_right</mat-icon>
