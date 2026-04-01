@@ -30,9 +30,6 @@
 
     <!-- Match Information -->
     <mat-card class="detail-card">
-      <mat-card-header>
-        <mat-card-title>Match Information</mat-card-title>
-      </mat-card-header>
       <mat-card-content>
         <div class="info-grid">
           <div class="info-item" *ngIf="match.round">
@@ -60,24 +57,19 @@
 
     <!-- Player Stats Section -->
     <mat-card class="detail-card" *ngIf="match.player_stats && match.player_stats.length > 0">
-      <mat-card-header>
-        <mat-card-title>Player Statistics</mat-card-title>
-      </mat-card-header>
       <mat-card-content>
-        <div class="stats-table">
+        <div class="stats-table" [class.stats-table--with-draws]="hasAnyDraws">
           <div class="stats-header">
             <span>Player</span>
             <span>Wins</span>
             <span>Losses</span>
-            <span>Draws</span>
-            <span>Total</span>
+            <span *ngIf="hasAnyDraws">Draws</span>
           </div>
           <div *ngFor="let stat of match.player_stats" class="stats-row">
             <a (click)="navigateToPlayer(stat.player_id)" class="player-link">{{ stat.gamertag }}</a>
             <span>{{ stat.wins }}</span>
             <span>{{ stat.losses }}</span>
-            <span>{{ stat.draws }}</span>
-            <span class="total">{{ stat.wins + stat.losses + stat.draws }}</span>
+            <span *ngIf="hasAnyDraws">{{ stat.draws }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -107,10 +99,6 @@
                   <mat-icon *ngIf="score.win" class="win-icon">star</mat-icon>
                 </span>
                 <span class="score-value">{{ score.score !== null && score.score !== undefined ? score.score : 'N/A' }}</span>
-              </div>
-              <div class="song-winner">
-                <mat-icon class="winner-icon">emoji_events</mat-icon>
-                <span>Winner: {{ getSongWinner(song) }}</span>
               </div>
             </div>
           </div>

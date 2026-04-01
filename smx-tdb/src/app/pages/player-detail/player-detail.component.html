@@ -18,18 +18,30 @@
   <div *ngIf="!isLoading && !error && player" class="player-detail-content">
     <div class="header-section">
       <mat-icon class="header-icon">person</mat-icon>
-      <h1>{{ player.username }}</h1>
+      <div class="header-main">
+        <h1>{{ player.username }}</h1>
+        <span class="header-record">{{ getMatchRecordString() }}</span>
+      </div>
     </div>
 
-     <!-- Events Section -->
-     <mat-card class="detail-card" *ngIf="events.length > 0">
-      <mat-card-header>
-        <mat-card-title>Events ({{ events.length }})</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        
+    <mat-accordion class="detail-accordion">
+      <mat-expansion-panel [expanded]="true" *ngIf="events.length > 0">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Events ({{ events.length }})</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="filter-section">
+          <mat-form-field appearance="outline" class="filter-field">
+            <input matInput [formControl]="eventFilterControl" placeholder="Filter events">
+            <mat-icon matPrefix>search</mat-icon>
+            <button *ngIf="eventFilterControl.value" matSuffix mat-icon-button (click)="eventFilterControl.setValue('')" aria-label="Clear filter">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
         <div class="events-list">
-          <div *ngFor="let event of events" class="event-item clickable" (click)="navigateToEvent(event.id)">
+          <div *ngFor="let event of filteredEvents" class="event-item clickable" (click)="navigateToEvent(event.id)">
             <mat-icon class="event-icon">event</mat-icon>
             <div class="event-info">
               <h3>{{ event.name }}</h3>
@@ -52,38 +64,53 @@
             </div>
           </div>
         </div>
-      </mat-card-content>
-    </mat-card>
 
-        <!-- Matches Section -->
-        <mat-card class="detail-card" *ngIf="matches.length > 0">
-          <mat-card-header>
-            <mat-card-title>
-              Matches Played ({{ matches.length }})
-              <span class="record">Record: {{ getMatchRecordString() }}</span>
-            </mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="matches-list">
-              <div *ngFor="let match of matches" class="match-item clickable" (click)="navigateToMatch(getMatchId(match))">
-                <mat-icon class="match-icon">sports_esports</mat-icon>
-                <div class="match-info">
-                  <h3 *ngIf="match.event">{{ match.event.name }}</h3>
-                  <div class="match-details">
-                    <span *ngIf="match.round" class="match-round">Round: {{ match.round }}</span>
-                    <span *ngIf="match.players && match.players.length > 0" class="match-players">
-                      vs. {{ getOpponentNames(match) }}
-                    </span>
-                    <span *ngIf="match.winner" class="match-winner" [class.is-winner]="match.winner.player_id === getPlayerId()">
-                      <mat-icon class="small-icon">emoji_events</mat-icon>
-                      Winner: {{ match.winner.gamertag }}
-                    </span>
-                  </div>
-                </div>
+        <div *ngIf="filteredEvents.length === 0" class="empty-message">
+          <mat-icon>event_busy</mat-icon>
+          <p>No events found{{ eventFilterControl.value ? ' matching your filter' : '' }}.</p>
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel [expanded]="false" *ngIf="matches.length > 0">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Matches ({{ matches.length }})</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="filter-section">
+          <mat-form-field appearance="outline" class="filter-field">
+            <input matInput [formControl]="matchFilterControl" placeholder="Filter matches">
+            <mat-icon matPrefix>search</mat-icon>
+            <button *ngIf="matchFilterControl.value" matSuffix mat-icon-button (click)="matchFilterControl.setValue('')" aria-label="Clear filter">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div class="matches-list">
+          <div *ngFor="let match of filteredMatches" class="match-item clickable" (click)="navigateToMatch(getMatchId(match))">
+            <mat-icon class="match-icon">sports_esports</mat-icon>
+            <div class="match-info">
+              <h3 *ngIf="match.event">{{ match.event.name }}</h3>
+              <div class="match-details">
+                <span *ngIf="match.round" class="match-round">Round: {{ match.round }}</span>
+                <span *ngIf="match.players && match.players.length > 0" class="match-players">
+                  vs. {{ getOpponentNames(match) }}
+                </span>
+                <span *ngIf="match.winner" class="match-winner" [class.is-winner]="match.winner.player_id === getPlayerId()">
+                  <mat-icon class="small-icon">emoji_events</mat-icon>
+                  Winner: {{ match.winner.gamertag }}
+                </span>
               </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+          </div>
+        </div>
+
+        <div *ngIf="filteredMatches.length === 0" class="empty-message">
+          <mat-icon>sports_esports</mat-icon>
+          <p>No matches found{{ matchFilterControl.value ? ' matching your filter' : '' }}.</p>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
 
    
 

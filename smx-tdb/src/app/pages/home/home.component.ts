@@ -13,6 +13,12 @@ import { MatchWithDetails } from '../../models/match';
 import { Observable, combineLatest, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, map, startWith } from 'rxjs/operators';
 
+type SearchAutocompleteOption = {
+  type: 'player' | 'event' | 'match';
+  item: any;
+  display: string;
+};
+
 @Component({
   selector: 'app-home',
   imports: [SharedModule, RouterModule],
@@ -36,7 +42,7 @@ export class HomeComponent implements OnInit {
   isLoading = false;
   hasSearched = false;
   
-  autocompleteOptions$: Observable<Array<{ type: 'player' | 'event' | 'match', item: any, display: string }>>;
+  autocompleteOptions$: Observable<SearchAutocompleteOption[]>;
 
   constructor(
     private playerService: PlayerService,
@@ -50,13 +56,13 @@ export class HomeComponent implements OnInit {
     this.autocompleteOptions$ = this.searchControl.valueChanges.pipe(
       startWith(''),
       debounceTime(300),
+      map((value) => this.searchTextFromControlValue(value)),
       distinctUntilChanged(),
-      switchMap(query => {
-        const searchTerm = query || '';
+      switchMap((searchTerm) => {
         if (searchTerm.trim().length < 2) {
           return of([]);
         }
-        
+
         return combineLatest([
           this.playerService.searchPlayers(searchTerm).pipe(
             catchError(() => of([]))
@@ -69,7 +75,7 @@ export class HomeComponent implements OnInit {
           )
         ]).pipe(
           map(([players, events, matches]) => {
-            const options: Array<{ type: 'player' | 'event' | 'match', item: any, display: string }> = [];
+            const options: SearchAutocompleteOption[] = [];
             
             // Add top 5 players
             players.slice(0, 5).forEach(player => {
@@ -144,8 +150,7 @@ export class HomeComponent implements OnInit {
   }
 
   performSearch(): void {
-    const query = this.searchControl.value || '';
-    this.searchQuery = query.trim();
+    this.searchQuery = this.searchTextFromControlValue(this.searchControl.value).trim();
     
     if (!this.searchQuery) {
       this.clearSearch();
@@ -197,7 +202,7 @@ export class HomeComponent implements OnInit {
     return option.display;
   }
 
-  onOptionSelected(option: { type: 'player' | 'event' | 'match', item: any, display: string }): void {
+  onOptionSelected(option: SearchAutocompleteOption): void {
     // Navigate directly to the detail page for the selected item
     if (option.type === 'player') {
       const playerId = option.item.id || option.item.player_id;
@@ -235,9 +240,21 @@ export class HomeComponent implements OnInit {
   }
 
   private homeSearchDetailNavExtras(): { state?: Record<string, { q: string }> } {
-    const q = (this.searchControl.value || '').trim();
+    const q = this.searchTextFromControlValue(this.searchControl.value).trim();
     if (!q) return {};
     return { state: { [HOME_SEARCH_RETURN_STATE_KEY]: { q } } };
+  }
+
+  /**
+   * Autocomplete sets the control value to the selected option object; free typing uses a string.
+   */
+  private searchTextFromControlValue(value: unknown): string {
+    if (value == null || value === '') return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value !== null && 'display' in value) {
+      return this.displayFn(value as SearchAutocompleteOption | string);
+    }
+    return '';
   }
 
   formatDate(date: string | Date): string {

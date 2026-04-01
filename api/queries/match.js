@@ -2,7 +2,7 @@ module.exports = {
   GET_MATCHES_BY_EVENT: `SELECT m.*
     FROM \`match\` m
     WHERE m.event_id = ?
-    ORDER BY m.created_at DESC`,
+    ORDER BY m.round DESC, m.id DESC`,
   SEARCH_MATCHES: `SELECT DISTINCT m.*
     FROM \`match\` m
     LEFT JOIN event e ON m.event_id = e.id
@@ -11,7 +11,11 @@ module.exports = {
     WHERE m.round LIKE ?
     OR e.name LIKE ?
     OR p.username LIKE ?
-    ORDER BY m.created_at DESC
+    ORDER BY
+      (e.date IS NULL) ASC,
+      e.date DESC,
+      m.created_at DESC,
+      m.id DESC
     LIMIT 50`,
   GET_MATCH_BY_ID: `SELECT m.*
     FROM \`match\` m
