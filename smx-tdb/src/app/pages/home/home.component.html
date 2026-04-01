@@ -123,12 +123,8 @@
               <mat-icon class="small-icon">emoji_events</mat-icon>
               <span>Winner: {{ match.winner.gamertag }}</span>
             </div>
-            <div *ngIf="match.player_stats && match.player_stats.length > 0" class="card-detail">
-              <div class="stats-list">
-                <span *ngFor="let stat of match.player_stats" class="stat-item">
-                  {{ stat.gamertag }}: {{ stat.wins }}-{{ stat.losses }}-{{ stat.draws }}
-                </span>
-              </div>
+            <div *ngIf="match.player_stats?.length" class="card-detail">
+              <app-match-player-records [playerStats]="match.player_stats" variant="chips"></app-match-player-records>
             </div>
           </mat-card-content>
         </mat-card>

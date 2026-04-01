@@ -97,6 +97,11 @@
                   <mat-icon class="small-icon">emoji_events</mat-icon>
                   Winner: {{ match.winner.gamertag }}
                 </span>
+                <app-match-player-records
+                  *ngIf="match.player_stats?.length"
+                  [playerStats]="match.player_stats"
+                  variant="inline"
+                ></app-match-player-records>
               </div>
             </div>
             <mat-icon class="row-chevron">chevron_right</mat-icon>

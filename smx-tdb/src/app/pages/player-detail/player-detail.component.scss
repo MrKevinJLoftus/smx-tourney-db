@@ -241,6 +241,10 @@
       font-size: 0.9rem;
       color: rgba(255, 255, 255, 0.7);
 
+      app-match-player-records {
+        flex-basis: 100%;
+      }
+
       span {
         display: flex;
         align-items: center;
