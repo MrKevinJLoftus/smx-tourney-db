@@ -95,6 +95,42 @@
   }
 }
 
+.rivals-section {
+  margin: 1rem 0;
+
+  .top5-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1rem 0;
+  }
+
+  .top5-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 0.75rem;
+    width: 100%;
+  }
+
+  .top5-link {
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .top5-muted {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.9rem;
+  }
+
+  .top5-empty {
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0.25rem 0;
+  }
+}
+
 .detail-accordion {
   margin-bottom: 2rem;
 }

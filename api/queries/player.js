@@ -27,6 +27,39 @@ module.exports = {
     FROM event_x_player ep 
     INNER JOIN event e ON ep.event_id = e.id 
     WHERE ep.player_id = ? 
-    ORDER BY e.date DESC`
+    ORDER BY e.date DESC`,
+
+  // Same pairing rules as browse GET_TOP_10_RIVALRIES_BY_MATCH_COUNT (1v1 via match_x_player_stats only).
+  GET_TOP_10_RIVALS_FOR_PLAYER: `
+    SELECT
+      pairs.player1_id,
+      p1.username AS player1_username,
+      pairs.player2_id,
+      p2.username AS player2_username,
+      pairs.match_count
+    FROM (
+      SELECT
+        mp.player1_id,
+        mp.player2_id,
+        COUNT(*) AS match_count
+      FROM (
+        SELECT
+          s.match_id,
+          MIN(s.player_id) AS player1_id,
+          MAX(s.player_id) AS player2_id,
+          COUNT(DISTINCT s.player_id) AS player_count
+        FROM match_x_player_stats s
+        GROUP BY s.match_id
+        HAVING player_count = 2
+      ) mp
+      WHERE mp.player1_id = ? OR mp.player2_id = ?
+      GROUP BY mp.player1_id, mp.player2_id
+      ORDER BY match_count DESC, mp.player1_id ASC, mp.player2_id ASC
+      LIMIT 10
+    ) pairs
+    INNER JOIN player p1 ON p1.id = pairs.player1_id
+    INNER JOIN player p2 ON p2.id = pairs.player2_id
+    ORDER BY pairs.match_count DESC, p1.username ASC, p2.username ASC
+  `
 };
 
