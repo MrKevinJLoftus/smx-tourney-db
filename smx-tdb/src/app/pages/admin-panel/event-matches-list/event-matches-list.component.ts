@@ -139,54 +139,5 @@ export class EventMatchesListComponent implements OnInit, OnChanges {
       }
     });
   }
-
-  onFileSelected(fileEvent: Event): void {
-    const input = (fileEvent.target as HTMLInputElement);
-    if (input.files && input.files.length > 0 && this.selectedEventId) {
-      const file = input.files[0];
-      this.bulkImportMatches(file);
-      // Reset the input so the same file can be selected again
-      input.value = '';
-    }
-  }
-
-  bulkImportMatches(file: File): void {
-    if (!this.selectedEventId) {
-      this.messageService.show('Please select an event first');
-      return;
-    }
-
-    this.isLoading = true;
-    this.matchService.bulkImportMatches(this.selectedEventId, file).subscribe({
-      next: (result) => {
-        this.isLoading = false;
-        const summary = result.summary;
-        let message = `Import completed: ${summary.matchesCreated} matches created`;
-        if (summary.duplicatesSkipped > 0) {
-          message += `, ${summary.duplicatesSkipped} duplicates skipped`;
-        }
-        if (summary.matchesSkipped > summary.duplicatesSkipped) {
-          message += `, ${summary.matchesSkipped - summary.duplicatesSkipped} matches skipped`;
-        }
-        if (summary.errors > 0) {
-          message += `, ${summary.errors} errors`;
-        }
-        this.messageService.show(message);
-        this.loadMatches();
-        
-        // Show detailed errors if any
-        if (result.errors && result.errors.length > 0) {
-          console.warn('Import errors:', result.errors);
-          // Optionally show errors in a dialog or expandable section
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        console.error('Error importing matches:', error);
-        const errorMessage = error.error?.message || 'Error importing matches. Please try again.';
-        this.messageService.show(errorMessage);
-      }
-    });
-  }
 }
 

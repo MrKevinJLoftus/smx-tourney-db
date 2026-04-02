@@ -15,19 +15,6 @@
         <mat-icon>add</mat-icon>
         Add Match To Event
       </button>
-      <input type="file" 
-             accept=".json,application/json" 
-             #fileInput 
-             (change)="onFileSelected($event)" 
-             style="display: none"
-             [disabled]="!selectedEventId || isLoading">
-      <button mat-raised-button 
-              color="accent" 
-              (click)="fileInput.click()" 
-              [disabled]="!selectedEventId || isLoading">
-        <mat-icon>upload</mat-icon>
-        Bulk Import from Start.gg JSON
-      </button>
     </div>
   </div>
   @if (isLoading) {
