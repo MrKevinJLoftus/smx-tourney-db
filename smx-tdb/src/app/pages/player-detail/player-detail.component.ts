@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -10,8 +11,15 @@ import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
 import { Top5Rivalry } from '../../services/browse.service';
-import { combineLatest, of } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { combineLatest, EMPTY, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  startWith,
+  switchMap
+} from 'rxjs/operators';
 
 @Component({
   selector: 'app-player-detail',
@@ -21,6 +29,8 @@ import { catchError, debounceTime, distinctUntilChanged, startWith } from 'rxjs/
   styleUrl: './player-detail.component.scss'
 })
 export class PlayerDetailComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   player: Player | null = null;
   events: Event[] = [];
   matches: MatchWithDetails[] = [];
@@ -42,20 +52,6 @@ export class PlayerDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) {
-      this.error = 'Invalid player ID';
-      this.isLoading = false;
-      return;
-    }
-
-    const playerId = parseInt(id, 10);
-    if (isNaN(playerId)) {
-      this.error = 'Invalid player ID';
-      this.isLoading = false;
-      return;
-    }
-
     this.eventFilterControl.valueChanges
       .pipe(startWith(''), debounceTime(200), distinctUntilChanged())
       .subscribe(() => this.applyEventFilter());
@@ -64,45 +60,65 @@ export class PlayerDetailComponent implements OnInit {
       .pipe(startWith(''), debounceTime(200), distinctUntilChanged())
       .subscribe(() => this.applyMatchFilter());
 
-    this.loadPlayer(playerId);
-  }
-
-  loadPlayer(id: number): void {
-    this.isLoading = true;
-    this.error = null;
-
-    combineLatest([
-      this.playerService.getPlayerById(id).pipe(
-        catchError(() => {
-          this.error = 'Failed to load player. Please try again.';
-          return of(null);
-        })
-      ),
-      this.playerService.getEventsByPlayer(id).pipe(
-        catchError(() => of([]))
-      ),
-      this.matchService.getMatchesByPlayer(id).pipe(
-        catchError(() => of([]))
-      ),
-      this.playerService.getRivalsForPlayer(id).pipe(
-        catchError(() => of([]))
+    this.route.paramMap
+      .pipe(
+        map((pm) => pm.get('id')),
+        map((raw) => {
+          if (!raw) return null;
+          const n = parseInt(raw, 10);
+          return isNaN(n) ? null : n;
+        }),
+        distinctUntilChanged(),
+        switchMap((playerId) => {
+          if (playerId === null) {
+            this.error = 'Invalid player ID';
+            this.isLoading = false;
+            this.player = null;
+            this.events = [];
+            this.matches = [];
+            this.topRivals = [];
+            this.filteredEvents = [];
+            this.filteredMatches = [];
+            return EMPTY;
+          }
+          this.isLoading = true;
+          this.error = null;
+          return combineLatest([
+            this.playerService.getPlayerById(playerId).pipe(
+              catchError(() => {
+                this.error = 'Failed to load player. Please try again.';
+                return of(null);
+              })
+            ),
+            this.playerService.getEventsByPlayer(playerId).pipe(
+              catchError(() => of([]))
+            ),
+            this.matchService.getMatchesByPlayer(playerId).pipe(
+              catchError(() => of([]))
+            ),
+            this.playerService.getRivalsForPlayer(playerId).pipe(
+              catchError(() => of([]))
+            )
+          ]);
+        }),
+        takeUntilDestroyed(this.destroyRef)
       )
-    ]).subscribe({
-      next: ([player, events, matches, rivals]) => {
-        this.player = player;
-        this.events = events;
-        this.matches = matches;
-        this.topRivals = rivals;
-        this.applyEventFilter();
-        this.applyMatchFilter();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading player data:', error);
-        this.error = 'Failed to load player data. Please try again.';
-        this.isLoading = false;
-      }
-    });
+      .subscribe({
+        next: ([player, events, matches, rivals]) => {
+          this.player = player;
+          this.events = events;
+          this.matches = matches;
+          this.topRivals = rivals;
+          this.applyEventFilter();
+          this.applyMatchFilter();
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading player data:', error);
+          this.error = 'Failed to load player data. Please try again.';
+          this.isLoading = false;
+        }
+      });
   }
 
   formatDate(date: string | Date | undefined): string {
