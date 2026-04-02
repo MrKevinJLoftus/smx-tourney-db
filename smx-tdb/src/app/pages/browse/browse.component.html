@@ -115,7 +115,7 @@
             <input 
               matInput 
               [formControl]="filterControl"
-              placeholder="Filter by round, event, or player">
+              placeholder="Search by round, event, or player">
             <mat-icon matPrefix>search</mat-icon>
             <button 
               *ngIf="filterControl.value" 
@@ -139,13 +139,13 @@
         </div>
 
         <div *ngIf="!isLoading && !error" class="list-section">
-          <div *ngIf="filteredMatches.length === 0" class="empty-message">
+          <div *ngIf="matches.length === 0" class="empty-message">
             <mat-icon>sports_esports</mat-icon>
-            <p>No matches found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
+            <p>No matches found{{ filterControl.value ? ' matching your search' : '' }}.</p>
           </div>
           
           <a 
-            *ngFor="let match of filteredMatches" 
+            *ngFor="let match of matches" 
             [routerLink]="['/match', match.match_id]"
             [state]="browseDetailNavState('match')"
             class="list-item clickable"
@@ -169,6 +169,17 @@
             </div>
             <mat-icon class="list-item-icon">chevron_right</mat-icon>
           </a>
+
+          <div class="match-load-more" *ngIf="matchHasMore && matches.length > 0">
+            <button
+              mat-stroked-button
+              type="button"
+              color="primary"
+              (click)="loadMatchesPage(true)"
+              [disabled]="isMatchLoadingMore">
+              {{ isMatchLoadingMore ? 'Loading…' : 'Load more' }}
+            </button>
+          </div>
         </div>
       </div>
     </mat-tab>

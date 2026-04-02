@@ -454,23 +454,46 @@ exports.getMatchById = async (req, res) => {
   res.status(200).json(transformedMatch);
 };
 
+const MATCH_SEARCH_DEFAULT_RECENT_LIMIT = 30;
+const MATCH_SEARCH_DEFAULT_QUERY_LIMIT = 50;
+const MATCH_SEARCH_MAX_LIMIT = 100;
+
 exports.searchMatches = async (req, res) => {
-  const query = req.query.q || req.query.query || '';
-  console.log(`Searching matches with query: ${query}`);
-  if (!query || query.trim().length === 0) {
-    // If no query, return empty array
-    res.status(200).json([]);
-    return;
+  const query = (req.query.q || req.query.query || '').trim();
+  console.log(`Searching matches with query: ${query || '(recent)'}`);
+
+  let limit = parseInt(req.query.limit, 10);
+  if (!Number.isFinite(limit) || limit < 1) {
+    limit = query ? MATCH_SEARCH_DEFAULT_QUERY_LIMIT : MATCH_SEARCH_DEFAULT_RECENT_LIMIT;
   }
-  const searchTerm = `%${query.trim()}%`;
-  const matches = await dbconn.executeMysqlQuery(queries.SEARCH_MATCHES, [
-    searchTerm,
-    searchTerm,
-    searchTerm
-  ]);
-  // Transform matches in batch (5 queries total instead of ~5 per match)
-  const transformedMatches = await transformMatchesBatch(matches);
-  res.status(200).json(transformedMatches);
+  if (limit > MATCH_SEARCH_MAX_LIMIT) {
+    limit = MATCH_SEARCH_MAX_LIMIT;
+  }
+
+  let offset = parseInt(req.query.offset, 10);
+  if (!Number.isFinite(offset) || offset < 0) {
+    offset = 0;
+  }
+
+  const fetchLimit = limit + 1;
+  let rows;
+  if (!query) {
+    rows = await dbconn.executeMysqlQuery(queries.RECENT_MATCHES, [fetchLimit, offset]);
+  } else {
+    const searchTerm = `%${query}%`;
+    rows = await dbconn.executeMysqlQuery(queries.SEARCH_MATCHES, [
+      searchTerm,
+      searchTerm,
+      searchTerm,
+      fetchLimit,
+      offset
+    ]);
+  }
+
+  const hasMore = rows.length > limit;
+  const pageRows = hasMore ? rows.slice(0, limit) : rows;
+  const transformedMatches = await transformMatchesBatch(pageRows);
+  res.status(200).json({ matches: transformedMatches, hasMore });
 };
 
 exports.createMatch = async (req, res) => {
