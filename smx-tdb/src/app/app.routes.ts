@@ -16,7 +16,7 @@ export const routes: Routes = [
   { path: 'event/:id', component: EventDetailComponent, data: { title: 'Event' } },
   { path: 'match/:id', component: MatchDetailComponent, data: { title: 'Match' } },
   { path: 'admin-panel', component: AdminPanelComponent, canActivate: [AuthGuard], data: { title: 'Admin Panel' }},
-  { path: 'super-admin-panel', component: SuperAdminPanelComponent, data: { title: 'Super Admin Panel' }},
+  { path: 'super-admin-panel', component: SuperAdminPanelComponent, canActivate: [AuthGuard], data: { title: 'Super Admin Panel' }},
   { path: 'update-password', component: UpdatePasswordComponent, canActivate: [AuthGuard], data: { title: 'Update Password' } },
   { path: 'login', loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule), data: { title: 'Login' } },
   { path: '**', redirectTo: '/' }
