@@ -71,6 +71,21 @@ exports.getEventsByPlayer = async (req, res) => {
   res.status(200).json(events);
 };
 
+exports.getRivalsForPlayer = async (req, res) => {
+  const playerId = req.params.id;
+  console.log(`Fetching top rivals for player: ${playerId}`);
+  const rows = await dbconn.executeMysqlQuery(queries.GET_TOP_10_RIVALS_FOR_PLAYER, [
+    playerId,
+    playerId
+  ]);
+  const rivals = (rows || []).map((r) => ({
+    player1: { id: r.player1_id, username: r.player1_username },
+    player2: { id: r.player2_id, username: r.player2_username },
+    matchCount: Number(r.match_count || 0)
+  }));
+  res.status(200).json(rivals);
+};
+
 exports.updatePlayer = async (req, res) => {
   const playerId = req.params.id;
   const { gamertag, pronouns, user_id } = req.body;

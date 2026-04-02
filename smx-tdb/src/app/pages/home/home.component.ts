@@ -70,7 +70,8 @@ export class HomeComponent implements OnInit {
           this.eventService.searchEvents(searchTerm).pipe(
             catchError(() => of([]))
           ),
-          this.matchService.searchMatches(searchTerm).pipe(
+          this.matchService.searchMatches(searchTerm, { limit: 50 }).pipe(
+            map((page) => page.matches),
             catchError(() => of([]))
           )
         ]).pipe(
@@ -167,7 +168,8 @@ export class HomeComponent implements OnInit {
       this.eventService.searchEvents(this.searchQuery).pipe(
         catchError(() => of([]))
       ),
-      this.matchService.searchMatches(this.searchQuery).pipe(
+      this.matchService.searchMatches(this.searchQuery, { limit: 50 }).pipe(
+        map((page) => page.matches),
         catchError(() => of([]))
       )
     ]).subscribe({

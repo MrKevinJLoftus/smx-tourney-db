@@ -3,6 +3,15 @@ module.exports = {
     FROM \`match\` m
     WHERE m.event_id = ?
     ORDER BY m.round DESC, m.id DESC`,
+  RECENT_MATCHES: `SELECT m.*
+    FROM \`match\` m
+    LEFT JOIN event e ON m.event_id = e.id
+    ORDER BY
+      (e.date IS NULL) ASC,
+      e.date DESC,
+      m.created_at DESC,
+      m.id DESC
+    LIMIT ? OFFSET ?`,
   SEARCH_MATCHES: `SELECT DISTINCT m.*
     FROM \`match\` m
     LEFT JOIN event e ON m.event_id = e.id
@@ -16,7 +25,7 @@ module.exports = {
       e.date DESC,
       m.created_at DESC,
       m.id DESC
-    LIMIT 50`,
+    LIMIT ? OFFSET ?`,
   GET_MATCH_BY_ID: `SELECT m.*
     FROM \`match\` m
     WHERE m.id = ?`,

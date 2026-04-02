@@ -5,6 +5,7 @@ import { Player } from '../models/player';
 import { Event } from '../models/event';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { Top5Rivalry } from './browse.service';
 
 @Injectable({
   providedIn: 'root'
@@ -77,6 +78,10 @@ export class PlayerService {
 
   getEventsByPlayer(playerId: number): Observable<Event[]> {
     return this.http.get<Event[]>(`${environment.apiUrl}/player/${playerId}/events`);
+  }
+
+  getRivalsForPlayer(playerId: number): Observable<Top5Rivalry[]> {
+    return this.http.get<Top5Rivalry[]>(`${environment.apiUrl}/player/${playerId}/rivals`);
   }
 }
 

@@ -5,6 +5,11 @@ import { Match, MatchWithDetails } from '../models/match';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
+export interface MatchSearchPage {
+  matches: MatchWithDetails[];
+  hasMore: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -23,12 +28,22 @@ export class MatchService {
     return this.http.get<MatchWithDetails>(`${environment.apiUrl}/match/${id}`);
   }
 
-  searchMatches(query: string): Observable<MatchWithDetails[]> {
+  searchMatches(
+    query: string,
+    options?: { limit?: number; offset?: number }
+  ): Observable<MatchSearchPage> {
     let params = new HttpParams();
-    if (query.trim()) {
-      params = params.set('q', query.trim());
+    const q = query.trim();
+    if (q) {
+      params = params.set('q', q);
     }
-    return this.http.get<MatchWithDetails[]>(`${environment.apiUrl}/match/search`, { params });
+    if (options?.limit != null) {
+      params = params.set('limit', String(options.limit));
+    }
+    if (options?.offset != null) {
+      params = params.set('offset', String(options.offset));
+    }
+    return this.http.get<MatchSearchPage>(`${environment.apiUrl}/match/search`, { params });
   }
 
   getMatchesByPlayer(playerId: number): Observable<MatchWithDetails[]> {

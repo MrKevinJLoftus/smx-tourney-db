@@ -117,6 +117,25 @@
       </mat-expansion-panel>
     </mat-accordion>
 
+    <div class="rivals-section">
+      <mat-card class="top5-card">
+        <mat-card-title>Top 10 rivalries (most matches)</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="topRivals.length === 0" class="top5-empty">No 1v1 matchups yet.</div>
+          <mat-list *ngIf="topRivals.length > 0">
+            <mat-list-item *ngFor="let r of topRivals">
+              <div class="top5-row">
+                <a class="top5-link" [routerLink]="['/player', r.player1.id]">{{ r.player1.username }}</a>
+                <span class="top5-muted">vs</span>
+                <a class="top5-link" [routerLink]="['/player', r.player2.id]">{{ r.player2.username }}</a>
+                <span class="top5-muted">({{ r.matchCount }} matches)</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
    
 
     <div class="placeholder-section" *ngIf="events.length === 0 && matches.length === 0 && !isLoading">

@@ -9,7 +9,7 @@ import { MatchService } from '../../services/match.service';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
-import { debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import {
   BROWSE_RETURN_STATE_KEY,
   BrowseTabParam,
@@ -35,8 +35,12 @@ export class BrowseComponent implements OnInit {
   
   filteredPlayers: Player[] = [];
   filteredEvents: Event[] = [];
-  filteredMatches: MatchWithDetails[] = [];
-  
+
+  /** Matches tab: server-paginated list */
+  readonly matchPageSize = 30;
+  matchHasMore = false;
+  isMatchLoadingMore = false;
+
   isLoading = false;
   error: string | null = null;
 
@@ -53,8 +57,13 @@ export class BrowseComponent implements OnInit {
 
     this.loadData();
 
-    this.filterControl.valueChanges.pipe(startWith(''), debounceTime(300), distinctUntilChanged()).subscribe(() => {
-      this.applyFilter();
+    this.filterControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      if (this.selectedTab === 'match') {
+        this.loadMatchesPage(false);
+      } else {
+        this.applyFilter();
+      }
+      this.syncBrowseQueryParams();
     });
 
     this.syncBrowseQueryParams();
@@ -87,7 +96,7 @@ export class BrowseComponent implements OnInit {
     if (this.selectedTab !== newTab) {
       this.selectedTab = newTab;
       this.selectedTabIndex = index;
-      this.filterControl.setValue('');
+      this.filterControl.setValue('', { emitEvent: false });
       this.loadData();
     } else {
       this.selectedTabIndex = index;
@@ -119,7 +128,7 @@ export class BrowseComponent implements OnInit {
         this.loadEvents();
         break;
       case 'match':
-        this.loadMatches();
+        this.loadMatchesPage(false);
         break;
     }
   }
@@ -154,21 +163,42 @@ export class BrowseComponent implements OnInit {
     });
   }
 
-  loadMatches(): void {
-    // Use a very broad search term to get all matches (API returns empty array for empty query)
-    // Using '%' as a search term that will match everything in the LIKE query
-    this.matchService.searchMatches('%').subscribe({
-      next: (matches) => {
-        this.matches = matches;
-        this.applyFilter();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading matches:', error);
-        this.error = 'Failed to load matches. Please try again.';
-        this.isLoading = false;
-      }
-    });
+  loadMatchesPage(append: boolean): void {
+    const q = (this.filterControl.value || '').trim();
+    const offset = append ? this.matches.length : 0;
+
+    if (append) {
+      this.isMatchLoadingMore = true;
+    } else {
+      this.isLoading = true;
+      this.error = null;
+      this.matchHasMore = false;
+    }
+
+    this.matchService
+      .searchMatches(q, { limit: this.matchPageSize, offset })
+      .subscribe({
+        next: ({ matches, hasMore }) => {
+          this.matches = append ? [...this.matches, ...matches] : matches;
+          this.matchHasMore = hasMore;
+          if (append) {
+            this.isMatchLoadingMore = false;
+          } else {
+            this.isLoading = false;
+          }
+        },
+        error: (error) => {
+          console.error('Error loading matches:', error);
+          this.error = 'Failed to load matches. Please try again.';
+          if (append) {
+            this.isMatchLoadingMore = false;
+          } else {
+            this.matches = [];
+            this.matchHasMore = false;
+            this.isLoading = false;
+          }
+        }
+      });
   }
 
   applyFilter(): void {
@@ -187,16 +217,6 @@ export class BrowseComponent implements OnInit {
           (event.location && event.location.toLowerCase().includes(filterValue)) ||
           (event.organizers && event.organizers.toLowerCase().includes(filterValue))
         );
-        break;
-      case 'match':
-        this.filteredMatches = this.matches.filter(match => {
-          const roundMatch = match.round && match.round.toLowerCase().includes(filterValue);
-          const eventMatch = match.event && match.event.name.toLowerCase().includes(filterValue);
-          const playerMatch = match.players && match.players.some(p => 
-            p.gamertag.toLowerCase().includes(filterValue)
-          );
-          return roundMatch || eventMatch || playerMatch;
-        });
         break;
     }
   }

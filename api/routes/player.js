@@ -10,6 +10,7 @@ router.get("/search", asyncWrapper(playerController.searchPlayers));
 router.get("/gamertag/:gamertag", asyncWrapper(playerController.getPlayerByGamertag));
 router.get("/event/:eventId", asyncWrapper(playerController.getPlayersByEvent));
 router.get("/:id/events", asyncWrapper(playerController.getEventsByPlayer));
+router.get("/:id/rivals", asyncWrapper(playerController.getRivalsForPlayer));
 router.get("/:id", asyncWrapper(playerController.getPlayerById));
 
 // Admin-only routes

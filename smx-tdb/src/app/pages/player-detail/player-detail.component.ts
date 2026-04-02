@@ -9,6 +9,7 @@ import { MatchService } from '../../services/match.service';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
+import { Top5Rivalry } from '../../services/browse.service';
 import { combineLatest, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, startWith } from 'rxjs/operators';
 
@@ -25,6 +26,7 @@ export class PlayerDetailComponent implements OnInit {
   matches: MatchWithDetails[] = [];
   filteredEvents: Event[] = [];
   filteredMatches: MatchWithDetails[] = [];
+  topRivals: Top5Rivalry[] = [];
 
   eventFilterControl = new FormControl('');
   matchFilterControl = new FormControl('');
@@ -81,12 +83,16 @@ export class PlayerDetailComponent implements OnInit {
       ),
       this.matchService.getMatchesByPlayer(id).pipe(
         catchError(() => of([]))
+      ),
+      this.playerService.getRivalsForPlayer(id).pipe(
+        catchError(() => of([]))
       )
     ]).subscribe({
-      next: ([player, events, matches]) => {
+      next: ([player, events, matches, rivals]) => {
         this.player = player;
         this.events = events;
         this.matches = matches;
+        this.topRivals = rivals;
         this.applyEventFilter();
         this.applyMatchFilter();
         this.isLoading = false;
@@ -162,9 +168,25 @@ export class PlayerDetailComponent implements OnInit {
     return { wins, losses, draws };
   }
 
+  /** W/L ratio for display; matches home top-list semantics (wins ÷ losses, null when losses === 0 → ∞). */
+  getWinLossRatio(): number | null {
+    const r = this.getMatchRecord();
+    if (r.losses === 0) {
+      return null;
+    }
+    return r.wins / r.losses;
+  }
+
+  formatRatio(ratio: number | null): string {
+    if (ratio === null || ratio === undefined) return '∞';
+    if (!Number.isFinite(ratio)) return '∞';
+    return ratio.toFixed(2);
+  }
+
   getMatchRecordString(): string {
     const r = this.getMatchRecord();
-    return `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ''}`;
+    const record = `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ''}`;
+    return `${record} · W/L: ${this.formatRatio(this.getWinLossRatio())}`;
   }
 
   getPlacementNumber(event: Event): number | null {
