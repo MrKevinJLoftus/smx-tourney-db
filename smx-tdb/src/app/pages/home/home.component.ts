@@ -7,6 +7,7 @@ import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
 import { MatchService } from '../../services/match.service';
 import { BrowseService, Top5PlayerByRatio, Top5RecentEvent, Top5Rivalry } from '../../services/browse.service';
+import { StartGgPublicService, UpcomingStartGgEvent } from '../../services/start-gg-public.service';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
@@ -38,6 +39,10 @@ export class HomeComponent implements OnInit {
   topRivalriesTop5: Top5Rivalry[] = [];
   isTop5Loading = false;
   top5Error: string | null = null;
+
+  upcomingStartGgEvents: UpcomingStartGgEvent[] = [];
+  isUpcomingStartGgLoading = false;
+  upcomingStartGgError: string | null = null;
   
   isLoading = false;
   hasSearched = false;
@@ -49,6 +54,7 @@ export class HomeComponent implements OnInit {
     private eventService: EventService,
     private matchService: MatchService,
     private browseService: BrowseService,
+    private startGgPublicService: StartGgPublicService,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -118,6 +124,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTop5Lists();
+    this.loadUpcomingStartGgEvents();
     const initialQ = this.route.snapshot.queryParamMap.get('q')?.trim();
     if (initialQ) {
       this.searchControl.setValue(initialQ);
@@ -146,6 +153,22 @@ export class HomeComponent implements OnInit {
         console.error('Error loading home lists:', error);
         this.top5Error = 'Failed to load home lists.';
         this.isTop5Loading = false;
+      }
+    });
+  }
+
+  loadUpcomingStartGgEvents(): void {
+    this.isUpcomingStartGgLoading = true;
+    this.upcomingStartGgError = null;
+    this.startGgPublicService.getUpcomingStepmaniaxEvents(2, 15).subscribe({
+      next: (data) => {
+        this.upcomingStartGgEvents = data?.events || [];
+        this.isUpcomingStartGgLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading upcoming start.gg events:', error);
+        this.upcomingStartGgError = 'Failed to load upcoming start.gg events.';
+        this.isUpcomingStartGgLoading = false;
       }
     });
   }
@@ -263,6 +286,11 @@ export class HomeComponent implements OnInit {
     if (!date) return '';
     const d = new Date(date);
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  formatUnixSecondsDate(seconds: number | null | undefined): string {
+    if (seconds == null || !Number.isFinite(Number(seconds))) return '';
+    return this.formatDate(new Date(Number(seconds) * 1000));
   }
 
   formatRatio(ratio: number | null): string {

@@ -1,7 +1,7 @@
 module.exports = {
   // 5 most recent events, plus winner based on event_x_player placement=1 (numeric).
   // If placement isn't numeric/consistent, winner will be null.
-  GET_TOP_5_RECENT_EVENTS_WITH_WINNER: `
+  GET_RECENT_EVENTS_WITH_WINNER: `
     SELECT
       e.id AS event_id,
       e.name,
@@ -20,7 +20,7 @@ module.exports = {
     ) ep1 ON ep1.event_id = e.id
     LEFT JOIN player w ON w.id = ep1.player_id
     ORDER BY (e.date IS NULL) ASC, e.date DESC, e.id DESC
-    LIMIT 5
+    LIMIT 10
   `,
 
   // Top 10 players by win/loss ratio counting MATCHES won/lost (not songs).
