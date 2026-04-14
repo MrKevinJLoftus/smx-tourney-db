@@ -30,13 +30,14 @@ module.exports = {
     SELECT
       p.id AS player_id,
       p.username,
-      COALESCE(SUM(CASE WHEN s.player_id = m.winner_id THEN 1 ELSE 0 END), 0) AS wins_total,
-      COALESCE(SUM(CASE WHEN s.player_id <> m.winner_id THEN 1 ELSE 0 END), 0) AS losses_total,
+      COUNT(DISTINCT CASE WHEN s.player_id = m.winner_id THEN m.id END) AS wins_total,
+      COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END) AS losses_total,
+      COUNT(DISTINCT m.id) AS matches_total,
       CASE
-        WHEN COALESCE(SUM(CASE WHEN s.player_id <> m.winner_id THEN 1 ELSE 0 END), 0) = 0 THEN NULL
+        WHEN COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END) = 0 THEN NULL
         ELSE (
-          COALESCE(SUM(CASE WHEN s.player_id = m.winner_id THEN 1 ELSE 0 END), 0)
-          / COALESCE(SUM(CASE WHEN s.player_id <> m.winner_id THEN 1 ELSE 0 END), 0)
+          COUNT(DISTINCT CASE WHEN s.player_id = m.winner_id THEN m.id END)
+          / COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END)
         )
       END AS win_loss_ratio
     FROM player p
@@ -51,7 +52,7 @@ module.exports = {
     ) only_1v1 ON only_1v1.match_id = s.match_id
     WHERE m.winner_id IS NOT NULL
     GROUP BY p.id, p.username
-    HAVING (wins_total + losses_total) > 0
+    HAVING matches_total >= 10
     ORDER BY
       (losses_total = 0) DESC,
       (wins_total / NULLIF(losses_total, 0)) DESC,

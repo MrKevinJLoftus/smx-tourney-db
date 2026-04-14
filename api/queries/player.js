@@ -18,11 +18,24 @@ module.exports = {
   CREATE_PLAYER: `INSERT INTO player (username, pronouns, created_by) VALUES (?, ?, ?)`,
   UPDATE_PLAYER: `UPDATE player SET username = ?, pronouns = ?, created_by = ? WHERE id = ?`,
   DELETE_PLAYER: `DELETE FROM player WHERE id = ?`,
-  GET_PLAYERS_BY_EVENT: `SELECT ep.*, p.id, p.username, p.pronouns 
-    FROM event_x_player ep 
-    INNER JOIN player p ON ep.player_id = p.id 
-    WHERE ep.event_id = ? 
-    ORDER BY ep.seed ASC, CAST(ep.placement AS UNSIGNED) ASC`,
+  // NOTE: Alias ids to avoid `id` collisions between `event_x_player` and `player`.
+  // Frontend expects both the join-row id (event_player_id) and the player id (player_id).
+  GET_PLAYERS_BY_EVENT: `
+    SELECT
+      ep.id AS event_player_id,
+      ep.event_id,
+      ep.player_id,
+      ep.seed,
+      ep.placement,
+      ep.created_by,
+      p.id AS player_id,
+      p.username,
+      p.pronouns
+    FROM event_x_player ep
+    INNER JOIN player p ON ep.player_id = p.id
+    WHERE ep.event_id = ?
+    ORDER BY ep.seed ASC, CAST(ep.placement AS UNSIGNED) ASC
+  `,
   GET_EVENTS_BY_PLAYER: `SELECT DISTINCT e.*, ep.placement, ep.seed
     FROM event_x_player ep 
     INNER JOIN event e ON ep.event_id = e.id 

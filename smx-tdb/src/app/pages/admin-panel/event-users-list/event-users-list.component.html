@@ -31,7 +31,7 @@
       }
       @if (players.length > 0) {
         <mat-list>
-          @for (player of players; track player.id || player.player_id || $index) {
+          @for (player of players; track player.event_player_id || player.id || $index) {
             <mat-list-item>
               <div class="player-item">
                 <div class="player-header">
@@ -58,7 +58,7 @@
                     </button>
                     <button mat-icon-button 
                             class="delete-button" 
-                            (click)="deletePlayer(player.id, player.username || player.gamertag)"
+                            (click)="deletePlayer(player.event_player_id || player.id, player.username || player.gamertag)"
                             matTooltip="Remove player from event">
                       <mat-icon>delete</mat-icon>
                     </button>

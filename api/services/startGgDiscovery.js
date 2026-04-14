@@ -41,11 +41,14 @@ const PAST_VIDEOGAME_TOURNAMENTS_PAGE = `
 const DEFAULT_MAX_PAGES = 20;
 const DEFAULT_PER_PAGE = 25;
 
-async function fetchPastVideogameTournamentPage(page, perPage, videogameId) {
-  const videogameIds = [String(videogameId)];
+async function fetchPastVideogameTournamentPage(page, perPage, videogameIds) {
   return executeGraphQL({
     query: PAST_VIDEOGAME_TOURNAMENTS_PAGE,
-    variables: { page, perPage, videogameIds },
+    variables: {
+      page,
+      perPage,
+      videogameIds: (videogameIds || []).map((v) => String(v)),
+    },
     operationName: 'PastVideogameTournaments',
   });
 }
@@ -55,7 +58,7 @@ async function fetchPastVideogameTournamentPage(page, perPage, videogameId) {
  * incremental vs. last stored max `event.startAt` unless `resetWatermark`.
  *
  * @param {object} opts
- * @param {string|number} opts.videogameId
+ * @param {Array<string|number>} opts.videogameIds
  * @param {Set<number>} opts.importedStartGgIds
  * @param {number|null|undefined} opts.lastWatermark Unix seconds; events with startAt <= this are excluded unless reset
  * @param {boolean} [opts.resetWatermark]
@@ -63,13 +66,18 @@ async function fetchPastVideogameTournamentPage(page, perPage, videogameId) {
  * @param {number} [opts.perPage]
  */
 async function discoverNotImportedPastEvents({
-  videogameId,
+  videogameIds,
   importedStartGgIds,
   lastWatermark,
   resetWatermark = false,
   maxPages = DEFAULT_MAX_PAGES,
   perPage = DEFAULT_PER_PAGE,
 }) {
+  const ids = (videogameIds || []).map((v) => String(v)).filter(Boolean);
+  if (ids.length === 0) {
+    throw new Error('No start.gg videogame ids provided for discovery.');
+  }
+
   const imported =
     importedStartGgIds instanceof Set
       ? importedStartGgIds
@@ -85,7 +93,7 @@ async function discoverNotImportedPastEvents({
     page <= Math.min(maxPages, reportedTotalPages);
     page++
   ) {
-    const data = await fetchPastVideogameTournamentPage(page, perPage, videogameId);
+    const data = await fetchPastVideogameTournamentPage(page, perPage, ids);
     const conn = data.tournaments;
     if (!conn?.nodes?.length) {
       break;

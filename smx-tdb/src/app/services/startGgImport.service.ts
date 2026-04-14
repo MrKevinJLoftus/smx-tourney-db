@@ -66,7 +66,7 @@ export interface StartGgStepmaniaCandidate {
 export interface StartGgStepmaniaRefreshResponse {
   candidates: StartGgStepmaniaCandidate[];
   meta: {
-    videogameId: string;
+    videogameIds: string[];
     previousWatermark: number | null;
     newWatermark: number | null;
     pagesFetched: number;
