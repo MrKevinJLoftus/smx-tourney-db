@@ -103,9 +103,9 @@ export class EventUsersListComponent implements OnInit, OnChanges {
       maxWidth: '90vw',
       data: {
         eventId: this.selectedEventId,
-        eventPlayerId: player.id,
+        eventPlayerId: player.event_player_id ?? player.id,
         player: {
-          id: player.player_id || player.id,
+          id: player.player_id ?? player.id,
           username: player.username || player.gamertag,
           pronouns: player.pronouns
         },

@@ -49,7 +49,7 @@
 
   @if (lastRefresh) {
     <div class="meta">
-      <span>Videogame id: {{ lastRefresh.meta.videogameId }}</span>
+      <span>Videogame ids: {{ lastRefresh.meta.videogameIds.join(', ') }}</span>
       <span>· Pages fetched: {{ lastRefresh.meta.pagesFetched }}</span>
       <span>· Events seen (all): {{ lastRefresh.meta.eventsSeen }}</span>
       @if (lastRefresh.meta.previousWatermark != null) {

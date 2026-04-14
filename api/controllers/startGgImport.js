@@ -20,8 +20,24 @@ const { importMatchesFromStartGgSets } = require('./match');
 const STANDINGS_PREVIEW_PER_PAGE = 25;
 const SETS_PREVIEW_PER_PAGE = 10;
 
-function stepmaniaxVideogameId() {
-  return process.env.START_GG_STEPMANIAX_VIDEOGAME_ID || '33834';
+function stepmaniaxVideogameIds() {
+  const rawList = process.env.START_GG_STEPMANIAX_VIDEOGAME_IDS;
+  if (rawList && String(rawList).trim()) {
+    const ids = String(rawList)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (ids.length) {
+      return ids;
+    }
+  }
+
+  const single = process.env.START_GG_STEPMANIAX_VIDEOGAME_ID;
+  if (single && String(single).trim()) {
+    return [String(single).trim()];
+  }
+
+  return ['33834', '55766'];
 }
 
 /**
@@ -377,7 +393,7 @@ exports.importStartGgEventById = async (req, res) => {
  */
 exports.refreshStepmaniaDiscovery = async (req, res) => {
   const resetWatermark = req.body?.resetWatermark === true;
-  const videogameId = stepmaniaxVideogameId();
+  const videogameIds = stepmaniaxVideogameIds();
 
   if (!isConfigured()) {
     return res.status(503).json({
@@ -406,7 +422,7 @@ exports.refreshStepmaniaDiscovery = async (req, res) => {
         : null;
 
     const disc = await discoverNotImportedPastEvents({
-      videogameId,
+      videogameIds,
       importedStartGgIds: imported,
       lastWatermark: Number.isFinite(lastWatermark) ? lastWatermark : null,
       resetWatermark,
@@ -429,7 +445,7 @@ exports.refreshStepmaniaDiscovery = async (req, res) => {
         tournamentName: c.tournamentName,
       })),
       meta: {
-        videogameId: String(videogameId),
+        videogameIds: videogameIds.map((v) => String(v)),
         previousWatermark: disc.previousWatermark,
         newWatermark: disc.newWatermark,
         pagesFetched: disc.pagesFetched,
