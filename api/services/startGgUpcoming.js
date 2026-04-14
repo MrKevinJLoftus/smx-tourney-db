@@ -47,6 +47,9 @@ const UPCOMING_TOURNAMENTS_BY_VIDEOGAME_QUERY = `
         name
         slug
         startAt
+        city
+        addrState
+        countryCode
         events(filter: { videogameId: $videogameIds }) {
           id
           name
@@ -57,6 +60,16 @@ const UPCOMING_TOURNAMENTS_BY_VIDEOGAME_QUERY = `
     }
   }
 `;
+
+function formatTournamentLocation(t) {
+  const city = t?.city ? String(t.city).trim() : '';
+  const state = t?.addrState ? String(t.addrState).trim() : '';
+  const country = t?.countryCode ? String(t.countryCode).trim() : '';
+
+  if (city && state) return `${city}, ${state}`;
+  if (city && country) return `${city}, ${country}`;
+  return city || state || country || null;
+}
 
 /**
  * Fetch upcoming (and recently-started) StepManiaX events.
@@ -108,6 +121,7 @@ async function fetchUpcomingStepmaniaxEvents({
         flat.push({
           tournamentName: t.name || null,
           tournamentSlug: t.slug || null,
+          tournamentLocation: formatTournamentLocation(t),
           eventName: ev.name || null,
           eventSlug: ev.slug || null,
           startAt,
@@ -126,6 +140,7 @@ async function fetchUpcomingStepmaniaxEvents({
     events: flat.slice(0, limit).map((e) => ({
       tournamentName: e.tournamentName,
       eventName: e.eventName,
+      location: e.tournamentLocation,
       startAt: e.startAt,
       url: e.eventSlug ? `https://start.gg/${String(e.eventSlug).replace(/^\/+/, '')}` : null,
     })),

@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 export interface UpcomingStartGgEvent {
   tournamentName: string | null;
   eventName: string | null;
+  location?: string | null;
   /** Unix seconds */
   startAt: number;
   url: string | null;
