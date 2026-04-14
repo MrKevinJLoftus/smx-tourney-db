@@ -3,7 +3,7 @@ const queries = require('../queries/browse');
 
 exports.getTop5Lists = async (req, res) => {
   const [recentEventsRows, topPlayersRows, rivalriesRows] = await Promise.all([
-    dbconn.executeMysqlQuery(queries.GET_TOP_5_RECENT_EVENTS_WITH_WINNER, []),
+    dbconn.executeMysqlQuery(queries.GET_RECENT_EVENTS_WITH_WINNER, []),
     dbconn.executeMysqlQuery(queries.GET_TOP_10_PLAYERS_BY_WIN_LOSS_RATIO, []),
     dbconn.executeMysqlQuery(queries.GET_TOP_10_RIVALRIES_BY_MATCH_COUNT, [])
   ]);
