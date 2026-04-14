@@ -232,6 +232,10 @@
                   <div *ngIf="!e.url" class="top5-event-name">{{ e.tournamentName || 'Unknown tournament' }}</div>
                   <div class="top5-event-meta">
                     <span class="top5-muted">{{ e.eventName || 'Unknown event' }}</span>
+                    <ng-container *ngIf="e.location">
+                      <span class="top5-event-meta-sep" aria-hidden="true">·</span>
+                      <span class="top5-muted">{{ e.location }}</span>
+                    </ng-container>
                     <span class="top5-event-meta-sep" aria-hidden="true">·</span>
                     <span class="top5-muted">{{ formatUnixSecondsDate(e.startAt) }}</span>
                   </div>
