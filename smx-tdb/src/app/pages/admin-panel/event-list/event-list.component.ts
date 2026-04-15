@@ -24,7 +24,7 @@ export class EventListComponent implements OnInit {
     private dialog: MatDialog,
     private messageService: MessageService
   ) {
-    this.events$ = this.eventService.getEvents();
+    this.events$ = this.eventService.getEventsAdmin();
   }
 
   ngOnInit(): void {
@@ -33,7 +33,7 @@ export class EventListComponent implements OnInit {
 
   loadEvents(): void {
     this.isLoading = true;
-    this.events$ = this.eventService.getEvents().pipe(
+    this.events$ = this.eventService.getEventsAdmin().pipe(
       catchError(error => {
         console.error('Error loading events:', error);
         return of([]);
@@ -96,6 +96,21 @@ export class EventListComponent implements OnInit {
             this.messageService.show('Error deleting event. Please try again.');
           }
         });
+      }
+    });
+  }
+
+  toggleHidden(event: Event): void {
+    if (!event.id) return;
+    const nextHidden = !event.hidden;
+    this.eventService.setEventHidden(event.id, nextHidden).subscribe({
+      next: () => {
+        this.messageService.show(nextHidden ? 'Event hidden' : 'Event unhidden');
+        this.loadEvents();
+      },
+      error: (error) => {
+        console.error('Error updating event hidden flag:', error);
+        this.messageService.show('Error updating event. Please try again.');
       }
     });
   }

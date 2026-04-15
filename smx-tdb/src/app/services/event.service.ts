@@ -39,6 +39,16 @@ export class EventService {
     });
   }
 
+  /** Admin-only: list all events including hidden. */
+  getEventsAdmin(): Observable<Event[]> {
+    const token = this.authService.getToken();
+    return this.http.get<Event[]>(`${environment.apiUrl}/event/admin/all`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
   /** Reload the events list (e.g. after start.gg import creates an event). */
   reloadEvents(): void {
     this.refreshEvents();
@@ -105,6 +115,20 @@ export class EventService {
     }).pipe(
       tap(() => {
         // Refresh events list after deleting an event
+        this.refreshEvents();
+      })
+    );
+  }
+
+  setEventHidden(id: number, hidden: boolean): Observable<Event> {
+    const token = this.authService.getToken();
+    return this.http.patch<Event>(`${environment.apiUrl}/event/${id}/hidden`, { hidden }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }).pipe(
+      tap(() => {
+        // Public event lists/searches must reflect the change.
         this.refreshEvents();
       })
     );

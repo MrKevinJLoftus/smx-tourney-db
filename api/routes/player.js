@@ -16,6 +16,7 @@ router.get("/:id", asyncWrapper(playerController.getPlayerById));
 // Admin-only routes
 router.post("/", checkAdmin, asyncWrapper(playerController.createPlayer));
 router.put("/:id", checkAdmin, asyncWrapper(playerController.updatePlayer));
+router.patch("/:id/match-data", checkAdmin, asyncWrapper(playerController.setPlayerMatchDataHidden));
 
 module.exports = router;
 

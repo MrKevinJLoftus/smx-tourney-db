@@ -83,5 +83,27 @@ export class PlayerService {
   getRivalsForPlayer(playerId: number): Observable<Top5Rivalry[]> {
     return this.http.get<Top5Rivalry[]>(`${environment.apiUrl}/player/${playerId}/rivals`);
   }
+
+  /** Admin-only: hide (or optionally delete) all matches involving a player. */
+  setPlayerMatchDataHidden(
+    playerId: number,
+    hidden: boolean,
+    options?: { delete?: boolean; deleteEventParticipation?: boolean }
+  ): Observable<{ player: Player; deletedMatches: number; deletedEventParticipations: number }> {
+    const token = this.authService.getToken();
+    return this.http.patch<{ player: Player; deletedMatches: number; deletedEventParticipations: number }>(
+      `${environment.apiUrl}/player/${playerId}/match-data`,
+      {
+        hidden,
+        delete: !!options?.delete,
+        deleteEventParticipation: !!options?.deleteEventParticipation
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+  }
 }
 
