@@ -3,6 +3,12 @@ const queries = require('../queries/event');
 
 exports.getAllEvents = async (req, res) => {
   console.log('Fetching all events');
+  const events = await dbconn.executeMysqlQuery(queries.GET_ALL_PUBLIC_EVENTS, []);
+  res.status(200).json(events);
+};
+
+exports.getAllEventsAdmin = async (req, res) => {
+  console.log('Fetching all events (admin)');
   const events = await dbconn.executeMysqlQuery(queries.GET_ALL_EVENTS, []);
   res.status(200).json(events);
 };
@@ -10,7 +16,7 @@ exports.getAllEvents = async (req, res) => {
 exports.getEventById = async (req, res) => {
   const eventId = req.params.id;
   console.log(`Fetching event with id: ${eventId}`);
-  const events = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [eventId]);
+  const events = await dbconn.executeMysqlQuery(queries.GET_PUBLIC_EVENT_BY_ID, [eventId]);
   if (!events || events.length < 1) {
     return res.status(404).json({ message: 'Event not found' });
   }
@@ -22,18 +28,33 @@ exports.searchEvents = async (req, res) => {
   console.log(`Searching events with query: ${query}`);
   if (!query || query.trim().length === 0) {
     // If no query, return recent events (limited)
-    const events = await dbconn.executeMysqlQuery(queries.GET_ALL_EVENTS, []);
+    const events = await dbconn.executeMysqlQuery(queries.GET_ALL_PUBLIC_EVENTS, []);
     res.status(200).json(events.slice(0, 50)); // Limit to 50 for performance
     return;
   }
   const searchTerm = `%${query.trim()}%`;
-  const events = await dbconn.executeMysqlQuery(queries.SEARCH_EVENTS, [
+  const events = await dbconn.executeMysqlQuery(queries.SEARCH_PUBLIC_EVENTS, [
     searchTerm,
     searchTerm,
     searchTerm,
     searchTerm
   ]);
   res.status(200).json(events);
+};
+
+exports.setEventHidden = async (req, res) => {
+  const eventId = req.params.id;
+  const hidden = !!req.body?.hidden;
+  console.log(`Setting event hidden=${hidden} for id: ${eventId}`);
+
+  const existing = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [eventId]);
+  if (!existing || existing.length < 1) {
+    return res.status(404).json({ message: 'Event not found' });
+  }
+
+  await dbconn.executeMysqlQuery(queries.UPDATE_EVENT_HIDDEN, [hidden ? 1 : 0, eventId]);
+  const updated = await dbconn.executeMysqlQuery(queries.GET_EVENT_BY_ID, [eventId]);
+  res.status(200).json(updated[0]);
 };
 
 exports.createEvent = async (req, res) => {

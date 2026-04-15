@@ -7,6 +7,8 @@ export interface Event {
   organizers?: string;
   /** Set when the event was created via start.gg import */
   start_gg_event_id?: number | null;
+  /** When true, event is hidden from all public pages/search/results. */
+  hidden?: boolean;
   created_at?: string;
   updated_at?: string;
   placement?: string | number; // Placement in event (only available when fetched by player)

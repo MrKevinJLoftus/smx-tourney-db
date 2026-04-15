@@ -1,0 +1,75 @@
+.player-privacy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-field {
+  width: 100%;
+  max-width: 520px;
+}
+
+.results {
+  max-width: 520px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.status {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.muted {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.selected {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 720px;
+}
+
+.selected-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.selected-title {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.selected-name {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warning {
+  font-size: 12px;
+  opacity: 0.9;
+}
+

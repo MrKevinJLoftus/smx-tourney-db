@@ -28,6 +28,9 @@
                 <div class="event-header">
                   <div class="event-info">
                     <span class="event-name">{{ event.name }}</span>
+                    @if (event.hidden) {
+                      <span class="chip" style="margin-left: 8px;">Hidden</span>
+                    }
                     <div class="event-details">
                       @if (event.date) {
                         <span class="date">{{ event.date | date:'shortDate' }}</span>
@@ -44,6 +47,12 @@
                     }
                   </div>
                   <div class="action-buttons">
+                    <button mat-icon-button
+                            class="hide-button"
+                            (click)="toggleHidden(event)"
+                            [matTooltip]="event.hidden ? 'Unhide event' : 'Hide event'">
+                      <mat-icon>{{ event.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
                     <button mat-icon-button 
                             class="edit-button" 
                             (click)="editEvent(event)"

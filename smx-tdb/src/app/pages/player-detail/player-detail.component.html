@@ -117,7 +117,7 @@
       </mat-expansion-panel>
     </mat-accordion>
 
-    <div class="rivals-section">
+    <div *ngIf="matches.length > 0" class="rivals-section">
       <mat-card class="top5-card">
         <mat-card-title>Top 10 rivalries (most matches)</mat-card-title>
         <mat-card-content>

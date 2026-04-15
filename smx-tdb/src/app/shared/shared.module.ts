@@ -24,6 +24,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 import { BackToSearchComponent } from './components/back-to-search/back-to-search.component';
 import { MatchPlayerRecordsComponent } from './components/match-player-records/match-player-records.component';
@@ -53,7 +54,8 @@ const MODULES = [
   MatDialogModule,
   MatAutocompleteModule,
   MatExpansionModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatSlideToggleModule
 ];
 
 const COMPONENTS = [

@@ -446,7 +446,7 @@ exports.getMatchesByEvent = async (req, res) => {
 exports.getMatchById = async (req, res) => {
   const matchId = req.params.id;
   console.log(`Fetching match with id: ${matchId}`);
-  const matches = await dbconn.executeMysqlQuery(queries.GET_MATCH_BY_ID, [matchId]);
+  const matches = await dbconn.executeMysqlQuery(queries.GET_PUBLIC_MATCH_BY_ID, [matchId]);
   if (!matches || matches.length < 1) {
     return res.status(404).json({ message: 'Match not found' });
   }
@@ -843,7 +843,7 @@ exports.deleteMatch = async (req, res) => {
 exports.getMatchesByPlayer = async (req, res) => {
   const playerId = req.params.playerId;
   console.log(`Fetching matches for player: ${playerId}`);
-  const matches = await dbconn.executeMysqlQuery(queries.GET_MATCHES_BY_PLAYER, [playerId]);
+  const matches = await dbconn.executeMysqlQuery(queries.GET_PUBLIC_MATCHES_BY_PLAYER, [playerId]);
   // Transform matches in batch (5 queries total instead of ~5 per match)
   const transformedMatches = await transformMatchesBatch(matches);
   res.status(200).json(transformedMatches);

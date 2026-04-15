@@ -200,6 +200,9 @@ export class PlayerDetailComponent implements OnInit {
   }
 
   getMatchRecordString(): string {
+    if (this.player?.hidden_matches) {
+      return '';
+    }
     const r = this.getMatchRecord();
     const record = `${r.wins}-${r.losses}${r.draws ? `-${r.draws}` : ''}`;
     return `${record} · W/L: ${this.formatRatio(this.getWinLossRatio())}`;

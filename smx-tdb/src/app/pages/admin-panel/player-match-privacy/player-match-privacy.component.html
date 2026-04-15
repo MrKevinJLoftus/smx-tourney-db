@@ -1,0 +1,58 @@
+<div class="player-privacy">
+  <h3>Hide or Delete a Player’s Match Data</h3>
+
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search player</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="Type a gamertag" />
+    <mat-icon matPrefix>search</mat-icon>
+    <button *ngIf="searchControl.value" matSuffix mat-icon-button (click)="searchControl.setValue('')" aria-label="Clear search">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div *ngIf="isSearching" class="muted">Searching…</div>
+
+  <mat-list *ngIf="!selectedPlayer && results.length > 0" class="results">
+    <mat-list-item *ngFor="let p of results" (click)="selectPlayer(p)" class="clickable">
+      <div class="row">
+        <span class="name">{{ p.username }}</span>
+        <span class="status" *ngIf="p.hidden_matches">Match data hidden</span>
+      </div>
+    </mat-list-item>
+  </mat-list>
+
+  <div *ngIf="selectedPlayer" class="selected">
+    <div class="selected-header">
+      <div>
+        <div class="selected-title">Selected player</div>
+        <div class="selected-name">{{ selectedPlayer.username }}</div>
+        <div class="muted" *ngIf="selectedPlayer.hidden_matches">Currently: match data hidden</div>
+        <div class="muted" *ngIf="!selectedPlayer.hidden_matches">Currently: match data visible</div>
+      </div>
+      <button mat-stroked-button (click)="clearSelection()">Change</button>
+    </div>
+
+    <div class="options">
+      <mat-slide-toggle [formControl]="hideMatchesControl">
+        Hide match data site-wide
+      </mat-slide-toggle>
+
+      <mat-checkbox [formControl]="deleteInsteadControl">
+        Delete match data instead (irreversible)
+      </mat-checkbox>
+
+      <mat-checkbox [formControl]="deleteEventParticipationControl" *ngIf="deleteInsteadControl.value">
+        Also delete event participation (placements/seeds) for this player
+      </mat-checkbox>
+
+      <div class="warning" *ngIf="deleteInsteadControl.value">
+        This will delete all matches involving this player (including opponents’ copies of those matches).
+      </div>
+    </div>
+
+    <button mat-raised-button color="primary" (click)="apply()" [disabled]="isSaving">
+      Apply
+    </button>
+  </div>
+</div>
+

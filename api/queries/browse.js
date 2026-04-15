@@ -19,6 +19,7 @@ module.exports = {
         AND CAST(ep.placement AS UNSIGNED) = 1
     ) ep1 ON ep1.event_id = e.id
     LEFT JOIN player w ON w.id = ep1.player_id
+    WHERE e.hidden = 0
     ORDER BY (e.date IS NULL) ASC, e.date DESC, e.id DESC
     LIMIT 10
   `,
@@ -43,14 +44,30 @@ module.exports = {
     FROM player p
     INNER JOIN match_x_player_stats s ON s.player_id = p.id
     INNER JOIN \`match\` m ON m.id = s.match_id
+    INNER JOIN event e ON e.id = m.event_id AND e.hidden = 0
     INNER JOIN (
       SELECT
         s2.match_id
       FROM match_x_player_stats s2
+      WHERE NOT EXISTS (
+        SELECT 1
+        FROM match_x_player_x_song mx
+        INNER JOIN player hp ON hp.id = mx.player_id
+        WHERE mx.match_id = s2.match_id
+          AND hp.hidden_matches = 1
+      )
       GROUP BY s2.match_id
       HAVING COUNT(DISTINCT s2.player_id) = 2
     ) only_1v1 ON only_1v1.match_id = s.match_id
     WHERE m.winner_id IS NOT NULL
+      AND p.hidden_matches = 0
+      AND NOT EXISTS (
+        SELECT 1
+        FROM match_x_player_x_song mx
+        INNER JOIN player hp ON hp.id = mx.player_id
+        WHERE mx.match_id = m.id
+          AND hp.hidden_matches = 1
+      )
     GROUP BY p.id, p.username
     HAVING matches_total >= 10
     ORDER BY
@@ -82,6 +99,15 @@ module.exports = {
           MAX(s.player_id) AS player2_id,
           COUNT(DISTINCT s.player_id) AS player_count
         FROM match_x_player_stats s
+        INNER JOIN \`match\` m ON m.id = s.match_id
+        INNER JOIN event e ON e.id = m.event_id AND e.hidden = 0
+        WHERE NOT EXISTS (
+          SELECT 1
+          FROM match_x_player_x_song mx
+          INNER JOIN player hp ON hp.id = mx.player_id
+          WHERE mx.match_id = m.id
+            AND hp.hidden_matches = 1
+        )
         GROUP BY s.match_id
         HAVING player_count = 2
       ) mp
@@ -91,6 +117,8 @@ module.exports = {
     ) pairs
     INNER JOIN player p1 ON p1.id = pairs.player1_id
     INNER JOIN player p2 ON p2.id = pairs.player2_id
+    WHERE p1.hidden_matches = 0
+      AND p2.hidden_matches = 0
     ORDER BY pairs.match_count DESC, p1.username ASC, p2.username ASC
   `
 };
