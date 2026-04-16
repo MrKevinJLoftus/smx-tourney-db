@@ -1,0 +1,148 @@
+<div class="compare-container">
+  <app-back-to-search></app-back-to-search>
+
+  <div class="header-section">
+    <mat-icon class="header-icon">compare_arrows</mat-icon>
+    <div class="header-main">
+      <h1>Compare players</h1>
+    </div>
+  </div>
+
+  <mat-card class="compare-card">
+    <mat-card-content>
+      <div class="picker-grid">
+        <mat-form-field appearance="outline" class="picker-field">
+          <mat-label>Player A</mat-label>
+          <input
+            matInput
+            [formControl]="playerAControl"
+            [matAutocomplete]="playerAAuto"
+            placeholder="Type at least 2 letters"
+          />
+          <mat-icon matPrefix>person</mat-icon>
+          <button
+            *ngIf="playerAControl.value"
+            matSuffix
+            mat-icon-button
+            (click)="clearAInput()"
+            aria-label="Clear Player A"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-autocomplete
+            #playerAAuto="matAutocomplete"
+            [displayWith]="displayPlayer"
+            (optionSelected)="onSelectPlayerA($event.option.value)"
+          >
+            <mat-option *ngFor="let p of (playerASuggestions$ | async)" [value]="p">
+              <span>{{ p.username }}</span>
+              <span *ngIf="p.pronouns" class="muted"> ({{ p.pronouns }})</span>
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="picker-field">
+          <mat-label>Player B</mat-label>
+          <input
+            matInput
+            [formControl]="playerBControl"
+            [matAutocomplete]="playerBAuto"
+            [placeholder]="selectedA ? (hasOpponents ? 'Start typing to filter opponents' : 'No opponents found') : 'Select Player A first'"
+          />
+          <mat-icon matPrefix>person_outline</mat-icon>
+          <button
+            *ngIf="playerBControl.enabled && playerBControl.value"
+            matSuffix
+            mat-icon-button
+            (click)="clearBInput()"
+            aria-label="Clear Player B"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-autocomplete
+            #playerBAuto="matAutocomplete"
+            [displayWith]="displaySimplePlayer"
+            (optionSelected)="onSelectPlayerB($event.option.value)"
+          >
+            <mat-option *ngFor="let p of (opponentSuggestions$ | async)" [value]="p">
+              <span>{{ p.username }}</span>
+            </mat-option>
+          </mat-autocomplete>
+          <mat-hint *ngIf="selectedA && isLoadingOpponents">Loading opponents…</mat-hint>
+          <mat-hint *ngIf="selectedA && !isLoadingOpponents && hasOpponents">
+            {{ opponentCount }} possible opponents
+          </mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div *ngIf="error" class="error-row">
+        <mat-icon class="error-icon">error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="selectedA && isLoadingMatches" class="loading-section">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading matches…</p>
+  </div>
+
+  <div *ngIf="canShowResults" class="results">
+    <mat-card class="summary-card">
+      <mat-card-title>Stats</mat-card-title>
+      <mat-card-content>
+        <div class="summary-line">
+          <span class="muted">Match record:</span>
+          <a class="link" (click)="navigateToPlayer(selectedAId)">
+            {{ selectedA?.username }}
+          </a>
+          <span class="summary-record">
+            {{ headToHeadMatchRecord.aWins }}-{{ headToHeadMatchRecord.bWins }}{{ headToHeadMatchRecord.draws ? '-' + headToHeadMatchRecord.draws : '' }}
+          </span>
+          <span class="muted">vs</span>
+          <span><a class="link" (click)="navigateToPlayer(selectedB?.id)">{{ selectedB?.username }}</a></span>
+        </div>
+
+        <div *ngIf="headToHeadSongRecord" class="summary-line">
+          <span class="muted">Song record (from per-match stats):</span>
+          <span class="summary-record">
+            {{ selectedA?.username }}: {{ headToHeadSongRecord.a.wins }} - {{selectedB?.username}}: {{ headToHeadSongRecord.a.losses }}{{ headToHeadSongRecord.a.draws ? '-' + headToHeadSongRecord.a.draws : '' }}
+          </span>
+        </div>
+
+        <div *ngIf="headToHeadMatches.length === 0" class="empty-message">
+          <mat-icon>sports_esports</mat-icon>
+          <p>No matches found between these players.</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="matches-card" *ngIf="headToHeadMatches.length > 0">
+      <mat-card-title>Matches</mat-card-title>
+      <mat-card-content>
+        <div class="matches-list">
+          <div *ngFor="let match of headToHeadMatches" class="match-item clickable" (click)="navigateToMatch(match)">
+            <mat-icon class="match-icon">sports_esports</mat-icon>
+            <div class="match-info">
+              <h3 *ngIf="match.event">{{ match.event.name }}</h3>
+              <div class="match-details">
+                <span *ngIf="match.event?.date" class="muted">{{ formatDate(match.event?.date) }}</span>
+                <span *ngIf="match.round" class="match-round">Round: {{ match.round }}</span>
+                <span *ngIf="match.winner" class="match-winner">
+                  <mat-icon class="small-icon">emoji_events</mat-icon>
+                  Winner: {{ match.winner.gamertag }}
+                </span>
+                <app-match-player-records
+                  *ngIf="match.player_stats?.length"
+                  [playerStats]="match.player_stats"
+                  variant="inline"
+                ></app-match-player-records>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+

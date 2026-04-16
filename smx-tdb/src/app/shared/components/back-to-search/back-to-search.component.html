@@ -1,4 +1,4 @@
-<button mat-button class="back-button" (click)="navigate()">
+<button mat-button type="button" class="back-button" (click)="goBack()" [attr.aria-label]="displayLabel">
   <mat-icon>arrow_back</mat-icon>
   <span>{{ displayLabel }}</span>
 </button>
