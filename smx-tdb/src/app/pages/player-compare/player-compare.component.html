@@ -43,34 +43,34 @@
 
         <mat-form-field appearance="outline" class="picker-field">
           <mat-label>Player B</mat-label>
-          <input
-            matInput
+          <mat-select
             [formControl]="playerBControl"
-            [matAutocomplete]="playerBAuto"
-            [placeholder]="selectedA ? (hasOpponents ? 'Start typing to filter opponents' : 'No opponents found') : 'Select Player A first'"
-          />
+            [compareWith]="compareSimplePlayers"
+            (selectionChange)="onSelectPlayerB($event.value)"
+          >
+            <mat-option *ngIf="selectedA && !isLoadingOpponents && hasOpponents" [value]="null">
+              Choose an opponent
+            </mat-option>
+            <mat-option *ngFor="let p of availableOpponents" [value]="p">
+              {{ p.username }}
+            </mat-option>
+          </mat-select>
           <mat-icon matPrefix>person_outline</mat-icon>
           <button
-            *ngIf="playerBControl.enabled && playerBControl.value"
+            *ngIf="playerBControl.enabled && selectedB"
             matSuffix
             mat-icon-button
-            (click)="clearBInput()"
+            (click)="clearBInput(); $event.stopPropagation()"
             aria-label="Clear Player B"
           >
             <mat-icon>close</mat-icon>
           </button>
-          <mat-autocomplete
-            #playerBAuto="matAutocomplete"
-            [displayWith]="displaySimplePlayer"
-            (optionSelected)="onSelectPlayerB($event.option.value)"
-          >
-            <mat-option *ngFor="let p of (opponentSuggestions$ | async)" [value]="p">
-              <span>{{ p.username }}</span>
-            </mat-option>
-          </mat-autocomplete>
           <mat-hint *ngIf="selectedA && isLoadingOpponents">Loading opponents…</mat-hint>
+          <mat-hint *ngIf="selectedA && !isLoadingOpponents && !hasOpponents">
+            No opponents found
+          </mat-hint>
           <mat-hint *ngIf="selectedA && !isLoadingOpponents && hasOpponents">
-            {{ opponentCount }} possible opponents
+            {{ opponentCount }} opponents to compare
           </mat-hint>
         </mat-form-field>
       </div>

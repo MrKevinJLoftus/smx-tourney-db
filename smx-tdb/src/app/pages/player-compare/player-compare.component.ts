@@ -24,10 +24,9 @@ export class PlayerCompareComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   playerAControl = new FormControl<Player | string>('');
-  playerBControl = new FormControl<SimplePlayer | string>({ value: '', disabled: true } as any);
+  playerBControl = new FormControl<SimplePlayer | null>({ value: null, disabled: true });
 
   playerASuggestions$: Observable<Player[]>;
-  opponentSuggestions$: Observable<SimplePlayer[]>;
 
   selectedA: Player | null = null;
   selectedB: SimplePlayer | null = null;
@@ -66,14 +65,6 @@ export class PlayerCompareComponent implements OnInit {
       })
     );
 
-    this.opponentSuggestions$ = this.playerBControl.valueChanges.pipe(
-      startWith(''),
-      debounceTime(150),
-      map((v) => this.textFromSimplePlayerControl(v)),
-      distinctUntilChanged(),
-      map((q) => this.filterOpponents(q))
-    );
-
     // If the user types in A field after selecting, clear state.
     this.playerAControl.valueChanges
       .pipe(
@@ -87,19 +78,6 @@ export class PlayerCompareComponent implements OnInit {
       )
       .subscribe();
 
-    // If the user types in B field after selecting, clear B selection + recompute.
-    this.playerBControl.valueChanges
-      .pipe(
-        debounceTime(150),
-        takeUntilDestroyed(this.destroyRef),
-        tap((v) => {
-          if (typeof v === 'string' && this.selectedB && v !== this.selectedB.username) {
-            this.selectedB = null;
-            this.recomputeHeadToHead();
-          }
-        })
-      )
-      .subscribe();
   }
 
   ngOnInit(): void {
@@ -126,17 +104,23 @@ export class PlayerCompareComponent implements OnInit {
     return p.username || '';
   }
 
-  displaySimplePlayer(p: SimplePlayer | string | null): string {
-    if (!p) return '';
-    if (typeof p === 'string') return p;
-    return p.username || '';
+  compareSimplePlayers(a: SimplePlayer | null, b: SimplePlayer | null): boolean {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    return a.id === b.id;
   }
 
   onSelectPlayerA(player: Player): void {
     this.selectPlayerA(player);
   }
 
-  onSelectPlayerB(player: SimplePlayer): void {
+  onSelectPlayerB(player: SimplePlayer | null): void {
+    if (!player) {
+      this.selectedB = null;
+      this.recomputeHeadToHead();
+      this.syncQueryParams();
+      return;
+    }
     this.selectedB = player;
     this.playerBControl.setValue(player, { emitEvent: false });
     this.recomputeHeadToHead();
@@ -149,7 +133,7 @@ export class PlayerCompareComponent implements OnInit {
   }
 
   clearBInput(): void {
-    this.playerBControl.setValue('');
+    this.playerBControl.setValue(null);
     this.selectedB = null;
     this.recomputeHeadToHead();
     this.syncQueryParams();
@@ -178,6 +162,10 @@ export class PlayerCompareComponent implements OnInit {
     return this.opponentPool?.length || 0;
   }
 
+  get availableOpponents(): SimplePlayer[] {
+    return this.opponentPool;
+  }
+
   get canShowResults(): boolean {
     return !!(this.selectedA && this.selectedB);
   }
@@ -195,7 +183,7 @@ export class PlayerCompareComponent implements OnInit {
     this.headToHeadMatchRecord = { aWins: 0, bWins: 0, draws: 0, total: 0 };
     this.headToHeadSongRecord = null;
     this.playerBControl.disable({ emitEvent: false });
-    this.playerBControl.setValue('', { emitEvent: false });
+    this.playerBControl.setValue(null, { emitEvent: false });
     this.error = null;
     this.syncQueryParams();
   }
@@ -228,6 +216,7 @@ export class PlayerCompareComponent implements OnInit {
       return;
     }
     if (this.selectedAId === aId && this.matchesByA.length > 0) {
+      this.playerBControl.enable({ emitEvent: false });
       this.applyOpponentById(bId);
       return;
     }
@@ -261,7 +250,7 @@ export class PlayerCompareComponent implements OnInit {
     this.headToHeadSongRecord = null;
     this.playerAControl.setValue('', { emitEvent: false });
     this.playerBControl.disable({ emitEvent: false });
-    this.playerBControl.setValue('', { emitEvent: false });
+    this.playerBControl.setValue(null, { emitEvent: false });
     this.error = null;
   }
 
@@ -277,8 +266,8 @@ export class PlayerCompareComponent implements OnInit {
     this.headToHeadSongRecord = null;
 
     this.playerAControl.setValue(player, { emitEvent: false });
-    this.playerBControl.setValue('', { emitEvent: false });
-    this.playerBControl.enable({ emitEvent: false });
+    this.playerBControl.setValue(null, { emitEvent: false });
+    this.playerBControl.disable({ emitEvent: false });
 
     const aId = this.playerId(player);
     if (!aId) {
@@ -299,6 +288,7 @@ export class PlayerCompareComponent implements OnInit {
           this.opponentPool = this.buildOpponentPool(aId, this.matchesByA);
           this.isLoadingOpponents = false;
           this.isLoadingMatches = false;
+          this.playerBControl.enable({ emitEvent: false });
           const bFromUrl = options?.bIdFromUrl;
           if (bFromUrl != null) {
             this.applyOpponentById(bFromUrl);
@@ -313,6 +303,7 @@ export class PlayerCompareComponent implements OnInit {
           this.opponentPool = [];
           this.isLoadingOpponents = false;
           this.isLoadingMatches = false;
+          this.playerBControl.enable({ emitEvent: false });
           this.error = 'Failed to load matches for that player. Please try again.';
           this.syncQueryParams();
         },
@@ -323,7 +314,7 @@ export class PlayerCompareComponent implements OnInit {
   private applyOpponentById(bId: number | null): void {
     if (bId == null) {
       this.selectedB = null;
-      this.playerBControl.setValue('', { emitEvent: false });
+      this.playerBControl.setValue(null, { emitEvent: false });
       this.recomputeHeadToHead();
       this.syncQueryParams();
       return;
@@ -355,7 +346,7 @@ export class PlayerCompareComponent implements OnInit {
         },
         error: () => {
           this.selectedB = null;
-          this.playerBControl.setValue('', { emitEvent: false });
+          this.playerBControl.setValue(null, { emitEvent: false });
           this.recomputeHeadToHead();
           this.syncQueryParams();
         },
@@ -451,12 +442,6 @@ export class PlayerCompareComponent implements OnInit {
     return [...mapById.values()].sort((x, y) => x.username.localeCompare(y.username));
   }
 
-  private filterOpponents(query: string): SimplePlayer[] {
-    const q = (query || '').toLowerCase().trim();
-    if (!q) return [...this.opponentPool];
-    return (this.opponentPool || []).filter((p) => p.username.toLowerCase().includes(q));
-  }
-
   private matchHasPlayer(match: MatchWithDetails, playerId: number): boolean {
     return !!match?.players?.some((p) => Number(p.player_id) === Number(playerId));
   }
@@ -475,11 +460,5 @@ export class PlayerCompareComponent implements OnInit {
     return '';
   }
 
-  private textFromSimplePlayerControl(v: unknown): string {
-    if (v == null || v === '') return '';
-    if (typeof v === 'string') return v;
-    if (typeof v === 'object' && v !== null && 'username' in v) return (v as SimplePlayer).username || '';
-    return '';
-  }
 }
 

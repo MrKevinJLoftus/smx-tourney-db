@@ -148,40 +148,6 @@
     </div>
 
     <div *ngIf="!isTop5Loading && !top5Error" class="top5-grid">
-      <mat-card class="top5-card">
-        <mat-card-title>Top 10 players (W/L ratio, &gt;=10 matches)</mat-card-title>
-        <mat-card-content>
-          <div *ngIf="topPlayersByRatioTop5.length === 0" class="top5-empty">No match stats yet.</div>
-          <mat-list *ngIf="topPlayersByRatioTop5.length > 0">
-            <mat-list-item *ngFor="let p of topPlayersByRatioTop5; index as i">
-              <div class="top5-row">
-                <span class="top5-rank">{{ i + 1 }}</span>
-                <a class="top5-link" [routerLink]="['/player', p.id]">{{ p.username }}</a>
-                <span class="top5-muted">{{ p.wins }}-{{ p.losses }}</span>
-                <span class="top5-muted">Ratio: {{ formatRatio(p.ratio) }}</span>
-              </div>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-
-      <mat-card class="top5-card">
-        <mat-card-title>Top 10 rivalries (most matches)</mat-card-title>
-        <mat-card-content>
-          <div *ngIf="topRivalriesTop5.length === 0" class="top5-empty">No 1v1 matchups yet.</div>
-          <mat-list *ngIf="topRivalriesTop5.length > 0">
-            <mat-list-item *ngFor="let r of topRivalriesTop5">
-              <div class="top5-row">
-                <a class="top5-link" [routerLink]="['/player', r.player1.id]">{{ r.player1.username }}</a>
-                <span class="top5-muted">vs</span>
-                <a class="top5-link" [routerLink]="['/player', r.player2.id]">{{ r.player2.username }}</a>
-                <span class="top5-muted">({{ r.matchCount }} matches)</span>
-              </div>
-            </mat-list-item>
-          </mat-list>
-        </mat-card-content>
-      </mat-card>
-
       <mat-card class="top5-card top5-events-card">
         <mat-card-title>Most recent events</mat-card-title>
         <mat-card-content>
@@ -244,6 +210,40 @@
               </ng-container>
             </div>
           </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="top5-card">
+        <mat-card-title>Top 10 players (W/L ratio, &gt;=10 matches)</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="topPlayersByRatioTop5.length === 0" class="top5-empty">No match stats yet.</div>
+          <mat-list *ngIf="topPlayersByRatioTop5.length > 0">
+            <mat-list-item *ngFor="let p of topPlayersByRatioTop5; index as i">
+              <div class="top5-row">
+                <span class="top5-rank">{{ i + 1 }}</span>
+                <a class="top5-link" [routerLink]="['/player', p.id]">{{ p.username }}</a>
+                <span class="top5-muted">{{ p.wins }}-{{ p.losses }}</span>
+                <span class="top5-muted">Ratio: {{ formatRatio(p.ratio) }}</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="top5-card">
+        <mat-card-title>Top 10 rivalries (most matches)</mat-card-title>
+        <mat-card-content>
+          <div *ngIf="topRivalriesTop5.length === 0" class="top5-empty">No 1v1 matchups yet.</div>
+          <mat-list *ngIf="topRivalriesTop5.length > 0">
+            <mat-list-item *ngFor="let r of topRivalriesTop5">
+              <div class="top5-row">
+                <a class="top5-link" [routerLink]="['/player', r.player1.id]">{{ r.player1.username }}</a>
+                <span class="top5-muted">vs</span>
+                <a class="top5-link" [routerLink]="['/player', r.player2.id]">{{ r.player2.username }}</a>
+                <span class="top5-muted">({{ r.matchCount }} matches)</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
         </mat-card-content>
       </mat-card>
     </div>
