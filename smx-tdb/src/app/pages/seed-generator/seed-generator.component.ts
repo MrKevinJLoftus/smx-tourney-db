@@ -3,7 +3,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { Player } from '../../models/player';
@@ -11,7 +11,7 @@ import { SeedEntry } from '../../models/seed';
 import { PlayerService } from '../../services/player.service';
 import { SeedService } from '../../services/seed.service';
 import { SharedModule } from '../../shared/shared.module';
-import { SeedRatingsHelpDialogComponent } from './seed-ratings-help-dialog/seed-ratings-help-dialog.component';
+import { RatingsHelpDialogComponent } from '../../shared/components/ratings-help-dialog/ratings-help-dialog.component';
 
 @Component({
   selector: 'app-seed-generator',
@@ -22,6 +22,7 @@ import { SeedRatingsHelpDialogComponent } from './seed-ratings-help-dialog/seed-
 })
 export class SeedGeneratorComponent {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly rosterChange$ = new Subject<Player[]>();
 
   playerControl = new FormControl<Player | string>('');
   playerSuggestions$: Observable<Player[]>;
@@ -51,6 +52,47 @@ export class SeedGeneratorComponent {
         return this.playerService.searchPlayers(query).pipe(catchError(() => of([])));
       })
     );
+
+    this.rosterChange$
+      .pipe(
+        switchMap((roster) => {
+          if (roster.length < 1) {
+            this.isGenerating = false;
+            this.seeding = [];
+            this.method = '';
+            this.tiebreak = '';
+            return of(null);
+          }
+
+          const playerIds = roster
+            .map((player) => player.id)
+            .filter((id): id is number => typeof id === 'number');
+
+          this.isGenerating = true;
+          this.error = null;
+
+          return this.seedService.generateSeeding(playerIds).pipe(
+            catchError((err) => of({ error: err?.error?.message || 'Failed to generate seeding.' }))
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((response) => {
+        if (!response) {
+          return;
+        }
+
+        if ('error' in response) {
+          this.error = response.error;
+          this.isGenerating = false;
+          return;
+        }
+
+        this.seeding = response.seeding || [];
+        this.method = response.method;
+        this.tiebreak = response.tiebreak;
+        this.isGenerating = false;
+      });
   }
 
   displayPlayer(player: Player | string | null): string {
@@ -76,48 +118,21 @@ export class SeedGeneratorComponent {
     this.roster = [...this.roster, player];
     this.playerControl.setValue('');
     this.error = null;
-    this.seeding = [];
+    this.rosterChange$.next(this.roster);
   }
 
   removePlayer(playerId: number): void {
     this.roster = this.roster.filter((player) => player.id !== playerId);
-    this.seeding = [];
+    this.rosterChange$.next(this.roster);
   }
 
   clearRoster(): void {
     this.roster = [];
     this.seeding = [];
+    this.method = '';
+    this.tiebreak = '';
     this.error = null;
-  }
-
-  generateSeeding(): void {
-    if (this.roster.length < 2) {
-      this.error = 'Add at least two players to generate a seeding.';
-      return;
-    }
-
-    const playerIds = this.roster
-      .map((player) => player.id)
-      .filter((id): id is number => typeof id === 'number');
-
-    this.isGenerating = true;
-    this.error = null;
-
-    this.seedService
-      .generateSeeding(playerIds)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          this.seeding = response.seeding || [];
-          this.method = response.method;
-          this.tiebreak = response.tiebreak;
-          this.isGenerating = false;
-        },
-        error: (err) => {
-          this.error = err?.error?.message || 'Failed to generate seeding.';
-          this.isGenerating = false;
-        },
-      });
+    this.isGenerating = false;
   }
 
   copySeeding(): void {
@@ -160,12 +175,8 @@ export class SeedGeneratorComponent {
     URL.revokeObjectURL(url);
   }
 
-  canGenerate(): boolean {
-    return this.roster.length >= 2 && !this.isGenerating;
-  }
-
   openRatingsHelp(): void {
-    this.dialog.open(SeedRatingsHelpDialogComponent, {
+    this.dialog.open(RatingsHelpDialogComponent, {
       width: '560px',
       autoFocus: false,
     });

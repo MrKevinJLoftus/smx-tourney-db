@@ -59,12 +59,6 @@
         </mat-chip-set>
       </div>
 
-      <div class="actions-row">
-        <button mat-raised-button color="primary" type="button" [disabled]="!canGenerate()" (click)="generateSeeding()">
-          Generate seeding
-        </button>
-      </div>
-
       <div *ngIf="error" class="error-row">
         <mat-icon class="error-icon">error</mat-icon>
         <span>{{ error }}</span>
