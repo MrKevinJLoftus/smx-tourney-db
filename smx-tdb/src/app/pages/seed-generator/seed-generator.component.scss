@@ -57,6 +57,24 @@
   margin-bottom: 16px;
 }
 
+.results-card {
+  padding: 16px;
+
+  mat-card-title {
+    display: block;
+    margin: 0 0 8px;
+  }
+
+  mat-card-subtitle {
+    display: block;
+    margin: 0 0 16px;
+  }
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
 .player-field {
   width: 100%;
 }

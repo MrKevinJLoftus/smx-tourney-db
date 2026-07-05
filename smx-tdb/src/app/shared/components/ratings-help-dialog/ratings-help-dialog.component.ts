@@ -3,14 +3,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-seed-ratings-help-dialog',
+  selector: 'app-ratings-help-dialog',
   standalone: true,
   imports: [MatDialogModule, MatButtonModule],
-  templateUrl: './seed-ratings-help-dialog.component.html',
-  styleUrl: './seed-ratings-help-dialog.component.scss',
+  templateUrl: './ratings-help-dialog.component.html',
+  styleUrl: './ratings-help-dialog.component.scss',
 })
-export class SeedRatingsHelpDialogComponent {
-  constructor(public dialogRef: MatDialogRef<SeedRatingsHelpDialogComponent>) {}
+export class RatingsHelpDialogComponent {
+  constructor(public dialogRef: MatDialogRef<RatingsHelpDialogComponent>) {}
 
   close(): void {
     this.dialogRef.close();

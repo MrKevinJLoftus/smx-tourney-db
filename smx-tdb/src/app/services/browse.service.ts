@@ -10,12 +10,13 @@ export interface Top5RecentEvent {
   winner: { id: number; username: string } | null;
 }
 
-export interface Top5PlayerByRatio {
+export interface Top5PlayerByRating {
   id: number;
   username: string;
-  wins: number;
-  losses: number;
-  ratio: number | null;
+  rating: number;
+  deviation: number;
+  matchesCounted: number;
+  provisional: boolean;
 }
 
 export interface Top5Rivalry {
@@ -26,7 +27,8 @@ export interface Top5Rivalry {
 
 export interface BrowseTop5ListsResponse {
   recentEvents: Top5RecentEvent[];
-  topPlayersByWinLossRatio: Top5PlayerByRatio[];
+  topPlayersByRating: Top5PlayerByRating[];
+  topPlayersByRatingEstablished: Top5PlayerByRating[];
   topRivalries: Top5Rivalry[];
 }
 
@@ -40,4 +42,3 @@ export class BrowseService {
     return this.http.get<BrowseTop5ListsResponse>(`${environment.apiUrl}/browse/top5`);
   }
 }
-

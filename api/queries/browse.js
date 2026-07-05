@@ -24,57 +24,35 @@ module.exports = {
     LIMIT 10
   `,
 
-  // Top 10 players by win/loss ratio counting MATCHES won/lost (not songs).
-  // Only includes strictly 1v1 matches (exactly 2 players) with a non-null winner_id.
-  // losses_total=0 is treated as "infinite" and sorted first, then by wins.
-  GET_TOP_10_PLAYERS_BY_WIN_LOSS_RATIO: `
+  // Top 10 players by Glicko-2 rating from precomputed player_rating rows.
+  GET_TOP_10_PLAYERS_BY_RATING: `
     SELECT
       p.id AS player_id,
       p.username,
-      COUNT(DISTINCT CASE WHEN s.player_id = m.winner_id THEN m.id END) AS wins_total,
-      COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END) AS losses_total,
-      COUNT(DISTINCT m.id) AS matches_total,
-      CASE
-        WHEN COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END) = 0 THEN NULL
-        ELSE (
-          COUNT(DISTINCT CASE WHEN s.player_id = m.winner_id THEN m.id END)
-          / COUNT(DISTINCT CASE WHEN s.player_id <> m.winner_id THEN m.id END)
-        )
-      END AS win_loss_ratio
-    FROM player p
-    INNER JOIN match_x_player_stats s ON s.player_id = p.id
-    INNER JOIN \`match\` m ON m.id = s.match_id
-    INNER JOIN event e ON e.id = m.event_id AND e.hidden = 0
-    INNER JOIN (
-      SELECT
-        s2.match_id
-      FROM match_x_player_stats s2
-      WHERE NOT EXISTS (
-        SELECT 1
-        FROM match_x_player_x_song mx
-        INNER JOIN player hp ON hp.id = mx.player_id
-        WHERE mx.match_id = s2.match_id
-          AND hp.hidden_matches = 1
-      )
-      GROUP BY s2.match_id
-      HAVING COUNT(DISTINCT s2.player_id) = 2
-    ) only_1v1 ON only_1v1.match_id = s.match_id
-    WHERE m.winner_id IS NOT NULL
-      AND p.hidden_matches = 0
-      AND NOT EXISTS (
-        SELECT 1
-        FROM match_x_player_x_song mx
-        INNER JOIN player hp ON hp.id = mx.player_id
-        WHERE mx.match_id = m.id
-          AND hp.hidden_matches = 1
-      )
-    GROUP BY p.id, p.username
-    HAVING matches_total >= 10
-    ORDER BY
-      (losses_total = 0) DESC,
-      (wins_total / NULLIF(losses_total, 0)) DESC,
-      wins_total DESC,
-      p.username ASC
+      pr.rating,
+      pr.deviation,
+      pr.matches_counted
+    FROM player_rating pr
+    INNER JOIN player p ON p.id = pr.player_id
+    WHERE p.hidden_matches = 0
+    ORDER BY pr.rating DESC, p.username ASC
+    LIMIT 10
+  `,
+
+  // Same as above but excludes provisional players (thresholds match ratingService.isProvisional).
+  GET_TOP_10_PLAYERS_BY_RATING_EXCLUDING_PROVISIONAL: `
+    SELECT
+      p.id AS player_id,
+      p.username,
+      pr.rating,
+      pr.deviation,
+      pr.matches_counted
+    FROM player_rating pr
+    INNER JOIN player p ON p.id = pr.player_id
+    WHERE p.hidden_matches = 0
+      AND pr.matches_counted >= 5
+      AND pr.deviation <= 150
+    ORDER BY pr.rating DESC, p.username ASC
     LIMIT 10
   `,
 

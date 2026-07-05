@@ -246,8 +246,8 @@ async function sortRosterForSeeding(roster) {
  */
 async function generateSeeding(playerIds) {
   const uniqueIds = [...new Set((playerIds || []).map((id) => Number(id)).filter((id) => id > 0))];
-  if (uniqueIds.length < 2) {
-    const err = new Error('At least two distinct players are required.');
+  if (uniqueIds.length < 1) {
+    const err = new Error('At least one distinct player is required.');
     err.statusCode = 400;
     throw err;
   }

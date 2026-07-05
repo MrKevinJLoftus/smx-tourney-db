@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
 import { HOME_SEARCH_RETURN_STATE_KEY } from '../../shared/navigation/detail-return-state';
 import { PlayerService } from '../../services/player.service';
 import { EventService } from '../../services/event.service';
 import { MatchService } from '../../services/match.service';
-import { BrowseService, Top5PlayerByRatio, Top5RecentEvent, Top5Rivalry } from '../../services/browse.service';
+import { BrowseService, Top5PlayerByRating, Top5RecentEvent, Top5Rivalry } from '../../services/browse.service';
 import { StartGgPublicService, UpcomingStartGgEvent } from '../../services/start-gg-public.service';
+import { RatingsHelpDialogComponent } from '../../shared/components/ratings-help-dialog/ratings-help-dialog.component';
 import { Player } from '../../models/player';
 import { Event } from '../../models/event';
 import { MatchWithDetails } from '../../models/match';
@@ -35,8 +37,10 @@ export class HomeComponent implements OnInit {
   matches: MatchWithDetails[] = [];
 
   recentEventsTop5: Top5RecentEvent[] = [];
-  topPlayersByRatioTop5: Top5PlayerByRatio[] = [];
+  topPlayersByRatingAll: Top5PlayerByRating[] = [];
+  topPlayersByRatingEstablished: Top5PlayerByRating[] = [];
   topRivalriesTop5: Top5Rivalry[] = [];
+  showProvisionalPlayers = false;
   isTop5Loading = false;
   top5Error: string | null = null;
 
@@ -55,6 +59,7 @@ export class HomeComponent implements OnInit {
     private matchService: MatchService,
     private browseService: BrowseService,
     private startGgPublicService: StartGgPublicService,
+    private dialog: MatDialog,
     private router: Router,
     private route: ActivatedRoute
   ) {
@@ -145,7 +150,8 @@ export class HomeComponent implements OnInit {
     this.browseService.getTop5Lists().subscribe({
       next: (data) => {
         this.recentEventsTop5 = data?.recentEvents || [];
-        this.topPlayersByRatioTop5 = data?.topPlayersByWinLossRatio || [];
+        this.topPlayersByRatingAll = data?.topPlayersByRating || [];
+        this.topPlayersByRatingEstablished = data?.topPlayersByRatingEstablished || [];
         this.topRivalriesTop5 = data?.topRivalries || [];
         this.isTop5Loading = false;
       },
@@ -155,6 +161,16 @@ export class HomeComponent implements OnInit {
         this.isTop5Loading = false;
       }
     });
+  }
+
+  onShowProvisionalChange(show: boolean): void {
+    this.showProvisionalPlayers = show;
+  }
+
+  get displayedTopPlayersByRating(): Top5PlayerByRating[] {
+    return this.showProvisionalPlayers
+      ? this.topPlayersByRatingAll
+      : this.topPlayersByRatingEstablished;
   }
 
   loadUpcomingStartGgEvents(): void {
@@ -293,10 +309,11 @@ export class HomeComponent implements OnInit {
     return this.formatDate(new Date(Number(seconds) * 1000));
   }
 
-  formatRatio(ratio: number | null): string {
-    if (ratio === null || ratio === undefined) return '∞';
-    if (!Number.isFinite(ratio)) return '∞';
-    return ratio.toFixed(2);
+  openRatingsHelp(): void {
+    this.dialog.open(RatingsHelpDialogComponent, {
+      width: '560px',
+      autoFocus: false,
+    });
   }
 
   getMatchDisplayText(match: MatchWithDetails): string {

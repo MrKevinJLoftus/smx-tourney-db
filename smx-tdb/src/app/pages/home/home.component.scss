@@ -67,6 +67,17 @@
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 1rem;
+
+  ::ng-deep mat-list-item {
+    height: auto;
+    min-height: 48px;
+    padding-block: 4px;
+
+    .mdc-list-item__content {
+      overflow: visible;
+      align-items: center;
+    }
+  }
 }
 
 .top5-events-card {
@@ -121,7 +132,7 @@
 .top5-row {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem 0.75rem;
   width: 100%;
 }
@@ -149,6 +160,57 @@
   width: 1.25rem;
   justify-content: center;
   color: rgba(255, 255, 255, 0.6);
+}
+
+.top5-card-title-with-help {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.top5-players-toggle {
+  margin-bottom: 0.625rem;
+
+  ::ng-deep .top5-players-toggle-control {
+    --mat-slide-toggle-label-text-color: rgba(255, 255, 255, 0.75);
+    --mat-slide-toggle-label-text-size: 0.8125rem;
+    --mat-slide-toggle-label-text-line-height: 1.25rem;
+
+    .mdc-label {
+      font-size: 0.8125rem;
+      line-height: 1.25rem;
+      padding-left: 6px;
+    }
+
+    .mdc-switch {
+      transform: scale(0.72);
+      transform-origin: center left;
+      margin-right: -6px;
+    }
+  }
+}
+
+.top5-help-button {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+
+  .mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.provisional-badge {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffd54f;
 }
 
 .autocomplete-option {
