@@ -134,7 +134,20 @@
 
   <div *ngIf="!hasSearched && !isLoading" class="welcome-section">
     <h2>StepManiaX Tournament DB</h2>
-    <p>Use the search bar above to find players, events, or matches, or <a routerLink="/browse" class="link">browse</a> all available data.</p>
+    <p class="welcome-intro">
+      Use the search bar above to find players, events, or matches, or
+      <a routerLink="/browse" class="link">browse</a> all available data.
+    </p>
+    <ul class="welcome-features">
+      <li>
+        <a routerLink="/compare" class="link">Compare players</a>
+        <span class="welcome-feature-desc">— Pick two competitors and view head-to-head match and song records.</span>
+      </li>
+      <li>
+        <a routerLink="/seed-generator" class="link">Seed generator</a>
+        <span class="welcome-feature-desc">— Build a hypothetical roster and get a suggested seeding from Glicko-2 ratings.</span>
+      </li>
+    </ul>
   </div>
 
   <div class="top5-section">

@@ -1,0 +1,106 @@
+<div class="seed-container">
+  <app-back-to-search></app-back-to-search>
+
+  <div class="header-section">
+    <mat-icon class="header-icon">format_list_numbered</mat-icon>
+    <div class="header-main">
+      <h1>Seed generator</h1>
+      <p class="header-subtitle">
+        Build a hypothetical roster and get a suggested seeding from Glicko-2 ratings based on 1v1 match history.
+        <button
+          mat-icon-button
+          type="button"
+          class="help-button"
+          matTooltip="How are ratings calculated?"
+          aria-label="How are ratings calculated?"
+          (click)="openRatingsHelp()"
+        >
+          <mat-icon>help_outline</mat-icon>
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <mat-card class="seed-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="player-field">
+        <mat-label>Add player</mat-label>
+        <input
+          matInput
+          [formControl]="playerControl"
+          [matAutocomplete]="playerAuto"
+          placeholder="Type at least 2 letters"
+        />
+        <mat-icon matPrefix>person_add</mat-icon>
+        <mat-autocomplete
+          #playerAuto="matAutocomplete"
+          [displayWith]="displayPlayer"
+          (optionSelected)="onSelectPlayer($event.option.value)"
+        >
+          <mat-option *ngFor="let player of (playerSuggestions$ | async)" [value]="player">
+            <span>{{ player.username }}</span>
+            <span *ngIf="player.pronouns" class="muted"> ({{ player.pronouns }})</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <div *ngIf="roster.length" class="roster-section">
+        <div class="roster-header">
+          <h2>Roster ({{ roster.length }})</h2>
+          <button mat-button type="button" (click)="clearRoster()">Clear roster</button>
+        </div>
+        <mat-chip-set class="roster-chips">
+          <mat-chip *ngFor="let player of roster" (removed)="removePlayer(player.id!)">
+            {{ player.username }}
+            <button matChipRemove [attr.aria-label]="'Remove ' + player.username">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="actions-row">
+        <button mat-raised-button color="primary" type="button" [disabled]="!canGenerate()" (click)="generateSeeding()">
+          Generate seeding
+        </button>
+      </div>
+
+      <div *ngIf="error" class="error-row">
+        <mat-icon class="error-icon">error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="isGenerating" class="loading-section">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Generating seeding…</p>
+  </div>
+
+  <mat-card *ngIf="seeding.length" class="results-card">
+    <mat-card-title>Suggested seeding</mat-card-title>
+    <mat-card-subtitle *ngIf="method">
+      Method: {{ method }} · Tiebreak: {{ tiebreak }}
+    </mat-card-subtitle>
+    <mat-card-content>
+      <div class="results-actions">
+        <button mat-stroked-button type="button" (click)="copySeeding()">Copy list</button>
+        <button mat-stroked-button type="button" (click)="exportSeedingToCsv()">Export to CSV</button>
+      </div>
+      <div class="seeding-list">
+        <div *ngFor="let entry of seeding" class="seeding-row">
+          <span class="seed-number">{{ entry.seed }}</span>
+          <div class="player-block">
+            <a class="player-link" [routerLink]="['/player', entry.player.id]">{{ entry.player.username }}</a>
+            <span *ngIf="entry.provisional" class="provisional-badge">Provisional</span>
+          </div>
+          <div class="rating-block">
+            <span class="rating-value">{{ entry.rating }}</span>
+            <span class="muted">RD {{ entry.deviation }}</span>
+            <span class="muted">{{ entry.matchesCounted }} 1v1 matches</span>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
