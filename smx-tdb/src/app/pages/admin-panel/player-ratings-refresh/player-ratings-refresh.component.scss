@@ -1,0 +1,17 @@
+.ratings-refresh {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+}
+
+.summary {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.inline-spinner {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}

@@ -8,6 +8,7 @@ const {
   prePopulatePlayerCache,
 } = require('../services/playerResolver');
 const { augmentStartGgSetForMatchImport } = require('../services/startGgRoundLabel');
+const { rebuildRatingsAfterMatchImport } = require('../services/ratingService');
 
 /**
  * Determines the winner(s) of a song based on scores.
@@ -1161,6 +1162,8 @@ exports.bulkImportMatches = async (req, res) => {
     summary.matchesCreated = matchRows.length;
   }
 
+  const ratingsRebuild = await rebuildRatingsAfterMatchImport('bulkImportMatches');
+
   res.status(200).json({
     message: 'Bulk import completed',
     summary: {
@@ -1171,6 +1174,7 @@ exports.bulkImportMatches = async (req, res) => {
       playersCreated: summary.playersCreated,
       errors: summary.errors.length
     },
+    ratingsRebuild: ratingsRebuild || { warning: 'Player ratings rebuild failed; use Admin Panel to refresh.' },
     errors: summary.errors.length > 0 ? summary.errors : undefined
   });
 };

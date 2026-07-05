@@ -36,7 +36,8 @@ export class AppComponent {
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
     { url: "/browse", text: "Browse", icon: "list" },
-    { url: "/compare", text: "Compare", icon: "compare_arrows" }
+    { url: "/compare", text: "Compare", icon: "compare_arrows" },
+    { url: "/seed-generator", text: "Seeds", icon: "format_list_numbered" }
   ];
   protectedRoutes: Route[] = [
     { url: '/admin-panel', text: 'Admin', icon: 'admin_panel_settings' },

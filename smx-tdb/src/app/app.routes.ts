@@ -6,6 +6,7 @@ import { UpdatePasswordComponent } from './pages/update-password/update-password
 import { SuperAdminPanelComponent } from './pages/super-admin-panel/super-admin-panel.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 import { PlayerCompareComponent } from './pages/player-compare/player-compare.component';
+import { SeedGeneratorComponent } from './pages/seed-generator/seed-generator.component';
 import { EventDetailComponent } from './pages/event-detail/event-detail.component';
 import { MatchDetailComponent } from './pages/match-detail/match-detail.component';
 import { AuthGuard } from './shared/auth/auth-guard';
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
   { path: 'browse', component: BrowseComponent, data: { title: 'Browse' } },
   { path: 'compare', component: PlayerCompareComponent, data: { title: 'Compare Players' } },
+  { path: 'seed-generator', component: SeedGeneratorComponent, data: { title: 'Seed Generator' } },
   { path: 'player/:id', component: PlayerDetailComponent, data: { title: 'Player' } },
   { path: 'event/:id', component: EventDetailComponent, data: { title: 'Event' } },
   { path: 'match/:id', component: MatchDetailComponent, data: { title: 'Match' } },

@@ -16,6 +16,7 @@ const {
 } = require('../services/startGgImportQueries');
 const { resolvePlayer, prePopulatePlayerCache } = require('../services/playerResolver');
 const { importMatchesFromStartGgSets } = require('./match');
+const { rebuildRatingsAfterMatchImport } = require('../services/ratingService');
 
 const STANDINGS_PREVIEW_PER_PAGE = 25;
 const SETS_PREVIEW_PER_PAGE = 10;
@@ -174,7 +175,8 @@ async function runFullImportFromStartGgEvent(ev, slug, createdBy) {
   };
 }
 
-function sendImportSuccess(res, slug, startGgEventIdNum, summary) {
+async function sendImportSuccess(res, slug, startGgEventIdNum, summary) {
+  const ratingsRebuild = await rebuildRatingsAfterMatchImport('startGgImport');
   res.status(201).json({
     message: 'Import completed',
     slug,
@@ -188,6 +190,7 @@ function sendImportSuccess(res, slug, startGgEventIdNum, summary) {
       setsFetched: summary.setsFetched,
       matches: summary.matches,
     },
+    ratingsRebuild: ratingsRebuild || { warning: 'Player ratings rebuild failed; use Admin Panel to refresh.' },
   });
 }
 
@@ -324,7 +327,7 @@ exports.importFullStartGgEvent = async (req, res) => {
     if (result.kind === 'err') {
       return res.status(result.status).json(result.body);
     }
-    sendImportSuccess(res, result.slug, result.startGgEventIdNum, result.summary);
+    await sendImportSuccess(res, result.slug, result.startGgEventIdNum, result.summary);
   } catch (e) {
     return handleImportException(res, e, 'importFullStartGgEvent');
   }
@@ -376,7 +379,7 @@ exports.importStartGgEventById = async (req, res) => {
     if (result.kind === 'err') {
       return res.status(result.status).json(result.body);
     }
-    sendImportSuccess(
+    await sendImportSuccess(
       res,
       result.slug,
       result.startGgEventIdNum,

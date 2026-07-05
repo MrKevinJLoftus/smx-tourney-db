@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>How ratings are calculated</h2>
+<mat-dialog-content>
+  <p>
+    Suggested seedings use precomputed <strong>Glicko-2</strong> ratings derived from match history in this database.
+    Each player gets a rating (strength estimate), an RD (rating deviation, a confidence measure), and a count of
+    matches used.
+  </p>
+
+  <h3>What matches count</h3>
+  <ul>
+    <li>Only strictly <strong>1v1</strong> matches with a recorded winner are included.</li>
+    <li>Matches with three or more players are skipped.</li>
+  </ul>
+
+  <h3>How Glicko-2 ratings are built</h3>
+  <ul>
+    <li>All eligible 1v1 matches are replayed in chronological order, grouped by event.</li>
+    <li>Each event acts as a rating period: results within that event update player ratings together.</li>
+    <li>Beating a stronger opponent raises your rating more; losing to a weaker opponent lowers it more.</li>
+    <li>Ratings are stored in the database and rebuilt after match imports.</li>
+  </ul>
+
+  <h3>How seeding is ordered</h3>
+  <p>When you generate a seeding for your roster, players are sorted best-to-worst using this tiebreak chain:</p>
+  <ol>
+    <li><strong>Glicko-2 rating</strong> (higher = better seed)</li>
+    <li><strong>Head-to-head</strong> record among the selected players</li>
+    <li><strong>Username</strong> (alphabetical)</li>
+    <li><strong>Provisional-last</strong> if still tied</li>
+  </ol>
+
+  <h3>Provisional ratings</h3>
+  <p>
+    A player is marked <strong>Provisional</strong> when they have fewer than 5 counted 1v1 matches or their RD is
+    above 150, meaning the rating is still uncertain. Players without any rating history start at the default rating
+    of 1500 and are also provisional.
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Close</button>
+</mat-dialog-actions>

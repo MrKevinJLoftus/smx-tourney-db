@@ -1,0 +1,20 @@
+<div class="ratings-refresh">
+  <p>
+    Rebuild Glicko-2 ratings from all 1v1 match history. Ratings are refreshed automatically after match imports;
+    use this after manually adding or editing matches in the admin panel.
+  </p>
+
+  <button
+    mat-raised-button
+    color="primary"
+    type="button"
+    [disabled]="isRefreshing"
+    (click)="refreshRatings()"
+  >
+    <mat-spinner *ngIf="isRefreshing" diameter="20" class="inline-spinner"></mat-spinner>
+    <span *ngIf="!isRefreshing">Refresh player ratings</span>
+    <span *ngIf="isRefreshing">Refreshing…</span>
+  </button>
+
+  <p *ngIf="lastSummary" class="summary">{{ lastSummary }}</p>
+</div>
