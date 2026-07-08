@@ -8,8 +8,9 @@ import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchM
 import { Player } from '../../models/player';
 import { MatchWithDetails, PlayerStats } from '../../models/match';
 import { MatchService } from '../../services/match.service';
-import { PlayerService } from '../../services/player.service';
+import { PlayerRatingResponse, PlayerService } from '../../services/player.service';
 import { SharedModule } from '../../shared/shared.module';
+import { PlayerRatingSummary } from '../../models/rating';
 
 type SimplePlayer = { id: number; username: string };
 
@@ -47,6 +48,8 @@ export class PlayerCompareComponent implements OnInit {
   };
   headToHeadSongRecord: { a: { wins: number; losses: number; draws: number }; b: { wins: number; losses: number; draws: number } } | null =
     null;
+  selectedARating: PlayerRatingSummary | null = null;
+  selectedBRating: PlayerRatingSummary | null = null;
 
   constructor(
     private playerService: PlayerService,
@@ -118,12 +121,14 @@ export class PlayerCompareComponent implements OnInit {
     if (!player) {
       this.selectedB = null;
       this.recomputeHeadToHead();
+      this.loadSelectedRatings();
       this.syncQueryParams();
       return;
     }
     this.selectedB = player;
     this.playerBControl.setValue(player, { emitEvent: false });
     this.recomputeHeadToHead();
+    this.loadSelectedRatings();
     this.syncQueryParams();
   }
 
@@ -136,6 +141,7 @@ export class PlayerCompareComponent implements OnInit {
     this.playerBControl.setValue(null);
     this.selectedB = null;
     this.recomputeHeadToHead();
+    this.loadSelectedRatings();
     this.syncQueryParams();
   }
 
@@ -174,6 +180,13 @@ export class PlayerCompareComponent implements OnInit {
     return this.selectedA ? this.playerId(this.selectedA) : null;
   }
 
+  get ratingDiff(): number | null {
+    if (!this.selectedARating || !this.selectedBRating) {
+      return null;
+    }
+    return Math.round((this.selectedBRating.rating - this.selectedARating.rating) * 100) / 100;
+  }
+
   private clearSelectionA(): void {
     this.selectedA = null;
     this.selectedB = null;
@@ -182,6 +195,8 @@ export class PlayerCompareComponent implements OnInit {
     this.headToHeadMatches = [];
     this.headToHeadMatchRecord = { aWins: 0, bWins: 0, draws: 0, total: 0 };
     this.headToHeadSongRecord = null;
+    this.selectedARating = null;
+    this.selectedBRating = null;
     this.playerBControl.disable({ emitEvent: false });
     this.playerBControl.setValue(null, { emitEvent: false });
     this.error = null;
@@ -248,6 +263,8 @@ export class PlayerCompareComponent implements OnInit {
     this.headToHeadMatches = [];
     this.headToHeadMatchRecord = { aWins: 0, bWins: 0, draws: 0, total: 0 };
     this.headToHeadSongRecord = null;
+    this.selectedARating = null;
+    this.selectedBRating = null;
     this.playerAControl.setValue('', { emitEvent: false });
     this.playerBControl.disable({ emitEvent: false });
     this.playerBControl.setValue(null, { emitEvent: false });
@@ -259,11 +276,13 @@ export class PlayerCompareComponent implements OnInit {
    */
   private selectPlayerA(player: Player, options?: { bIdFromUrl?: number | null }): void {
     this.selectedA = player;
+    this.selectedARating = player.rating ?? null;
     this.error = null;
     this.selectedB = null;
     this.headToHeadMatches = [];
     this.headToHeadMatchRecord = { aWins: 0, bWins: 0, draws: 0, total: 0 };
     this.headToHeadSongRecord = null;
+    this.selectedBRating = null;
 
     this.playerAControl.setValue(player, { emitEvent: false });
     this.playerBControl.setValue(null, { emitEvent: false });
@@ -294,6 +313,7 @@ export class PlayerCompareComponent implements OnInit {
             this.applyOpponentById(bFromUrl);
           } else {
             this.recomputeHeadToHead();
+            this.loadSelectedRatings();
             this.syncQueryParams();
           }
         },
@@ -316,6 +336,7 @@ export class PlayerCompareComponent implements OnInit {
       this.selectedB = null;
       this.playerBControl.setValue(null, { emitEvent: false });
       this.recomputeHeadToHead();
+      this.loadSelectedRatings();
       this.syncQueryParams();
       return;
     }
@@ -324,6 +345,7 @@ export class PlayerCompareComponent implements OnInit {
       this.selectedB = fromPool;
       this.playerBControl.setValue(fromPool, { emitEvent: false });
       this.recomputeHeadToHead();
+      this.loadSelectedRatings();
       this.syncQueryParams();
       return;
     }
@@ -342,13 +364,44 @@ export class PlayerCompareComponent implements OnInit {
           this.selectedB = { id, username: p.username };
           this.playerBControl.setValue(this.selectedB, { emitEvent: false });
           this.recomputeHeadToHead();
+          this.loadSelectedRatings();
           this.syncQueryParams();
         },
         error: () => {
           this.selectedB = null;
           this.playerBControl.setValue(null, { emitEvent: false });
           this.recomputeHeadToHead();
+          this.loadSelectedRatings();
           this.syncQueryParams();
+        },
+      });
+  }
+
+  private loadSelectedRatings(): void {
+    const aId = this.selectedAId;
+    const bId = this.selectedB?.id ?? null;
+
+    this.selectedARating = this.selectedA?.rating ?? null;
+    this.selectedBRating = null;
+
+    if (!aId || !bId) {
+      return;
+    }
+
+    this.playerService
+      .getRatingsByPlayerIds([aId, bId])
+      .pipe(take(1))
+      .subscribe({
+        next: (rows) => {
+          const byId = new Map<number, PlayerRatingSummary>(
+            (rows || []).map((row: PlayerRatingResponse) => [row.playerId, row])
+          );
+          this.selectedARating = byId.get(aId) ?? this.selectedA?.rating ?? this.defaultRating();
+          this.selectedBRating = byId.get(bId) ?? this.defaultRating();
+        },
+        error: () => {
+          this.selectedARating = this.selectedA?.rating ?? this.defaultRating();
+          this.selectedBRating = this.defaultRating();
         },
       });
   }
@@ -458,6 +511,16 @@ export class PlayerCompareComponent implements OnInit {
     if (typeof v === 'string') return v;
     if (typeof v === 'object' && v !== null && 'username' in v) return (v as Player).username || '';
     return '';
+  }
+
+  private defaultRating(): PlayerRatingSummary {
+    return {
+      rating: 1500,
+      deviation: 350,
+      matchesCounted: 0,
+      provisional: true,
+      rank: null,
+    };
   }
 
 }

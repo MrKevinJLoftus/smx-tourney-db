@@ -36,6 +36,7 @@ module.exports = {
   `,
 
   DELETE_ALL_PLAYER_RATINGS: `DELETE FROM player_rating`,
+  DELETE_ALL_MATCH_PLAYER_RATINGS: `DELETE FROM match_player_rating`,
 
   GET_PLAYER_RATINGS_BY_IDS: `
     SELECT
@@ -55,6 +56,13 @@ module.exports = {
     FROM player
     WHERE id IN (?)
   `,
+
+  CREATE_MATCH_PLAYER_RATINGS_BATCH: (rowCount) => {
+    if (rowCount < 1) return null;
+    const rowPlaceholders = '(?, ?, ?, ?)';
+    const values = Array(rowCount).fill(rowPlaceholders).join(', ');
+    return `INSERT INTO match_player_rating (match_id, player_id, rating, deviation) VALUES ${values}`;
+  },
 
   // Head-to-head wins between two players (1v1 matches only, same visibility rules).
   GET_HEAD_TO_HEAD_WINS: `

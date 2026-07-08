@@ -3,7 +3,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
+import { RatingsHelpDialogComponent } from '../../shared/components/ratings-help-dialog/ratings-help-dialog.component';
 import { OrdinalPipe } from '../../shared/pipes/ordinal.pipe';
 import { PlayerService } from '../../services/player.service';
 import { MatchService } from '../../services/match.service';
@@ -48,7 +50,8 @@ export class PlayerDetailComponent implements OnInit {
     private route: ActivatedRoute,
     public router: Router,
     private playerService: PlayerService,
-    private matchService: MatchService
+    private matchService: MatchService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -255,6 +258,13 @@ export class PlayerDetailComponent implements OnInit {
         .join(' ')
         .toLowerCase();
       return haystack.includes(q);
+    });
+  }
+
+  openRatingsHelp(): void {
+    this.dialog.open(RatingsHelpDialogComponent, {
+      width: '560px',
+      autoFocus: false,
     });
   }
 }

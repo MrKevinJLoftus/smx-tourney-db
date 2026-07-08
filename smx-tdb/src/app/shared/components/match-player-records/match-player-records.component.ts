@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PlayerStats } from '../../../models/match';
+import { PlayerMatchRating, PlayerStats } from '../../../models/match';
 
 @Component({
   selector: 'app-match-player-records',
@@ -12,6 +12,8 @@ import { PlayerStats } from '../../../models/match';
 export class MatchPlayerRecordsComponent {
   /** Per-song aggregate W–L–D for each competitor in the match (from API `player_stats`). */
   @Input() playerStats: PlayerStats[] | null | undefined;
+  /** Pre-event Glicko-2 ratings for players in the match (from API `player_ratings`). */
+  @Input() playerRatings: PlayerMatchRating[] | null | undefined;
   /** `chips`: pill style (e.g. home cards). `inline`: compact text rows (lists, expansion panels). */
   @Input() variant: 'chips' | 'inline' = 'inline';
 
@@ -36,5 +38,13 @@ export class MatchPlayerRecordsComponent {
       return `${w}-${l}-${d}`;
     }
     return `${w}-${l}`;
+  }
+
+  getRatingText(playerId: number): string | null {
+    const rating = (this.playerRatings || []).find((entry) => Number(entry.player_id) === Number(playerId));
+    if (!rating) {
+      return null;
+    }
+    return `Rating ${rating.rating} (RD ${rating.deviation})`;
   }
 }

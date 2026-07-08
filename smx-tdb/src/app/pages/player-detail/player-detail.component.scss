@@ -77,6 +77,7 @@
       align-items: baseline;
       gap: 0.75rem 1rem;
       min-width: 0;
+      flex: 1 1 0;
     }
 
     h1 {
@@ -91,6 +92,31 @@
       font-weight: 400;
       color: rgba(255, 255, 255, 0.7);
       white-space: nowrap;
+    }
+
+    .header-rating {
+      flex-basis: auto;
+    }
+
+    .header-rating-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.25rem;
+      flex-basis: 100%;
+    }
+
+    .ratings-help-button {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      color: rgba(255, 255, 255, 0.72);
+
+      .mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
     }
   }
 }

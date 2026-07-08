@@ -9,6 +9,9 @@
       <span class="mpr__name">{{ stat.gamertag || 'Player' }}</span>
       <span class="mpr__sep">: </span>
       <span class="mpr__record">{{ formatRecord(stat) }}</span>
+      <span *ngIf="getRatingText(stat.player_id) as ratingText" class="mpr__rating">
+        {{ ratingText }}
+      </span>
     </span>
   </div>
 </ng-container>

@@ -153,6 +153,7 @@ const transformMatchesBatch = async (matches) => {
     allPlayers,
     allPlayerSongScores,
     allPlayerStats,
+    allPlayerRatings,
     allWinners,
     allEvents
   ] = await Promise.all([
@@ -169,6 +170,10 @@ const transformMatchesBatch = async (matches) => {
     // Get all player stats for all matches
     matchIds.length > 0 ? dbconn.executeMysqlQuery(
       queries.GET_PLAYER_STATS_BY_MATCHES(matchIds),
+      matchIds
+    ) : Promise.resolve([]),
+    matchIds.length > 0 ? dbconn.executeMysqlQuery(
+      queries.GET_MATCH_PLAYER_RATINGS_BY_MATCHES(matchIds),
       matchIds
     ) : Promise.resolve([]),
     // Get all winners (only if not already in players list)
@@ -214,6 +219,19 @@ const transformMatchesBatch = async (matches) => {
       losses: stat.losses || 0,
       draws: stat.draws || 0,
       gamertag: stat.gamertag
+    });
+  });
+
+  const playerRatingsByMatchId = new Map();
+  allPlayerRatings.forEach((rating) => {
+    if (!playerRatingsByMatchId.has(rating.match_id)) {
+      playerRatingsByMatchId.set(rating.match_id, []);
+    }
+    playerRatingsByMatchId.get(rating.match_id).push({
+      player_id: rating.player_id,
+      rating: Number(rating.rating),
+      deviation: Number(rating.deviation),
+      gamertag: rating.gamertag
     });
   });
 
@@ -297,6 +315,7 @@ const transformMatchesBatch = async (matches) => {
 
     // Get player stats
     const playerStatsArray = playerStatsByMatchId.get(match.id) || [];
+    const playerRatingsArray = playerRatingsByMatchId.get(match.id) || [];
 
     // Get event
     const event = match.event_id ? (eventsById.get(match.event_id) || null) : null;
@@ -310,6 +329,7 @@ const transformMatchesBatch = async (matches) => {
       winner: winner,
       songs: songsArray,
       player_stats: playerStatsArray,
+      player_ratings: playerRatingsArray,
       event: event
     };
   });
@@ -406,6 +426,14 @@ const transformMatchResult = async (match) => {
     gamertag: stat.gamertag
   }));
 
+  const playerRatings = await dbconn.executeMysqlQuery(queries.GET_MATCH_PLAYER_RATINGS_BY_MATCH, [match.id]);
+  const playerRatingsArray = playerRatings.map((rating) => ({
+    player_id: rating.player_id,
+    rating: Number(rating.rating),
+    deviation: Number(rating.deviation),
+    gamertag: rating.gamertag
+  }));
+
   // Fetch event information
   let event = null;
   if (match.event_id) {
@@ -431,6 +459,7 @@ const transformMatchResult = async (match) => {
     winner: winner,
     songs: songsArray,
     player_stats: playerStatsArray,
+    player_ratings: playerRatingsArray,
     event: event
   };
 };

@@ -164,7 +164,11 @@
                 Winner: {{ match.winner.gamertag }}
               </span>
               <span class="list-item-secondary" *ngIf="match.player_stats?.length">
-                <app-match-player-records [playerStats]="match.player_stats" variant="inline"></app-match-player-records>
+                <app-match-player-records
+                  [playerStats]="match.player_stats"
+                  [playerRatings]="match.player_ratings"
+                  variant="inline"
+                ></app-match-player-records>
               </span>
             </div>
             <mat-icon class="list-item-icon">chevron_right</mat-icon>

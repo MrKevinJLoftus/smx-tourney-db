@@ -61,12 +61,19 @@
         <div class="stats-table" [class.stats-table--with-draws]="hasAnyDraws">
           <div class="stats-header">
             <span>Player</span>
+            <span>Pre-match rating</span>
             <span>Wins</span>
             <span>Losses</span>
             <span *ngIf="hasAnyDraws">Draws</span>
           </div>
           <div *ngFor="let stat of match.player_stats" class="stats-row">
             <a (click)="navigateToPlayer(stat.player_id)" class="player-link">{{ stat.gamertag }}</a>
+            <span>
+              <ng-container *ngIf="getPlayerRating(stat.player_id) as rating; else noRating">
+                {{ rating.rating }} (RD {{ rating.deviation }})
+              </ng-container>
+              <ng-template #noRating>N/A</ng-template>
+            </span>
             <span>{{ stat.wins }}</span>
             <span>{{ stat.losses }}</span>
             <span *ngIf="hasAnyDraws">{{ stat.draws }}</span>

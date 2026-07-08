@@ -9,11 +9,13 @@ import { PlayerCompareComponent } from './pages/player-compare/player-compare.co
 import { SeedGeneratorComponent } from './pages/seed-generator/seed-generator.component';
 import { EventDetailComponent } from './pages/event-detail/event-detail.component';
 import { MatchDetailComponent } from './pages/match-detail/match-detail.component';
+import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
 import { AuthGuard } from './shared/auth/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
   { path: 'browse', component: BrowseComponent, data: { title: 'Browse' } },
+  { path: 'leaderboard', component: LeaderboardComponent, data: { title: 'Leaderboard' } },
   { path: 'compare', component: PlayerCompareComponent, data: { title: 'Compare Players' } },
   { path: 'seed-generator', component: SeedGeneratorComponent, data: { title: 'Seed Generator' } },
   { path: 'player/:id', component: PlayerDetailComponent, data: { title: 'Player' } },

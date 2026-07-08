@@ -28,6 +28,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { UnderConstructionComponent } from './components/under-construction/under-construction.component';
 import { BackToSearchComponent } from './components/back-to-search/back-to-search.component';
 import { MatchPlayerRecordsComponent } from './components/match-player-records/match-player-records.component';
+import { PlayerRatingSummaryComponent } from './components/player-rating-summary/player-rating-summary.component';
 
 const MODULES = [
   CommonModule,
@@ -64,7 +65,7 @@ const COMPONENTS = [
 
 @NgModule({
   declarations: [...COMPONENTS],
-  imports: [...MODULES, BackToSearchComponent, MatchPlayerRecordsComponent],
-  exports: [...MODULES, ...COMPONENTS, BackToSearchComponent, MatchPlayerRecordsComponent]
+  imports: [...MODULES, BackToSearchComponent, MatchPlayerRecordsComponent, PlayerRatingSummaryComponent],
+  exports: [...MODULES, ...COMPONENTS, BackToSearchComponent, MatchPlayerRecordsComponent, PlayerRatingSummaryComponent]
 })
 export class SharedModule { }

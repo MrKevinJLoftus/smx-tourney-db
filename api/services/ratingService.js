@@ -1,11 +1,16 @@
-const dbconn = require('../database/connector');
-const queries = require('../queries/seed');
 const glicko2 = require('./glicko2');
 
 const PROVISIONAL_RD_THRESHOLD = 150;
 const PROVISIONAL_MATCHES_THRESHOLD = 5;
 const RATING_TIE_EPSILON = 0.5;
 const INSERT_BATCH_SIZE = 200;
+
+function getDbDependencies() {
+  return {
+    dbconn: require('../database/connector'),
+    queries: require('../queries/seed'),
+  };
+}
 
 /**
  * Group chronological match rows by event_id (rating period).
@@ -36,6 +41,7 @@ function groupMatchesByEvent(rows) {
  */
 function computeRatingsFromMatches(matchRows) {
   const ratings = new Map();
+  const matchSnapshots = [];
   const periods = groupMatchesByEvent(matchRows);
 
   for (const period of periods) {
@@ -77,6 +83,26 @@ function computeRatingsFromMatches(matchRows) {
       prePeriod.set(playerId, { ...ratings.get(playerId) });
     }
 
+    for (const match of period.matches) {
+      const player1Id = Number(match.player1_id);
+      const player2Id = Number(match.player2_id);
+      const player1State = prePeriod.get(player1Id) || glicko2.createDefaultPlayer();
+      const player2State = prePeriod.get(player2Id) || glicko2.createDefaultPlayer();
+
+      matchSnapshots.push({
+        matchId: Number(match.match_id),
+        playerId: player1Id,
+        rating: Number(player1State.rating.toFixed(2)),
+        deviation: Number(player1State.rd.toFixed(2)),
+      });
+      matchSnapshots.push({
+        matchId: Number(match.match_id),
+        playerId: player2Id,
+        rating: Number(player2State.rating.toFixed(2)),
+        deviation: Number(player2State.rd.toFixed(2)),
+      });
+    }
+
     for (const [playerId, opponents] of opponentsByPlayer.entries()) {
       const current = prePeriod.get(playerId);
       const glickoOpponents = opponents.map((opp) => {
@@ -97,7 +123,7 @@ function computeRatingsFromMatches(matchRows) {
     }
   }
 
-  return ratings;
+  return { ratings, matchSnapshots };
 }
 
 function isProvisional(ratingRow) {
@@ -108,6 +134,7 @@ function isProvisional(ratingRow) {
 }
 
 async function insertRatingsBatch(connection, entries) {
+  const { dbconn } = getDbDependencies();
   if (!entries.length) return;
 
   for (let i = 0; i < entries.length; i += INSERT_BATCH_SIZE) {
@@ -129,13 +156,34 @@ async function insertRatingsBatch(connection, entries) {
   }
 }
 
+async function insertMatchSnapshotsBatch(connection, entries) {
+  const { dbconn, queries } = getDbDependencies();
+  if (!entries.length) return;
+
+  for (let i = 0; i < entries.length; i += INSERT_BATCH_SIZE) {
+    const batch = entries.slice(i, i + INSERT_BATCH_SIZE);
+    const params = batch.flatMap(({ matchId, playerId, rating, deviation }) => [
+      matchId,
+      playerId,
+      rating,
+      deviation,
+    ]);
+    await dbconn.executeMysqlQuery(
+      queries.CREATE_MATCH_PLAYER_RATINGS_BATCH(batch.length),
+      params,
+      connection
+    );
+  }
+}
+
 /**
  * Rebuild all player ratings from 1v1 match history and persist to player_rating.
  * @returns {Promise<{ playersRated: number, matchesProcessed: number }>}
  */
 async function rebuildRatings() {
+  const { dbconn, queries } = getDbDependencies();
   const matchRows = await dbconn.executeMysqlQuery(queries.GET_CHRONOLOGICAL_1V1_MATCHES, []);
-  const ratings = computeRatingsFromMatches(matchRows);
+  const { ratings, matchSnapshots } = computeRatingsFromMatches(matchRows);
   const entries = Array.from(ratings.entries()).map(([playerId, state]) => [
     playerId,
     Number(state.rating.toFixed(2)),
@@ -145,7 +193,9 @@ async function rebuildRatings() {
   ]);
 
   await dbconn.withTransaction(async (connection) => {
+    await dbconn.executeMysqlQuery(queries.DELETE_ALL_MATCH_PLAYER_RATINGS, [], connection);
     await dbconn.executeMysqlQuery(queries.DELETE_ALL_PLAYER_RATINGS, [], connection);
+    await insertMatchSnapshotsBatch(connection, matchSnapshots);
     await insertRatingsBatch(connection, entries);
   });
 
@@ -160,6 +210,7 @@ async function rebuildRatings() {
  * @returns {Promise<number>} negative if a ranks higher, positive if b ranks higher, 0 if tied
  */
 async function comparePlayersForTiebreak(aId, bId, ratingA, ratingB) {
+  const { dbconn, queries } = getDbDependencies();
   const ratingDiff = Number(ratingB.rating) - Number(ratingA.rating);
   if (Math.abs(ratingDiff) > RATING_TIE_EPSILON) {
     // Higher rating = better seed = sort earlier (negative return for a when a is stronger).
@@ -245,6 +296,7 @@ async function sortRosterForSeeding(roster) {
  * @param {number[]} playerIds
  */
 async function generateSeeding(playerIds) {
+  const { dbconn, queries } = getDbDependencies();
   const uniqueIds = [...new Set((playerIds || []).map((id) => Number(id)).filter((id) => id > 0))];
   if (uniqueIds.length < 1) {
     const err = new Error('At least one distinct player is required.');

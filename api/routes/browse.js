@@ -5,6 +5,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/top5", asyncWrapper(browseController.getTop5Lists));
+router.get("/leaderboard", asyncWrapper(browseController.getLeaderboard));
 
 module.exports = router;
 

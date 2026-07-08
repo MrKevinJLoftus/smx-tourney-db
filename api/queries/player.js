@@ -13,7 +13,29 @@ module.exports = {
     ) epc ON epc.player_id = p.id
     ORDER BY COALESCE(epc.cnt, 0) DESC, p.username ASC
   `,
-  GET_PLAYER_BY_ID: `SELECT * FROM player WHERE id = ?`,
+  GET_PLAYER_BY_ID: `
+    SELECT
+      p.*,
+      pr.rating AS glicko_rating,
+      pr.deviation AS glicko_deviation,
+      pr.matches_counted AS glicko_matches_counted,
+      CASE
+        WHEN pr.player_id IS NULL THEN NULL
+        ELSE (
+          SELECT COUNT(*) + 1
+          FROM player_rating pr2
+          INNER JOIN player p2 ON p2.id = pr2.player_id
+          WHERE p2.hidden_matches = 0
+            AND (
+              pr2.rating > pr.rating OR
+              (pr2.rating = pr.rating AND p2.username < p.username)
+            )
+        )
+      END AS glicko_rank
+    FROM player p
+    LEFT JOIN player_rating pr ON pr.player_id = p.id
+    WHERE p.id = ?
+  `,
   GET_PLAYER_BY_USERNAME: `SELECT * FROM player WHERE username = ?`,
   SEARCH_PLAYERS: `SELECT * FROM player WHERE username LIKE ? ORDER BY username ASC LIMIT 50`,
   CREATE_PLAYER: `INSERT INTO player (username, pronouns, created_by) VALUES (?, ?, ?)`,
@@ -88,6 +110,28 @@ module.exports = {
     WHERE p1.hidden_matches = 0
       AND p2.hidden_matches = 0
     ORDER BY pairs.match_count DESC, p1.username ASC, p2.username ASC
+  `,
+
+  GET_PLAYER_RATINGS_BY_IDS: `
+    SELECT
+      p.id AS player_id,
+      p.username,
+      pr.rating,
+      pr.deviation,
+      pr.matches_counted,
+      (
+        SELECT COUNT(*) + 1
+        FROM player_rating pr2
+        INNER JOIN player p2 ON p2.id = pr2.player_id
+        WHERE p2.hidden_matches = 0
+          AND (
+            pr2.rating > pr.rating OR
+            (pr2.rating = pr.rating AND p2.username < p.username)
+          )
+      ) AS glicko_rank
+    FROM player p
+    INNER JOIN player_rating pr ON pr.player_id = p.id
+    WHERE p.id IN (?)
   `
 };
 

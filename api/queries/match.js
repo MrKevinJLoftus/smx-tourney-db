@@ -97,6 +97,11 @@ module.exports = {
     LEFT JOIN player p ON mps.player_id = p.id
     WHERE mps.match_id = ?
     ORDER BY mps.player_id ASC`,
+  GET_MATCH_PLAYER_RATINGS_BY_MATCH: `SELECT mpr.match_id, mpr.player_id, mpr.rating, mpr.deviation, p.username as gamertag
+    FROM match_player_rating mpr
+    LEFT JOIN player p ON mpr.player_id = p.id
+    WHERE mpr.match_id = ?
+    ORDER BY mpr.player_id ASC`,
   CREATE_MATCH_PLAYER_STATS: `INSERT INTO match_x_player_stats (match_id, player_id, wins, losses, draws, created_by) 
     VALUES (?, ?, ?, ?, ?, ?)
     ON DUPLICATE KEY UPDATE wins = VALUES(wins), losses = VALUES(losses), draws = VALUES(draws)`,
@@ -179,6 +184,15 @@ module.exports = {
       LEFT JOIN player p ON mps.player_id = p.id
       WHERE mps.match_id IN (${placeholders})
       ORDER BY mps.match_id ASC, mps.player_id ASC`;
+  },
+  GET_MATCH_PLAYER_RATINGS_BY_MATCHES: (matchIds) => {
+    if (!matchIds || matchIds.length === 0) return null;
+    const placeholders = matchIds.map(() => '?').join(',');
+    return `SELECT mpr.match_id, mpr.player_id, mpr.rating, mpr.deviation, p.username as gamertag
+      FROM match_player_rating mpr
+      LEFT JOIN player p ON mpr.player_id = p.id
+      WHERE mpr.match_id IN (${placeholders})
+      ORDER BY mpr.match_id ASC, mpr.player_id ASC`;
   },
   GET_WINNERS_BY_IDS: (winnerIds) => {
     if (!winnerIds || winnerIds.length === 0) return null;

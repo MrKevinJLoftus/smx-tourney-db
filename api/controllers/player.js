@@ -1,5 +1,6 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/player');
+const ratingService = require('../services/ratingService');
 
 async function fetchMatchIdsByPlayerId(playerId) {
   const rows = await dbconn.executeMysqlQuery(
@@ -34,7 +35,22 @@ exports.getPlayerById = async (req, res) => {
   if (!players || players.length < 1) {
     return res.status(404).json({ message: 'Player not found' });
   }
-  res.status(200).json(players[0]);
+  const player = players[0];
+  res.status(200).json({
+    ...player,
+    rating: player.glicko_rating == null
+      ? null
+      : {
+          rating: Number(player.glicko_rating),
+          deviation: Number(player.glicko_deviation),
+          matchesCounted: Number(player.glicko_matches_counted || 0),
+          provisional: ratingService.isProvisional({
+            matchesCounted: player.glicko_matches_counted,
+            deviation: player.glicko_deviation,
+          }),
+          rank: player.glicko_rank == null ? null : Number(player.glicko_rank),
+        },
+  });
 };
 
 exports.getPlayerByGamertag = async (req, res) => {
@@ -104,6 +120,31 @@ exports.getRivalsForPlayer = async (req, res) => {
     matchCount: Number(r.match_count || 0)
   }));
   res.status(200).json(rivals);
+};
+
+exports.getRatingsByIds = async (req, res) => {
+  const ids = String(req.query.ids || '')
+    .split(',')
+    .map((id) => Number(id.trim()))
+    .filter((id) => Number.isFinite(id) && id > 0);
+
+  if (ids.length === 0) {
+    return res.status(200).json([]);
+  }
+
+  const rows = await dbconn.executeMysqlQuery(queries.GET_PLAYER_RATINGS_BY_IDS, [ids]);
+  res.status(200).json((rows || []).map((row) => ({
+    playerId: Number(row.player_id),
+    username: row.username,
+    rating: Number(row.rating),
+    deviation: Number(row.deviation),
+    matchesCounted: Number(row.matches_counted || 0),
+    provisional: ratingService.isProvisional({
+      matchesCounted: row.matches_counted,
+      deviation: row.deviation,
+    }),
+    rank: row.glicko_rank == null ? null : Number(row.glicko_rank),
+  })));
 };
 
 exports.updatePlayer = async (req, res) => {

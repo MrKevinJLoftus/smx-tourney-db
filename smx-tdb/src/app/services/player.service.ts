@@ -6,6 +6,12 @@ import { Event } from '../models/event';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Top5Rivalry } from './browse.service';
+import { PlayerRatingSummary } from '../models/rating';
+
+export interface PlayerRatingResponse extends PlayerRatingSummary {
+  playerId: number;
+  username: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +88,14 @@ export class PlayerService {
 
   getRivalsForPlayer(playerId: number): Observable<Top5Rivalry[]> {
     return this.http.get<Top5Rivalry[]>(`${environment.apiUrl}/player/${playerId}/rivals`);
+  }
+
+  getRatingsByPlayerIds(ids: number[]): Observable<PlayerRatingResponse[]> {
+    let params = new HttpParams();
+    if (ids.length > 0) {
+      params = params.set('ids', ids.join(','));
+    }
+    return this.http.get<PlayerRatingResponse[]>(`${environment.apiUrl}/player/ratings`, { params });
   }
 
   /** Admin-only: hide (or optionally delete) all matches involving a player. */

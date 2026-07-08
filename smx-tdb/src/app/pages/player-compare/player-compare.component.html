@@ -103,6 +103,23 @@
           <span><a class="link" (click)="navigateToPlayer(selectedB?.id)">{{ selectedB?.username }}</a></span>
         </div>
 
+        <div *ngIf="selectedARating" class="summary-line">
+          <span class="muted">{{ selectedA?.username }} rating:</span>
+          <app-player-rating-summary [rating]="selectedARating" [compact]="true"></app-player-rating-summary>
+        </div>
+
+        <div *ngIf="selectedBRating" class="summary-line">
+          <span class="muted">{{ selectedB?.username }} rating:</span>
+          <app-player-rating-summary [rating]="selectedBRating" [compact]="true"></app-player-rating-summary>
+        </div>
+
+        <div *ngIf="ratingDiff !== null" class="summary-line">
+          <span class="muted">Rating edge:</span>
+          <span class="summary-record">
+            {{ ratingDiff! > 0 ? '+' : '' }}{{ ratingDiff }} for {{ ratingDiff! >= 0 ? selectedB?.username : selectedA?.username }}
+          </span>
+        </div>
+
         <div *ngIf="headToHeadSongRecord" class="summary-line">
           <span class="muted">Song record (from per-match stats):</span>
           <span class="summary-record">
@@ -135,6 +152,7 @@
                 <app-match-player-records
                   *ngIf="match.player_stats?.length"
                   [playerStats]="match.player_stats"
+                  [playerRatings]="match.player_ratings"
                   variant="inline"
                 ></app-match-player-records>
               </div>

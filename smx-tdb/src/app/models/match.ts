@@ -33,6 +33,13 @@ export interface PlayerStats {
   gamertag?: string;
 }
 
+export interface PlayerMatchRating {
+  player_id: number;
+  rating: number;
+  deviation: number;
+  gamertag?: string;
+}
+
 export interface MatchWithDetails extends Match {
   players?: Array<{
     player_id: number;
@@ -44,6 +51,7 @@ export interface MatchWithDetails extends Match {
   } | null;
   songs?: MatchSong[];
   player_stats?: PlayerStats[];
+  player_ratings?: PlayerMatchRating[];
   event?: {
     event_id: number;
     name: string;

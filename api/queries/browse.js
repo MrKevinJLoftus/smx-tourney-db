@@ -56,6 +56,21 @@ module.exports = {
     LIMIT 10
   `,
 
+  GET_LEADERBOARD_PLAYERS_BY_RATING: `
+    SELECT
+      p.id AS player_id,
+      p.username,
+      pr.rating,
+      pr.deviation,
+      pr.matches_counted
+    FROM player_rating pr
+    INNER JOIN player p ON p.id = pr.player_id
+    WHERE p.hidden_matches = 0
+      AND (? = 1 OR (pr.matches_counted >= 5 AND pr.deviation <= 150))
+      AND (? = '' OR p.username LIKE ?)
+    ORDER BY pr.rating DESC, p.username ASC
+  `,
+
   // Top 10 rivalries = pairs of players with the most matches against each other.
   // Only counts matches that have exactly 2 distinct players in match_x_player_stats.
   GET_TOP_10_RIVALRIES_BY_MATCH_COUNT: `

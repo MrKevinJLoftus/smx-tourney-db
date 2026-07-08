@@ -16,6 +16,13 @@ function mapTopPlayersRows(rows) {
   }));
 }
 
+function mapLeaderboardRows(rows) {
+  return mapTopPlayersRows(rows).map((row, index) => ({
+    rank: index + 1,
+    ...row,
+  }));
+}
+
 exports.getTop5Lists = async (req, res) => {
   const [recentEventsRows, topPlayersAllRows, topPlayersEstablishedRows, rivalriesRows] = await Promise.all([
     dbconn.executeMysqlQuery(queries.GET_RECENT_EVENTS_WITH_WINNER, []),
@@ -47,5 +54,21 @@ exports.getTop5Lists = async (req, res) => {
     topPlayersByRating,
     topPlayersByRatingEstablished,
     topRivalries
+  });
+};
+
+exports.getLeaderboard = async (req, res) => {
+  const includeProvisional = String(req.query.includeProvisional || 'true').toLowerCase() !== 'false';
+  const rawQuery = String(req.query.q || '').trim();
+  const searchTerm = rawQuery ? `%${rawQuery}%` : '';
+
+  const rows = await dbconn.executeMysqlQuery(queries.GET_LEADERBOARD_PLAYERS_BY_RATING, [
+    includeProvisional ? 1 : 0,
+    searchTerm,
+    searchTerm,
+  ]);
+
+  res.status(200).json({
+    players: mapLeaderboardRows(rows),
   });
 };
