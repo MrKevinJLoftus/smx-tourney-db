@@ -3,7 +3,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
 import { MatchService } from '../../services/match.service';
-import { MatchWithDetails } from '../../models/match';
+import { MatchWithDetails, PlayerMatchRating } from '../../models/match';
 
 @Component({
   selector: 'app-match-detail',
@@ -117,6 +117,10 @@ export class MatchDetailComponent implements OnInit {
     }
 
     return 'No winner';
+  }
+
+  getPlayerRating(playerId: number): PlayerMatchRating | null {
+    return this.match?.player_ratings?.find((rating) => Number(rating.player_id) === Number(playerId)) ?? null;
   }
 }
 

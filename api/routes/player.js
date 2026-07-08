@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Public routes
 router.get("/", asyncWrapper(playerController.getAllPlayers));
+router.get("/ratings", asyncWrapper(playerController.getRatingsByIds));
 router.get("/search", asyncWrapper(playerController.searchPlayers));
 router.get("/gamertag/:gamertag", asyncWrapper(playerController.getPlayerByGamertag));
 router.get("/event/:eventId", asyncWrapper(playerController.getPlayersByEvent));

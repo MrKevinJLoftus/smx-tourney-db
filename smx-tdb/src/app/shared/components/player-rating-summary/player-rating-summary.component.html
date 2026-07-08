@@ -1,0 +1,28 @@
+<ng-container *ngIf="hasRating && rating">
+  <div class="rating-summary" [class.rating-summary--compact]="compact">
+    <span *ngIf="rating.rank && !compact" class="rating-summary__item">
+      <span class="rating-summary__label">Rank</span>
+      <a
+        *ngIf="showRankLink"
+        class="rating-summary__link"
+        [routerLink]="rankLink"
+      >
+        #{{ rating.rank }}
+      </a>
+      <span *ngIf="!showRankLink">#{{ rating.rank }}</span>
+    </span>
+    <span class="rating-summary__item">
+      <span class="rating-summary__label">Rating</span>
+      <span>{{ rating.rating }}</span>
+    </span>
+    <span class="rating-summary__item">
+      <span class="rating-summary__label">RD</span>
+      <span>{{ rating.deviation }}</span>
+    </span>
+    <span class="rating-summary__item">
+      <span class="rating-summary__label">1v1 matches</span>
+      <span>{{ rating.matchesCounted }}</span>
+    </span>
+    <span *ngIf="rating.provisional" class="rating-summary__badge">Provisional</span>
+  </div>
+</ng-container>

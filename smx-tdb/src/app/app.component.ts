@@ -36,6 +36,7 @@ export class AppComponent {
   routes: Route[] = [
     { url: "/", text: "Home", icon: "home" },
     { url: "/browse", text: "Browse", icon: "list" },
+    { url: "/leaderboard", text: "Leaderboard", icon: "leaderboard" },
     { url: "/compare", text: "Compare", icon: "compare_arrows" },
     { url: "/seed-generator", text: "Seeds", icon: "format_list_numbered" }
   ];

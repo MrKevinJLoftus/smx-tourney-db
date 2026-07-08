@@ -19,6 +19,10 @@ export interface Top5PlayerByRating {
   provisional: boolean;
 }
 
+export interface LeaderboardEntry extends Top5PlayerByRating {
+  rank: number;
+}
+
 export interface Top5Rivalry {
   player1: { id: number; username: string };
   player2: { id: number; username: string };
@@ -32,6 +36,10 @@ export interface BrowseTop5ListsResponse {
   topRivalries: Top5Rivalry[];
 }
 
+export interface LeaderboardResponse {
+  players: LeaderboardEntry[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -40,5 +48,14 @@ export class BrowseService {
 
   getTop5Lists(): Observable<BrowseTop5ListsResponse> {
     return this.http.get<BrowseTop5ListsResponse>(`${environment.apiUrl}/browse/top5`);
+  }
+
+  getLeaderboard(includeProvisional = true, q = ''): Observable<LeaderboardResponse> {
+    const params = new URLSearchParams();
+    params.set('includeProvisional', String(includeProvisional));
+    if (q.trim()) {
+      params.set('q', q.trim());
+    }
+    return this.http.get<LeaderboardResponse>(`${environment.apiUrl}/browse/leaderboard?${params.toString()}`);
   }
 }

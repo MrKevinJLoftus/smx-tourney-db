@@ -1,0 +1,76 @@
+<div class="leaderboard-container">
+  <app-back-to-search></app-back-to-search>
+
+  <div class="header-section">
+    <mat-icon class="header-icon">leaderboard</mat-icon>
+    <div class="header-main">
+      <div class="header-title-row">
+        <h1>Leaderboard</h1>
+        <button
+          mat-icon-button
+          type="button"
+          class="help-button"
+          matTooltip="How are ratings calculated?"
+          aria-label="How are ratings calculated?"
+          (click)="openRatingsHelp()"
+        >
+          <mat-icon>help_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <mat-card class="leaderboard-card">
+    <mat-card-content>
+      <div class="controls-row">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Filter players</mat-label>
+          <input matInput [formControl]="filterControl" placeholder="Enter player gamertag">
+          <mat-icon matPrefix>search</mat-icon>
+          <button
+            *ngIf="filterControl.value"
+            matSuffix
+            mat-icon-button
+            (click)="filterControl.setValue('')"
+            aria-label="Clear filter"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <mat-slide-toggle [formControl]="showProvisionalControl">
+          Show provisional ratings
+        </mat-slide-toggle>
+      </div>
+
+      <div class="help-row">
+        <button mat-button type="button" routerLink="/seed-generator">Open seed generator</button>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-section">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading leaderboard...</p>
+      </div>
+
+      <div *ngIf="error" class="error-section">
+        <mat-icon class="error-icon">error</mat-icon>
+        <p>{{ error }}</p>
+      </div>
+
+      <div *ngIf="!isLoading && !error && players.length === 0" class="empty-message">
+        <mat-icon>person_off</mat-icon>
+        <p>No rated players found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
+      </div>
+
+      <mat-list *ngIf="!isLoading && !error && players.length > 0">
+        <mat-list-item *ngFor="let player of players">
+          <div class="leaderboard-row">
+            <span class="leaderboard-rank">#{{ player.rank }}</span>
+            <a class="leaderboard-link" [routerLink]="['/player', player.id]">{{ player.username }}</a>
+            <app-player-rating-summary [rating]="player" [compact]="true"></app-player-rating-summary>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>

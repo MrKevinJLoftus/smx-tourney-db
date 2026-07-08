@@ -21,6 +21,24 @@
       <div class="header-main">
         <h1>{{ player.username }}</h1>
         <span class="header-record">{{ getMatchRecordString() }}</span>
+        <div class="header-rating-row">
+          <app-player-rating-summary
+            *ngIf="player.rating"
+            class="header-rating"
+            [rating]="player.rating"
+            [showRankLink]="true"
+          ></app-player-rating-summary>
+          <button
+            mat-icon-button
+            type="button"
+            class="ratings-help-button"
+            matTooltip="How are ratings calculated?"
+            aria-label="How are ratings calculated?"
+            (click)="openRatingsHelp()"
+          >
+            <mat-icon>help_outline</mat-icon>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -103,6 +121,7 @@
                 <app-match-player-records
                   *ngIf="match.player_stats?.length"
                   [playerStats]="match.player_stats"
+                  [playerRatings]="match.player_ratings"
                   variant="inline"
                 ></app-match-player-records>
               </div>
