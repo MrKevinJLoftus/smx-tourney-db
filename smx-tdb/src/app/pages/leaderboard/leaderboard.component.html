@@ -62,7 +62,7 @@
         <p>No rated players found{{ filterControl.value ? ' matching your filter' : '' }}.</p>
       </div>
 
-      <mat-list *ngIf="!isLoading && !error && players.length > 0">
+      <mat-list class="leaderboard-list" *ngIf="!isLoading && !error && players.length > 0">
         <mat-list-item *ngFor="let player of players">
           <div class="leaderboard-row">
             <span class="leaderboard-rank">#{{ player.rank }}</span>

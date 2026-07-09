@@ -17,9 +17,17 @@ function mapTopPlayersRows(rows) {
 }
 
 function mapLeaderboardRows(rows) {
-  return mapTopPlayersRows(rows).map((row, index) => ({
-    rank: index + 1,
-    ...row,
+  return (rows || []).map((r) => ({
+    rank: Number(r.leaderboard_rank),
+    id: r.player_id,
+    username: r.username,
+    rating: Number(r.rating),
+    deviation: Number(r.deviation),
+    matchesCounted: Number(r.matches_counted || 0),
+    provisional: ratingService.isProvisional({
+      matchesCounted: r.matches_counted,
+      deviation: r.deviation,
+    }),
   }));
 }
 
@@ -62,8 +70,10 @@ exports.getLeaderboard = async (req, res) => {
   const rawQuery = String(req.query.q || '').trim();
   const searchTerm = rawQuery ? `%${rawQuery}%` : '';
 
+  const includeProvisionalFlag = includeProvisional ? 1 : 0;
   const rows = await dbconn.executeMysqlQuery(queries.GET_LEADERBOARD_PLAYERS_BY_RATING, [
-    includeProvisional ? 1 : 0,
+    includeProvisionalFlag,
+    includeProvisionalFlag,
     searchTerm,
     searchTerm,
   ]);

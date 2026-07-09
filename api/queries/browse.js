@@ -62,7 +62,18 @@ module.exports = {
       p.username,
       pr.rating,
       pr.deviation,
-      pr.matches_counted
+      pr.matches_counted,
+      (
+        SELECT COUNT(*) + 1
+        FROM player_rating pr2
+        INNER JOIN player p2 ON p2.id = pr2.player_id
+        WHERE p2.hidden_matches = 0
+          AND (? = 1 OR (pr2.matches_counted >= 5 AND pr2.deviation <= 150))
+          AND (
+            pr2.rating > pr.rating OR
+            (pr2.rating = pr.rating AND p2.username < p.username)
+          )
+      ) AS leaderboard_rank
     FROM player_rating pr
     INNER JOIN player p ON p.id = pr.player_id
     WHERE p.hidden_matches = 0
