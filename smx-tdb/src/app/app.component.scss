@@ -1,12 +1,10 @@
 .app-container {
   display: grid;
-  grid-template-rows: auto 1fr; // Toolbar takes its natural height, content fills the rest
-  height: 100vh;
-  width: 100vw;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
   overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
 }
 
 .app-toolbar {
@@ -94,12 +92,14 @@
 .mat-sidenav-container {
   grid-row: 2;
   height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
 // Material sidenav-content must fill its container
 ::ng-deep .mat-sidenav-content {
   height: 100% !important;
+  min-height: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -111,6 +111,9 @@
   overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1rem);
   
   * :not(.material-icons) {
     font-family: "Titillium Web", "Arial", "Times New Roman", "serif" !important;
@@ -143,8 +146,9 @@ h1 {
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  height: 100dvh;
+  width: 100%;
   background-color: rgba(0,0,0,0.5);
   display: flex;
   justify-content: center;
