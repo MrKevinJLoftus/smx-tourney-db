@@ -18,6 +18,9 @@ interface GuestOptionValue {
   guestUsername: string;
 }
 
+const GUEST_USERNAME_MIN_LENGTH = 2;
+const GUEST_USERNAME_MAX_LENGTH = 64;
+
 @Component({
   selector: 'app-seed-generator',
   standalone: true,
@@ -98,7 +101,14 @@ export class SeedGeneratorComponent {
           this.error = null;
 
           return this.seedService.generateSeeding(playerIds, guestPlayers).pipe(
-            catchError((err) => of({ error: err?.error?.message || 'Failed to generate seeding.' }))
+            catchError((err) => {
+              const message = err?.error?.message || 'Failed to generate seeding.';
+              const friendlyMessage =
+                message === 'One or more player IDs were not found.'
+                  ? 'One or more roster players were not found in the database. Remove them from the roster and try again.'
+                  : message;
+              return of({ error: friendlyMessage });
+            })
           );
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -146,7 +156,11 @@ export class SeedGeneratorComponent {
 
   canAddGuest(query: string): boolean {
     const trimmed = query.trim();
-    return trimmed.length >= 2 && !this.hasRosterUsername(trimmed);
+    return (
+      trimmed.length >= GUEST_USERNAME_MIN_LENGTH &&
+      trimmed.length <= GUEST_USERNAME_MAX_LENGTH &&
+      !this.hasRosterUsername(trimmed)
+    );
   }
 
   onSelectPlayer(player: Player): void {
@@ -154,6 +168,11 @@ export class SeedGeneratorComponent {
       return;
     }
     if (this.roster.some((entry) => entry.kind === 'tracked' && entry.id === player.id)) {
+      this.error = `${player.username} is already on the roster.`;
+      this.playerControl.setValue('');
+      return;
+    }
+    if (this.hasRosterUsername(player.username)) {
       this.error = `${player.username} is already on the roster.`;
       this.playerControl.setValue('');
       return;
@@ -167,8 +186,10 @@ export class SeedGeneratorComponent {
   onAddGuestFromQuery(query: string): void {
     const username = query.trim();
     if (!this.canAddGuest(username)) {
-      if (username.length >= 2 && this.hasRosterUsername(username)) {
+      if (username.length >= GUEST_USERNAME_MIN_LENGTH && this.hasRosterUsername(username)) {
         this.error = `${username} is already on the roster.`;
+      } else if (username.length > GUEST_USERNAME_MAX_LENGTH) {
+        this.error = `Guest player usernames must be ${GUEST_USERNAME_MAX_LENGTH} characters or fewer.`;
       }
       return;
     }

@@ -411,6 +411,21 @@ async function generateSeeding(playerIds, guestPlayers = []) {
     });
   }
 
+  if (guests.length > 0 && trackedRoster.length > 0) {
+    const trackedUsernameKeys = new Set(
+      trackedRoster.map((entry) => String(entry.username || '').trim().toLowerCase())
+    );
+
+    for (const guest of guests) {
+      const guestUsernameKey = guest.username.trim().toLowerCase();
+      if (trackedUsernameKeys.has(guestUsernameKey)) {
+        const err = new Error('Guest usernames must not match tracked player usernames on the roster.');
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+  }
+
   const guestRoster = guests.map((guest) => ({
     playerId: guest.playerId,
     username: guest.username,

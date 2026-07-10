@@ -3,6 +3,9 @@ import { SeedRosterEntry } from '../models/seed';
 
 const STORAGE_KEY = 'smx-tdb-seed-generator-roster';
 const STORAGE_VERSION = 1;
+const GUEST_USERNAME_MIN_LENGTH = 2;
+const GUEST_USERNAME_MAX_LENGTH = 64;
+const DEFAULT_NEXT_GUEST_ID = -1;
 
 interface StoredRoster {
   version: number;
@@ -38,7 +41,7 @@ export class SeedGeneratorStorageService {
       return {
         version: STORAGE_VERSION,
         entries,
-        nextGuestId: parsed.nextGuestId,
+        nextGuestId: this.resolveNextGuestId(parsed.nextGuestId, entries),
       };
     } catch {
       return null;
@@ -64,8 +67,29 @@ export class SeedGeneratorStorageService {
     localStorage.removeItem(STORAGE_KEY);
   }
 
+  private resolveNextGuestId(nextGuestId: number, entries: SeedRosterEntry[]): number {
+    if (typeof nextGuestId === 'number' && nextGuestId < 0) {
+      return nextGuestId;
+    }
+
+    const guestIds = entries
+      .filter((entry): entry is Extract<SeedRosterEntry, { kind: 'guest' }> => entry.kind === 'guest')
+      .map((entry) => entry.guestId);
+
+    if (!guestIds.length) {
+      return DEFAULT_NEXT_GUEST_ID;
+    }
+
+    return Math.min(...guestIds) - 1;
+  }
+
   private isValidEntry(entry: SeedRosterEntry): boolean {
-    if (!entry || typeof entry.username !== 'string' || !entry.username.trim()) {
+    const username = entry?.username?.trim() || '';
+    if (!entry || typeof entry.username !== 'string' || username.length < GUEST_USERNAME_MIN_LENGTH) {
+      return false;
+    }
+
+    if (username.length > GUEST_USERNAME_MAX_LENGTH) {
       return false;
     }
 
