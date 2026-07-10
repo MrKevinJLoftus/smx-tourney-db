@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { RebuildRatingsResponse, SeedGenerateResponse } from '../models/seed';
+import { GuestPlayerInput, RebuildRatingsResponse, SeedGenerateResponse } from '../models/seed';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -14,9 +14,10 @@ export class SeedService {
     private authService: AuthService
   ) {}
 
-  generateSeeding(playerIds: number[]): Observable<SeedGenerateResponse> {
+  generateSeeding(playerIds: number[], guestPlayers: GuestPlayerInput[] = []): Observable<SeedGenerateResponse> {
     return this.http.post<SeedGenerateResponse>(`${environment.apiUrl}/seed/generate`, {
       playerIds,
+      guestPlayers,
     });
   }
 

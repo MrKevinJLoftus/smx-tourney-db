@@ -165,6 +165,18 @@
   text-decoration: underline;
 }
 
+.player-name {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.guest-badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(144, 202, 249, 0.18);
+  color: #90caf9;
+}
+
 .provisional-badge {
   font-size: 12px;
   padding: 2px 8px;
