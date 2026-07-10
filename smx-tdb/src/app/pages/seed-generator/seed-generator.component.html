@@ -7,6 +7,7 @@
       <h1>Seed generator</h1>
       <p class="header-subtitle">
         Build a hypothetical roster and get a suggested seeding from Glicko-2 ratings based on 1v1 match history.
+        Guest players not yet in the database are seeded at the default rating (1500).
         <button
           mat-icon-button
           type="button"
@@ -30,16 +31,23 @@
           [formControl]="playerControl"
           [matAutocomplete]="playerAuto"
           placeholder="Type at least 2 letters"
+          (keydown.enter)="onPlayerInputEnter($event)"
         />
         <mat-icon matPrefix>person_add</mat-icon>
         <mat-autocomplete
           #playerAuto="matAutocomplete"
           [displayWith]="displayPlayer"
-          (optionSelected)="onSelectPlayer($event.option.value)"
+          (optionSelected)="onAutocompleteSelected($event.option.value)"
         >
           <mat-option *ngFor="let player of (playerSuggestions$ | async)" [value]="player">
             <span>{{ player.username }}</span>
             <span *ngIf="player.pronouns" class="muted"> ({{ player.pronouns }})</span>
+          </mat-option>
+          <mat-option
+            *ngIf="canAddGuest((guestAddQuery$ | async) || '')"
+            [value]="guestOptionValue((guestAddQuery$ | async) || '')"
+          >
+            Add "<strong>{{ (guestAddQuery$ | async)?.trim() }}</strong>" as guest player (rating 1500)
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
@@ -50,8 +58,9 @@
           <button mat-button type="button" (click)="clearRoster()">Clear roster</button>
         </div>
         <mat-chip-set class="roster-chips">
-          <mat-chip *ngFor="let player of roster" (removed)="removePlayer(player.id!)">
+          <mat-chip *ngFor="let player of roster" (removed)="removePlayer(player)">
             {{ player.username }}
+            <span *ngIf="player.kind === 'guest'" class="guest-badge">Guest</span>
             <button matChipRemove [attr.aria-label]="'Remove ' + player.username">
               <mat-icon>cancel</mat-icon>
             </button>
@@ -85,7 +94,17 @@
         <div *ngFor="let entry of seeding" class="seeding-row">
           <span class="seed-number">{{ entry.seed }}</span>
           <div class="player-block">
-            <a class="player-link" [routerLink]="['/player', entry.player.id]">{{ entry.player.username }}</a>
+            <a
+              *ngIf="entry.player.id > 0; else guestPlayerName"
+              class="player-link"
+              [routerLink]="['/player', entry.player.id]"
+            >
+              {{ entry.player.username }}
+            </a>
+            <ng-template #guestPlayerName>
+              <span class="player-name">{{ entry.player.username }}</span>
+              <span class="guest-badge">Guest</span>
+            </ng-template>
             <span *ngIf="entry.provisional" class="provisional-badge">Provisional</span>
           </div>
           <div class="rating-block">

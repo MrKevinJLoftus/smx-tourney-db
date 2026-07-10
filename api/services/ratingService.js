@@ -292,69 +292,150 @@ async function sortRosterForSeeding(roster) {
 }
 
 /**
+ * Normalize and validate guest player inputs from the request body.
+ * @param {Array} guestPlayers
+ * @returns {Array<{ playerId: number, username: string, rating: number }>}
+ */
+function normalizeGuestPlayers(guestPlayers) {
+  if (!Array.isArray(guestPlayers) || guestPlayers.length === 0) {
+    return [];
+  }
+
+  const seenIds = new Set();
+  const seenUsernames = new Set();
+  const normalized = [];
+
+  for (const guest of guestPlayers) {
+    const playerId = Number(guest?.id);
+    const username = String(guest?.username || '').trim();
+
+    if (!Number.isFinite(playerId) || playerId >= 0) {
+      const err = new Error('Each guest player must have a negative id.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (username.length < 2 || username.length > 64) {
+      const err = new Error('Each guest player username must be between 2 and 64 characters.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    const usernameKey = username.toLowerCase();
+    if (seenIds.has(playerId) || seenUsernames.has(usernameKey)) {
+      const err = new Error('Guest players must have distinct ids and usernames.');
+      err.statusCode = 400;
+      throw err;
+    }
+
+    seenIds.add(playerId);
+    seenUsernames.add(usernameKey);
+    normalized.push({
+      playerId,
+      username,
+      rating: glicko2.DEFAULT_RATING,
+    });
+  }
+
+  return normalized;
+}
+
+/**
  * Generate a suggested seeding for a hypothetical roster.
  * @param {number[]} playerIds
+ * @param {Array} guestPlayers
  */
-async function generateSeeding(playerIds) {
+async function generateSeeding(playerIds, guestPlayers = []) {
   const { dbconn, queries } = getDbDependencies();
   const uniqueIds = [...new Set((playerIds || []).map((id) => Number(id)).filter((id) => id > 0))];
-  if (uniqueIds.length < 1) {
+  const guests = normalizeGuestPlayers(guestPlayers);
+
+  if (uniqueIds.length < 1 && guests.length < 1) {
     const err = new Error('At least one distinct player is required.');
     err.statusCode = 400;
     throw err;
   }
 
-  const [ratingRows, playerRows] = await Promise.all([
-    dbconn.executeMysqlQuery(queries.GET_PLAYER_RATINGS_BY_IDS, [uniqueIds]),
-    dbconn.executeMysqlQuery(queries.GET_PLAYERS_BY_IDS, [uniqueIds]),
-  ]);
+  let trackedRoster = [];
 
-  const usernameById = new Map(
-    (playerRows || []).map((row) => [Number(row.player_id), row.username])
-  );
+  if (uniqueIds.length > 0) {
+    const [ratingRows, playerRows] = await Promise.all([
+      dbconn.executeMysqlQuery(queries.GET_PLAYER_RATINGS_BY_IDS, [uniqueIds]),
+      dbconn.executeMysqlQuery(queries.GET_PLAYERS_BY_IDS, [uniqueIds]),
+    ]);
 
-  if (usernameById.size !== uniqueIds.length) {
-    const err = new Error('One or more player IDs were not found.');
-    err.statusCode = 404;
-    throw err;
-  }
+    const usernameById = new Map(
+      (playerRows || []).map((row) => [Number(row.player_id), row.username])
+    );
 
-  const ratingById = new Map(
-    (ratingRows || []).map((row) => [
-      Number(row.player_id),
-      {
-        rating: Number(row.rating),
-        rd: Number(row.deviation),
-        volatility: Number(row.volatility),
-        matchesCounted: Number(row.matches_counted),
-        username: row.username,
-      },
-    ])
-  );
-
-  const roster = uniqueIds.map((id) => {
-    const existing = ratingById.get(id);
-    if (existing) {
-      return {
-        playerId: id,
-        username: existing.username || usernameById.get(id),
-        rating: existing.rating,
-        deviation: existing.rd,
-        matchesCounted: existing.matchesCounted,
-        provisional: isProvisional({ matchesCounted: existing.matchesCounted, rd: existing.rd }),
-      };
+    if (usernameById.size !== uniqueIds.length) {
+      const err = new Error('One or more player IDs were not found.');
+      err.statusCode = 404;
+      throw err;
     }
 
-    return {
-      playerId: id,
-      username: usernameById.get(id),
-      rating: glicko2.DEFAULT_RATING,
-      deviation: glicko2.DEFAULT_RD,
-      matchesCounted: 0,
-      provisional: true,
-    };
-  });
+    const ratingById = new Map(
+      (ratingRows || []).map((row) => [
+        Number(row.player_id),
+        {
+          rating: Number(row.rating),
+          rd: Number(row.deviation),
+          volatility: Number(row.volatility),
+          matchesCounted: Number(row.matches_counted),
+          username: row.username,
+        },
+      ])
+    );
 
+    trackedRoster = uniqueIds.map((id) => {
+      const existing = ratingById.get(id);
+      if (existing) {
+        return {
+          playerId: id,
+          username: existing.username || usernameById.get(id),
+          rating: existing.rating,
+          deviation: existing.rd,
+          matchesCounted: existing.matchesCounted,
+          provisional: isProvisional({ matchesCounted: existing.matchesCounted, rd: existing.rd }),
+        };
+      }
+
+      return {
+        playerId: id,
+        username: usernameById.get(id),
+        rating: glicko2.DEFAULT_RATING,
+        deviation: glicko2.DEFAULT_RD,
+        matchesCounted: 0,
+        provisional: true,
+      };
+    });
+  }
+
+  if (guests.length > 0 && trackedRoster.length > 0) {
+    const trackedUsernameKeys = new Set(
+      trackedRoster.map((entry) => String(entry.username || '').trim().toLowerCase())
+    );
+
+    for (const guest of guests) {
+      const guestUsernameKey = guest.username.trim().toLowerCase();
+      if (trackedUsernameKeys.has(guestUsernameKey)) {
+        const err = new Error('Guest usernames must not match tracked player usernames on the roster.');
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+  }
+
+  const guestRoster = guests.map((guest) => ({
+    playerId: guest.playerId,
+    username: guest.username,
+    rating: guest.rating,
+    deviation: glicko2.DEFAULT_RD,
+    matchesCounted: 0,
+    provisional: true,
+  }));
+
+  const roster = [...trackedRoster, ...guestRoster];
   const sorted = await sortRosterForSeeding(roster);
 
   const seeding = sorted.map((entry, index) => ({
@@ -362,6 +443,7 @@ async function generateSeeding(playerIds) {
     player: {
       id: entry.playerId,
       username: entry.username,
+      isGuest: entry.playerId < 0,
     },
     rating: Math.round(entry.rating * 100) / 100,
     deviation: Math.round(entry.deviation * 100) / 100,

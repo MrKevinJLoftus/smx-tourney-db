@@ -7,11 +7,19 @@ import { Observable, Subject, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { Player } from '../../models/player';
-import { SeedEntry } from '../../models/seed';
+import { GuestPlayerInput, SeedEntry, SeedRosterEntry } from '../../models/seed';
 import { PlayerService } from '../../services/player.service';
+import { SeedGeneratorStorageService } from '../../services/seed-generator-storage.service';
 import { SeedService } from '../../services/seed.service';
 import { SharedModule } from '../../shared/shared.module';
 import { RatingsHelpDialogComponent } from '../../shared/components/ratings-help-dialog/ratings-help-dialog.component';
+
+interface GuestOptionValue {
+  guestUsername: string;
+}
+
+const GUEST_USERNAME_MIN_LENGTH = 2;
+const GUEST_USERNAME_MAX_LENGTH = 64;
 
 @Component({
   selector: 'app-seed-generator',
@@ -22,22 +30,26 @@ import { RatingsHelpDialogComponent } from '../../shared/components/ratings-help
 })
 export class SeedGeneratorComponent {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly rosterChange$ = new Subject<Player[]>();
+  private readonly rosterChange$ = new Subject<SeedRosterEntry[]>();
 
-  playerControl = new FormControl<Player | string>('');
+  playerControl = new FormControl<Player | string | GuestOptionValue>('');
   playerSuggestions$: Observable<Player[]>;
+  guestAddQuery$: Observable<string>;
 
-  roster: Player[] = [];
+  roster: SeedRosterEntry[] = [];
+  nextGuestId = -1;
   seeding: SeedEntry[] = [];
   method = '';
   tiebreak = '';
 
   isGenerating = false;
   error: string | null = null;
+  private latestSuggestions: Player[] = [];
 
   constructor(
     private playerService: PlayerService,
     private seedService: SeedService,
+    private storageService: SeedGeneratorStorageService,
     private dialog: MatDialog
   ) {
     this.playerSuggestions$ = this.playerControl.valueChanges.pipe(
@@ -53,6 +65,16 @@ export class SeedGeneratorComponent {
       })
     );
 
+    this.playerSuggestions$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((suggestions) => {
+      this.latestSuggestions = suggestions;
+    });
+
+    this.guestAddQuery$ = this.playerControl.valueChanges.pipe(
+      startWith(''),
+      map((value) => this.textFromPlayerControl(value)),
+      distinctUntilChanged()
+    );
+
     this.rosterChange$
       .pipe(
         switchMap((roster) => {
@@ -65,14 +87,28 @@ export class SeedGeneratorComponent {
           }
 
           const playerIds = roster
-            .map((player) => player.id)
-            .filter((id): id is number => typeof id === 'number');
+            .filter((entry): entry is Extract<SeedRosterEntry, { kind: 'tracked' }> => entry.kind === 'tracked')
+            .map((entry) => entry.id);
+
+          const guestPlayers: GuestPlayerInput[] = roster
+            .filter((entry): entry is Extract<SeedRosterEntry, { kind: 'guest' }> => entry.kind === 'guest')
+            .map((entry) => ({
+              id: entry.guestId,
+              username: entry.username,
+            }));
 
           this.isGenerating = true;
           this.error = null;
 
-          return this.seedService.generateSeeding(playerIds).pipe(
-            catchError((err) => of({ error: err?.error?.message || 'Failed to generate seeding.' }))
+          return this.seedService.generateSeeding(playerIds, guestPlayers).pipe(
+            catchError((err) => {
+              const message = err?.error?.message || 'Failed to generate seeding.';
+              const friendlyMessage =
+                message === 'One or more player IDs were not found.'
+                  ? 'One or more roster players were not found in the database. Remove them from the roster and try again.'
+                  : message;
+              return of({ error: friendlyMessage });
+            })
           );
         }),
         takeUntilDestroyed(this.destroyRef)
@@ -93,11 +129,16 @@ export class SeedGeneratorComponent {
         this.tiebreak = response.tiebreak;
         this.isGenerating = false;
       });
+
+    this.restoreRosterFromStorage();
   }
 
-  displayPlayer(player: Player | string | null): string {
+  displayPlayer(player: Player | string | GuestOptionValue | null): string {
     if (!player) {
       return '';
+    }
+    if (typeof player === 'object' && 'guestUsername' in player) {
+      return player.guestUsername;
     }
     if (typeof player === 'string') {
       return player;
@@ -105,34 +146,106 @@ export class SeedGeneratorComponent {
     return player.username || '';
   }
 
+  guestOptionValue(query: string): GuestOptionValue {
+    return { guestUsername: query.trim() };
+  }
+
+  isGuestOptionValue(value: unknown): value is GuestOptionValue {
+    return !!value && typeof value === 'object' && 'guestUsername' in value;
+  }
+
+  canAddGuest(query: string): boolean {
+    const trimmed = query.trim();
+    return (
+      trimmed.length >= GUEST_USERNAME_MIN_LENGTH &&
+      trimmed.length <= GUEST_USERNAME_MAX_LENGTH &&
+      !this.hasRosterUsername(trimmed)
+    );
+  }
+
   onSelectPlayer(player: Player): void {
     if (!player?.id) {
       return;
     }
-    if (this.roster.some((entry) => entry.id === player.id)) {
+    if (this.roster.some((entry) => entry.kind === 'tracked' && entry.id === player.id)) {
+      this.error = `${player.username} is already on the roster.`;
+      this.playerControl.setValue('');
+      return;
+    }
+    if (this.hasRosterUsername(player.username)) {
       this.error = `${player.username} is already on the roster.`;
       this.playerControl.setValue('');
       return;
     }
 
-    this.roster = [...this.roster, player];
+    this.addRosterEntry({ kind: 'tracked', id: player.id, username: player.username });
     this.playerControl.setValue('');
     this.error = null;
-    this.rosterChange$.next(this.roster);
   }
 
-  removePlayer(playerId: number): void {
-    this.roster = this.roster.filter((player) => player.id !== playerId);
+  onAddGuestFromQuery(query: string): void {
+    const username = query.trim();
+    if (!this.canAddGuest(username)) {
+      if (username.length >= GUEST_USERNAME_MIN_LENGTH && this.hasRosterUsername(username)) {
+        this.error = `${username} is already on the roster.`;
+      } else if (username.length > GUEST_USERNAME_MAX_LENGTH) {
+        this.error = `Guest player usernames must be ${GUEST_USERNAME_MAX_LENGTH} characters or fewer.`;
+      }
+      return;
+    }
+
+    this.addGuestPlayer(username);
+    this.playerControl.setValue('');
+    this.error = null;
+  }
+
+  onPlayerInputEnter(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (keyboardEvent.defaultPrevented) {
+      return;
+    }
+
+    const query = this.textFromPlayerControl(this.playerControl.value);
+    if (!this.canAddGuest(query) || this.matchesTrackedSuggestion(query)) {
+      return;
+    }
+
+    keyboardEvent.preventDefault();
+    this.onAddGuestFromQuery(query);
+  }
+
+  onAutocompleteSelected(value: Player | string | GuestOptionValue): void {
+    if (this.isGuestOptionValue(value)) {
+      this.onAddGuestFromQuery(value.guestUsername);
+      return;
+    }
+
+    if (typeof value !== 'string') {
+      this.onSelectPlayer(value);
+    }
+  }
+
+  removePlayer(entry: SeedRosterEntry): void {
+    this.roster = this.roster.filter((player) => !this.isSameRosterEntry(player, entry));
+    this.persistRoster();
     this.rosterChange$.next(this.roster);
   }
 
   clearRoster(): void {
     this.roster = [];
+    this.nextGuestId = -1;
     this.seeding = [];
     this.method = '';
     this.tiebreak = '';
     this.error = null;
     this.isGenerating = false;
+    this.storageService.clear();
+    this.rosterChange$.next(this.roster);
+  }
+
+  private matchesTrackedSuggestion(query: string): boolean {
+    const normalized = query.trim().toLowerCase();
+    return this.latestSuggestions.some((player) => player.username.trim().toLowerCase() === normalized);
   }
 
   copySeeding(): void {
@@ -140,10 +253,19 @@ export class SeedGeneratorComponent {
       return;
     }
 
-    const lines = this.seeding.map(
-      (entry) =>
-        `${entry.seed}. ${entry.player.username} (rating ${entry.rating}${entry.provisional ? ', provisional' : ''})`
-    );
+    const lines = this.seeding.map((entry) => {
+      const tags: string[] = [];
+      if (entry.player.isGuest || entry.player.id < 0) {
+        tags.push('guest');
+      }
+      if (entry.provisional) {
+        tags.push('provisional');
+      }
+
+      const suffix = tags.length ? `, ${tags.join(', ')}` : '';
+      return `${entry.seed}. ${entry.player.username} (rating ${entry.rating}${suffix})`;
+    });
+
     navigator.clipboard.writeText(lines.join('\n')).catch(() => {
       this.error = 'Could not copy to clipboard.';
     });
@@ -157,7 +279,7 @@ export class SeedGeneratorComponent {
     const headers = ['Seed', 'Player ID', 'Username', 'Rating', 'RD', '1v1 Matches', 'Provisional'];
     const rows = this.seeding.map((entry) => [
       entry.seed,
-      entry.player.id,
+      entry.player.id > 0 ? entry.player.id : 'guest',
       entry.player.username,
       entry.rating,
       entry.deviation,
@@ -182,9 +304,65 @@ export class SeedGeneratorComponent {
     });
   }
 
-  private textFromPlayerControl(value: Player | string | null): string {
+  private restoreRosterFromStorage(): void {
+    const stored = this.storageService.load();
+    if (!stored) {
+      return;
+    }
+
+    this.roster = stored.entries;
+    this.nextGuestId = stored.nextGuestId;
+    this.rosterChange$.next(this.roster);
+  }
+
+  private addGuestPlayer(username: string): void {
+    const trimmed = username.trim();
+    if (!this.canAddGuest(trimmed)) {
+      return;
+    }
+
+    const guestId = this.nextGuestId;
+    this.nextGuestId -= 1;
+    this.addRosterEntry({ kind: 'guest', guestId, username: trimmed });
+  }
+
+  private addRosterEntry(entry: SeedRosterEntry): void {
+    this.roster = [...this.roster, entry];
+    this.persistRoster();
+    this.rosterChange$.next(this.roster);
+  }
+
+  private persistRoster(): void {
+    this.storageService.save(this.roster, this.nextGuestId);
+  }
+
+  private hasRosterUsername(username: string): boolean {
+    const normalized = username.trim().toLowerCase();
+    return this.roster.some((entry) => entry.username.trim().toLowerCase() === normalized);
+  }
+
+  private isSameRosterEntry(a: SeedRosterEntry, b: SeedRosterEntry): boolean {
+    if (a.kind !== b.kind) {
+      return false;
+    }
+
+    if (a.kind === 'tracked' && b.kind === 'tracked') {
+      return a.id === b.id;
+    }
+
+    if (a.kind === 'guest' && b.kind === 'guest') {
+      return a.guestId === b.guestId;
+    }
+
+    return false;
+  }
+
+  private textFromPlayerControl(value: Player | string | GuestOptionValue | null): string {
     if (!value) {
       return '';
+    }
+    if (this.isGuestOptionValue(value)) {
+      return value.guestUsername;
     }
     if (typeof value === 'string') {
       return value;
