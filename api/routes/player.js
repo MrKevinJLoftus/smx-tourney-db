@@ -10,6 +10,9 @@ router.get("/ratings", asyncWrapper(playerController.getRatingsByIds));
 router.get("/search", asyncWrapper(playerController.searchPlayers));
 router.get("/gamertag/:gamertag", asyncWrapper(playerController.getPlayerByGamertag));
 router.get("/event/:eventId", asyncWrapper(playerController.getPlayersByEvent));
+// Admin merge routes must be registered before /:id
+router.get("/merge/preview", checkAdmin, asyncWrapper(playerController.previewPlayerMerge));
+router.post("/merge", checkAdmin, asyncWrapper(playerController.mergePlayers));
 router.get("/:id/events", asyncWrapper(playerController.getEventsByPlayer));
 router.get("/:id/rivals", asyncWrapper(playerController.getRivalsForPlayer));
 router.get("/:id", asyncWrapper(playerController.getPlayerById));

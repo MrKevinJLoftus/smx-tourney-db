@@ -13,6 +13,22 @@ export interface PlayerRatingResponse extends PlayerRatingSummary {
   username: string;
 }
 
+export interface PlayerMergePreview {
+  keep: Player;
+  absorb: Player;
+  keepEvents: Event[];
+  absorbEvents: Event[];
+  overlappingEventIds: number[];
+  canMerge: boolean;
+}
+
+export interface PlayerMergeResult {
+  player: Player;
+  absorbedPlayerId: number;
+  absorbedUsername: string;
+  ratingsRebuild: { playersRated: number; matchesProcessed: number } | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -118,6 +134,38 @@ export class PlayerService {
         }
       }
     );
+  }
+
+  /** Admin-only: preview merging Absorb into Keep. */
+  previewPlayerMerge(keepId: number, absorbId: number): Observable<PlayerMergePreview> {
+    const token = this.authService.getToken();
+    const params = new HttpParams()
+      .set('keepId', String(keepId))
+      .set('absorbId', String(absorbId));
+    return this.http.get<PlayerMergePreview>(`${environment.apiUrl}/player/merge/preview`, {
+      params,
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
+
+  /** Admin-only: merge Absorb into Keep, delete Absorb, rebuild ratings. */
+  mergePlayers(
+    keepId: number,
+    absorbId: number,
+    username?: string
+  ): Observable<PlayerMergeResult> {
+    const token = this.authService.getToken();
+    const body: { keepId: number; absorbId: number; username?: string } = { keepId, absorbId };
+    if (username !== undefined) {
+      body.username = username;
+    }
+    return this.http.post<PlayerMergeResult>(`${environment.apiUrl}/player/merge`, body, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
   }
 }
 

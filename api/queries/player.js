@@ -37,11 +37,26 @@ module.exports = {
     WHERE p.id = ?
   `,
   GET_PLAYER_BY_USERNAME: `SELECT * FROM player WHERE username = ?`,
+  GET_PLAYER_BASIC_BY_ID: `SELECT * FROM player WHERE id = ?`,
   SEARCH_PLAYERS: `SELECT * FROM player WHERE username LIKE ? ORDER BY username ASC LIMIT 50`,
   CREATE_PLAYER: `INSERT INTO player (username, pronouns, created_by) VALUES (?, ?, ?)`,
   UPDATE_PLAYER: `UPDATE player SET username = ?, pronouns = ?, created_by = ? WHERE id = ?`,
+  UPDATE_PLAYER_USERNAME: `UPDATE player SET username = ? WHERE id = ?`,
   UPDATE_PLAYER_HIDDEN_MATCHES: `UPDATE player SET hidden_matches = ? WHERE id = ?`,
   DELETE_PLAYER: `DELETE FROM player WHERE id = ?`,
+  // Includes hidden events so merge overlap checks see full attendance history.
+  GET_ALL_EVENTS_BY_PLAYER: `SELECT DISTINCT e.*, ep.placement, ep.seed
+    FROM event_x_player ep
+    INNER JOIN event e ON ep.event_id = e.id
+    WHERE ep.player_id = ?
+    ORDER BY e.date DESC`,
+  GET_OVERLAPPING_EVENT_IDS: `
+    SELECT DISTINCT a.event_id
+    FROM event_x_player a
+    INNER JOIN event_x_player b ON a.event_id = b.event_id
+    WHERE a.player_id = ? AND b.player_id = ?
+    ORDER BY a.event_id ASC
+  `,
   // NOTE: Alias ids to avoid `id` collisions between `event_x_player` and `player`.
   // Frontend expects both the join-row id (event_player_id) and the player id (player_id).
   GET_PLAYERS_BY_EVENT: `

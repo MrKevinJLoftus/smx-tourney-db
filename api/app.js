@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-dotenv.config();
+dotenv.config({ override: true });
 
 // external routing files
 const userRoutes = require('./routes/user');

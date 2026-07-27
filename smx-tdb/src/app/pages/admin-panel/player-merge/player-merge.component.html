@@ -1,0 +1,138 @@
+<div class="player-merge">
+  <h3>Merge Player Histories</h3>
+  <p class="muted">
+    Move one player’s event and match history onto another when they never attended the same event
+    (e.g. a handle change). The Absorb player is deleted; ratings rebuild automatically.
+  </p>
+
+  <div class="selectors">
+    <div class="selector-column">
+      <h4>Keep (survives)</h4>
+
+      <mat-form-field appearance="outline" class="search-field" *ngIf="!keepPlayer">
+        <mat-label>Search keep player</mat-label>
+        <input matInput [formControl]="keepSearchControl" placeholder="Type a gamertag" />
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="keepSearchControl.value" matSuffix mat-icon-button type="button"
+          (click)="keepSearchControl.setValue('')" aria-label="Clear keep search">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <div *ngIf="isSearchingKeep" class="muted">Searching…</div>
+
+      <mat-list *ngIf="!keepPlayer && keepResults.length > 0" class="results">
+        <mat-list-item *ngFor="let p of keepResults" (click)="selectKeep(p)" class="clickable">
+          <div class="row">
+            <span class="name">{{ p.username }}</span>
+            <span class="muted">ID {{ p.id || p.player_id }}</span>
+          </div>
+        </mat-list-item>
+      </mat-list>
+
+      <div *ngIf="keepPlayer" class="selected-card">
+        <div class="selected-header">
+          <div>
+            <div class="selected-title">Keep player</div>
+            <div class="selected-name">{{ keepPlayer.username }}</div>
+            <div class="muted">ID {{ keepPlayer.id || keepPlayer.player_id }}</div>
+          </div>
+          <button mat-stroked-button type="button" (click)="clearKeep()">Change</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="selector-column">
+      <h4>Absorb (deleted)</h4>
+
+      <mat-form-field appearance="outline" class="search-field" *ngIf="!absorbPlayer">
+        <mat-label>Search absorb player</mat-label>
+        <input matInput [formControl]="absorbSearchControl" placeholder="Type a gamertag" />
+        <mat-icon matPrefix>search</mat-icon>
+        <button *ngIf="absorbSearchControl.value" matSuffix mat-icon-button type="button"
+          (click)="absorbSearchControl.setValue('')" aria-label="Clear absorb search">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <div *ngIf="isSearchingAbsorb" class="muted">Searching…</div>
+
+      <mat-list *ngIf="!absorbPlayer && absorbResults.length > 0" class="results">
+        <mat-list-item *ngFor="let p of absorbResults" (click)="selectAbsorb(p)" class="clickable">
+          <div class="row">
+            <span class="name">{{ p.username }}</span>
+            <span class="muted">ID {{ p.id || p.player_id }}</span>
+          </div>
+        </mat-list-item>
+      </mat-list>
+
+      <div *ngIf="absorbPlayer" class="selected-card">
+        <div class="selected-header">
+          <div>
+            <div class="selected-title">Absorb player</div>
+            <div class="selected-name">{{ absorbPlayer.username }}</div>
+            <div class="muted">ID {{ absorbPlayer.id || absorbPlayer.player_id }}</div>
+          </div>
+          <button mat-stroked-button type="button" (click)="clearAbsorb()">Change</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoadingPreview" class="muted">Loading preview…</div>
+
+  <div *ngIf="preview" class="preview">
+    <div class="overlap" *ngIf="!preview.canMerge">
+      Cannot merge: these players share
+      {{ preview.overlappingEventIds.length }}
+      event{{ preview.overlappingEventIds.length === 1 ? '' : 's' }}.
+    </div>
+    <div class="ok" *ngIf="preview.canMerge">
+      No overlapping events — merge is allowed.
+    </div>
+
+    <div class="event-columns">
+      <div class="event-list">
+        <h4>Keep events ({{ preview.keepEvents.length }})</h4>
+        <ul *ngIf="preview.keepEvents.length > 0; else noKeepEvents">
+          <li *ngFor="let e of preview.keepEvents"
+            [class.overlap-event]="preview.overlappingEventIds.includes(e.id!)">
+            <span class="event-name">{{ e.name }}</span>
+            <span class="muted">{{ formatEventDate(e) }}</span>
+            <span class="muted" *ngIf="e.placement != null">Place {{ e.placement }}</span>
+            <span class="hidden-tag" *ngIf="e.hidden">Hidden</span>
+          </li>
+        </ul>
+        <ng-template #noKeepEvents><p class="muted">No events</p></ng-template>
+      </div>
+
+      <div class="event-list">
+        <h4>Absorb events ({{ preview.absorbEvents.length }})</h4>
+        <ul *ngIf="preview.absorbEvents.length > 0; else noAbsorbEvents">
+          <li *ngFor="let e of preview.absorbEvents"
+            [class.overlap-event]="preview.overlappingEventIds.includes(e.id!)">
+            <span class="event-name">{{ e.name }}</span>
+            <span class="muted">{{ formatEventDate(e) }}</span>
+            <span class="muted" *ngIf="e.placement != null">Place {{ e.placement }}</span>
+            <span class="hidden-tag" *ngIf="e.hidden">Hidden</span>
+          </li>
+        </ul>
+        <ng-template #noAbsorbEvents><p class="muted">No events</p></ng-template>
+      </div>
+    </div>
+
+    <mat-form-field appearance="outline" class="search-field" *ngIf="preview.canMerge">
+      <mat-label>Resulting username</mat-label>
+      <input matInput [formControl]="usernameControl" placeholder="Username for surviving player" />
+    </mat-form-field>
+
+    <button
+      mat-raised-button
+      color="warn"
+      type="button"
+      (click)="confirmMerge()"
+      [disabled]="!preview.canMerge || isMerging || !usernameControl.value.trim()">
+      {{ isMerging ? 'Merging…' : 'Merge Players' }}
+    </button>
+  </div>
+</div>

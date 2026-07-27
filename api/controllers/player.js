@@ -1,6 +1,8 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/player');
 const ratingService = require('../services/ratingService');
+const playerMergeService = require('../services/playerMergeService');
+const { PlayerMergeError } = playerMergeService;
 
 async function fetchMatchIdsByPlayerId(playerId) {
   const rows = await dbconn.executeMysqlQuery(
@@ -158,6 +160,48 @@ exports.updatePlayer = async (req, res) => {
   await dbconn.executeMysqlQuery(queries.UPDATE_PLAYER, [gamertag || player[0].username, pronouns !== undefined ? pronouns : player[0].pronouns, user_id !== undefined ? user_id : player[0].created_by, playerId]);
   const updatedPlayer = await dbconn.executeMysqlQuery(queries.GET_PLAYER_BY_ID, [playerId]);
   res.status(200).json(updatedPlayer[0]);
+};
+
+/**
+ * Admin: preview merging Absorb into Keep (event histories + overlap check).
+ * Query: keepId, absorbId
+ */
+exports.previewPlayerMerge = async (req, res) => {
+  try {
+    const preview = await playerMergeService.previewMerge(req.query.keepId, req.query.absorbId);
+    res.status(200).json(preview);
+  } catch (error) {
+    if (error instanceof PlayerMergeError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    throw error;
+  }
+};
+
+/**
+ * Admin: merge Absorb player history into Keep, delete Absorb, rebuild ratings.
+ * Body: { keepId, absorbId, username? }
+ */
+exports.mergePlayers = async (req, res) => {
+  try {
+    const result = await playerMergeService.mergePlayers({
+      keepId: req.body?.keepId,
+      absorbId: req.body?.absorbId,
+      username: req.body?.username,
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof PlayerMergeError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    // Unique-key collisions from unexpected shared-match data
+    if (error && (error.code === 'ER_DUP_ENTRY' || error.errno === 1062)) {
+      return res.status(409).json({
+        message: 'Cannot merge: remapping would create duplicate match or rating rows.',
+      });
+    }
+    throw error;
+  }
 };
 
 /**
