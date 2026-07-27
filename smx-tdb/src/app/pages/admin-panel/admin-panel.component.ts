@@ -8,10 +8,11 @@ import { StartGgImportComponent } from './start-gg-import/start-gg-import.compon
 import { StartGgStepmaniaDiscoveryComponent } from './start-gg-stepmania-discovery/start-gg-stepmania-discovery.component';
 import { PlayerMatchPrivacyComponent } from './player-match-privacy/player-match-privacy.component';
 import { PlayerRatingsRefreshComponent } from './player-ratings-refresh/player-ratings-refresh.component';
+import { PlayerMergeComponent } from './player-merge/player-merge.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SharedModule, EventListComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent, StartGgImportComponent, StartGgStepmaniaDiscoveryComponent, PlayerMatchPrivacyComponent, PlayerRatingsRefreshComponent],
+  imports: [SharedModule, EventListComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent, StartGgImportComponent, StartGgStepmaniaDiscoveryComponent, PlayerMatchPrivacyComponent, PlayerRatingsRefreshComponent, PlayerMergeComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })
