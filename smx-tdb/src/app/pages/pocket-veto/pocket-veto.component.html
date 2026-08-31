@@ -1,0 +1,210 @@
+<div class="pocket-veto-container">
+  <app-back-to-search></app-back-to-search>
+
+  <div class="header-section">
+    <mat-icon class="header-icon">query_stats</mat-icon>
+    <div class="header-main">
+      <h1>Protect / Veto Scout</h1>
+      <p class="header-subtitle">
+        Compare StatManiaX scores against one or more opponents to find protects and vetos.
+        Data is fetched live from
+        <a href="https://statmaniax.com/" target="_blank" rel="noopener noreferrer" class="link">StatManiaX</a>.
+        <button
+          mat-icon-button
+          type="button"
+          class="help-button"
+          matTooltip="How are protects and vetos chosen?"
+          aria-label="How are protects and vetos chosen?"
+          (click)="openScoutHelp()"
+        >
+          <mat-icon>help_outline</mat-icon>
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <mat-card class="setup-card">
+    <mat-card-content>
+      <div class="section-label">Who are you?</div>
+      <mat-form-field appearance="outline" class="picker-field">
+        <mat-label>Your StatManiaX account</mat-label>
+        <input
+          matInput
+          [formControl]="youControl"
+          [matAutocomplete]="youAuto"
+          placeholder="Username, player id, or StatManiaX profile URL"
+          (keydown.enter)="onYouEnter($event)"
+        />
+        <mat-icon matPrefix>person</mat-icon>
+        <button
+          *ngIf="youControl.value"
+          matSuffix
+          mat-icon-button
+          (click)="clearYou()"
+          aria-label="Clear you"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-autocomplete
+          #youAuto="matAutocomplete"
+          [displayWith]="displaySuggestion"
+          (optionSelected)="onSelectYou($event.option.value)"
+        >
+          <mat-option *ngFor="let s of (youSuggestions$ | async)" [value]="s">
+            <span>{{ s.username }}</span>
+            <span class="muted source-badge">{{ s.source === 'tdb' ? 'TDB' : 'SMX' }}</span>
+          </mat-option>
+        </mat-autocomplete>
+        <mat-hint *ngIf="you">Selected: {{ you.username }} (id {{ you.id }})</mat-hint>
+      </mat-form-field>
+
+      <div class="section-label">Opponents</div>
+      <mat-form-field appearance="outline" class="picker-field">
+        <mat-label>Add opponent</mat-label>
+        <input
+          matInput
+          [formControl]="opponentControl"
+          [matAutocomplete]="opponentAuto"
+          placeholder="Username, player id, or StatManiaX profile URL"
+          (keydown.enter)="onOpponentEnter($event)"
+        />
+        <mat-icon matPrefix>group_add</mat-icon>
+        <mat-autocomplete
+          #opponentAuto="matAutocomplete"
+          [displayWith]="displaySuggestion"
+          (optionSelected)="onSelectOpponent($event.option.value)"
+        >
+          <mat-option *ngFor="let s of (opponentSuggestions$ | async)" [value]="s">
+            <span>{{ s.username }}</span>
+            <span class="muted source-badge">{{ s.source === 'tdb' ? 'TDB' : 'SMX' }}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <div *ngIf="opponents.length" class="chip-section">
+        <div class="chip-header">
+          <span>Opponents ({{ opponents.length }})</span>
+          <button mat-button type="button" (click)="clearOpponents()">Clear all</button>
+        </div>
+        <mat-chip-set class="opponent-chips">
+          <mat-chip *ngFor="let opp of opponents" (removed)="removeOpponent(opp)">
+            <a
+              class="chip-link"
+              [href]="statmaniaxPlayerUrl(opp.id)"
+              target="_blank"
+              rel="noopener noreferrer"
+              (click)="$event.stopPropagation()"
+            >{{ opp.username }}</a>
+            <button matChipRemove [attr.aria-label]="'Remove ' + opp.username">
+              <mat-icon>cancel</mat-icon>
+            </button>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <div class="filters-grid">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Difficulty</mat-label>
+          <mat-select [formControl]="modeControl">
+            <mat-option *ngFor="let m of modes" [value]="m.value">{{ m.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Level min</mat-label>
+          <input matInput type="number" [formControl]="levelMinControl" placeholder="Any" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Level max</mat-label>
+          <input matInput type="number" [formControl]="levelMaxControl" placeholder="Any" />
+        </mat-form-field>
+      </div>
+
+      <div class="actions-row">
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          [disabled]="!canCompare"
+          (click)="compare()"
+        >
+          Compare scores
+        </button>
+      </div>
+
+      <div *ngIf="error" class="error-row">
+        <mat-icon class="error-icon">error</mat-icon>
+        <span>{{ error }}</span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div *ngIf="isResolving || isComparing" class="loading-section">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>{{ isComparing ? 'Comparing scores…' : 'Resolving player…' }}</p>
+  </div>
+
+  <div *ngIf="compareResult" class="results-section">
+    <p class="results-summary muted">
+      Compared {{ compareResult.chartCount }} charts in {{ compareResult.mode }} mode
+      <span *ngIf="compareResult.levelMin != null || compareResult.levelMax != null">
+        (levels {{ compareResult.levelMin ?? 'any' }}–{{ compareResult.levelMax ?? 'any' }})
+      </span>
+    </p>
+
+    <mat-accordion class="results-accordion" multi>
+      <mat-expansion-panel [expanded]="true" class="pocket-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <ng-container *ngIf="compareResult.pocketPickMode === 'wins'; else fallbackTitle">
+              Protects ({{ compareResult.pocketPicks.length }})
+            </ng-container>
+            <ng-template #fallbackTitle>
+              Closest matchups ({{ compareResult.closestMatchups.length }})
+            </ng-template>
+          </mat-panel-title>
+          <mat-panel-description>{{ pocketPanelDescription(compareResult) }}</mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div *ngIf="compareResult.pocketPickMode === 'fallback'" class="fallback-banner">
+          <mat-icon>info</mat-icon>
+          <p>No charts where you lead. These are your best chances — sorted by smallest gap behind the best opponent.</p>
+        </div>
+
+        <div *ngIf="!pocketChartCount(compareResult)" class="empty-message">
+          <mat-icon>thumb_up_off_alt</mat-icon>
+          <p>No protects or closest matchups found for these filters.</p>
+        </div>
+        <div *ngIf="pocketChartCount(compareResult)" class="chart-list">
+          <app-scout-chart-row
+            *ngFor="let chart of pocketCharts(compareResult)"
+            [chart]="chart"
+            [mode]="compareResult.mode"
+            [deltaClass]="deltaClass(chart.delta, compareResult.pocketPickMode)"
+          />
+        </div>
+      </mat-expansion-panel>
+
+      <mat-expansion-panel [expanded]="false" class="veto-panel">
+        <mat-expansion-panel-header>
+          <mat-panel-title>Vetos ({{ compareResult.vetos.length }})</mat-panel-title>
+          <mat-panel-description>Charts where an opponent leads you</mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div *ngIf="!compareResult.vetos.length" class="empty-message">
+          <mat-icon>block</mat-icon>
+          <p>No vetos found for these filters.</p>
+        </div>
+        <div *ngIf="compareResult.vetos.length" class="chart-list">
+          <app-scout-chart-row
+            *ngFor="let chart of compareResult.vetos"
+            [chart]="chart"
+            [mode]="compareResult.mode"
+            deltaClass="negative"
+          />
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

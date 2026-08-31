@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>How protects and vetos are chosen</h2>
+<mat-dialog-content>
+  <p>
+    Suggestions are based on each player's <strong>StatManiaX personal bests</strong> for the selected difficulty.
+    Scores are fetched live when you compare and may be up to ~15 minutes behind the game.
+  </p>
+
+  <h3>What charts are considered</h3>
+  <ul>
+    <li>Only charts in the selected difficulty mode (for example, Wild).</li>
+    <li>Charts are filtered to the level min/max range you set, if any.</li>
+    <li>
+      The comparison includes any chart where <strong>you or at least one opponent</strong> has a score on record
+      for that mode.
+    </li>
+  </ul>
+
+  <h3>How scores are compared</h3>
+  <ul>
+    <li>For each chart, your score is compared against the <strong>highest opponent score</strong> among the selected opponents.</li>
+    <li>If an opponent has no score on a chart, they are treated as <strong>0</strong> for that chart.</li>
+    <li>
+      <strong>Delta</strong> = your score minus the best opponent score. Positive delta means you lead; negative
+      means an opponent leads.
+    </li>
+  </ul>
+
+  <h3>Protects</h3>
+  <p>Charts where you have a score and your delta is <strong>positive</strong> (you beat the best opponent score).</p>
+  <p>Sorted by delta, highest first, then by your score. Up to 50 charts are shown.</p>
+
+  <h3>Closest matchups (fallback)</h3>
+  <p>
+    If there are no protects, the same panel shows your <strong>closest matchups</strong> instead: charts where
+    you have a score but trail or tie the best opponent (<strong>delta ≤ 0</strong>).
+  </p>
+  <p>Sorted by delta, least negative first (smallest gap behind). Ties are labeled <strong>Even</strong>.</p>
+
+  <h3>Vetos</h3>
+  <p>
+    Charts where an opponent's best score is <strong>higher than yours</strong>. If you have no score on a chart,
+    your score is treated as 0 for this check.
+  </p>
+  <p>Sorted by delta, most negative first (biggest disadvantage). Up to 50 charts are shown.</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="close()">Close</button>
+</mat-dialog-actions>
