@@ -38,6 +38,7 @@ export class AppComponent {
     { url: "/browse", text: "Browse", icon: "list" },
     { url: "/leaderboard", text: "Leaderboard", icon: "leaderboard" },
     { url: "/compare", text: "Compare", icon: "compare_arrows" },
+    { url: "/protect-veto", text: "Protect/Veto", icon: "query_stats" },
     { url: "/seed-generator", text: "Seeds", icon: "format_list_numbered" }
   ];
   protectedRoutes: Route[] = [

@@ -1,0 +1,27 @@
+<div class="chart-row">
+  <div class="chart-main">
+    <a
+      *ngIf="songUrl; else titleOnly"
+      class="chart-title link"
+      [href]="songUrl"
+      target="_blank"
+      rel="noopener noreferrer"
+    >{{ chart.title }} <span class="chart-mode-level muted">{{ modeLevelLabel }}</span></a>
+    <ng-template #titleOnly>
+      <span class="chart-title">{{ chart.title }} <span class="chart-mode-level muted">{{ modeLevelLabel }}</span></span>
+    </ng-template>
+    <span class="chart-meta muted">{{ chart.artist }}</span>
+  </div>
+  <div class="chart-scores">
+    <span class="score-you">You: {{ formatScore(chart.yourScore) }}</span>
+    <span class="score-opp muted">Best opp: {{ formatScore(chart.bestOpponentScore) }}</span>
+    <span class="score-delta" [ngClass]="deltaClass">{{ formatDelta(chart.delta) }}</span>
+  </div>
+  <div class="opp-breakdown">
+    <span *ngFor="let opp of chart.opponentScores" class="opp-score-chip muted">
+      {{ opp.username }}:
+      <ng-container *ngIf="opp.score != null; else noScore">{{ formatScore(opp.score) }}</ng-container>
+      <ng-template #noScore>no score</ng-template>
+    </span>
+  </div>
+</div>

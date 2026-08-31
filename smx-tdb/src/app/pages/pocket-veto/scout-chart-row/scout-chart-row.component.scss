@@ -1,0 +1,78 @@
+.chart-row {
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+}
+
+.chart-main {
+  margin-bottom: 6px;
+}
+
+.chart-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.chart-mode-level {
+  font-weight: 500;
+}
+
+.chart-meta {
+  display: block;
+  margin-top: 2px;
+}
+
+.chart-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.score-you {
+  font-weight: 600;
+}
+
+.score-delta {
+  font-weight: 700;
+}
+
+.score-delta.positive {
+  color: #81c784;
+}
+
+.score-delta.fallback {
+  color: #ffb74d;
+}
+
+.score-delta.even {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.score-delta.negative {
+  color: #e57373;
+}
+
+.opp-breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.opp-score-chip {
+  font-size: 12px;
+}
+
+.muted {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.link {
+  color: #90caf9;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}

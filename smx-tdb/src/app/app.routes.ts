@@ -6,6 +6,7 @@ import { UpdatePasswordComponent } from './pages/update-password/update-password
 import { SuperAdminPanelComponent } from './pages/super-admin-panel/super-admin-panel.component';
 import { PlayerDetailComponent } from './pages/player-detail/player-detail.component';
 import { PlayerCompareComponent } from './pages/player-compare/player-compare.component';
+import { PocketVetoComponent } from './pages/pocket-veto/pocket-veto.component';
 import { SeedGeneratorComponent } from './pages/seed-generator/seed-generator.component';
 import { EventDetailComponent } from './pages/event-detail/event-detail.component';
 import { MatchDetailComponent } from './pages/match-detail/match-detail.component';
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'browse', component: BrowseComponent, data: { title: 'Browse' } },
   { path: 'leaderboard', component: LeaderboardComponent, data: { title: 'Leaderboard' } },
   { path: 'compare', component: PlayerCompareComponent, data: { title: 'Compare Players' } },
+  { path: 'protect-veto', component: PocketVetoComponent, data: { title: 'Protect / Veto' } },
   { path: 'seed-generator', component: SeedGeneratorComponent, data: { title: 'Seed Generator' } },
   { path: 'player/:id', component: PlayerDetailComponent, data: { title: 'Player' } },
   { path: 'event/:id', component: EventDetailComponent, data: { title: 'Event' } },
