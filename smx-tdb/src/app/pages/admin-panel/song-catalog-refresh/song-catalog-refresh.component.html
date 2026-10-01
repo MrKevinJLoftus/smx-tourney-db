@@ -1,0 +1,137 @@
+<div class="song-catalog-refresh">
+  <p class="hint">
+    Refresh songs and charts from the ddr.tools StepManiaX song data. Missing songs and charts are added;
+    nothing is deleted, because matches reference existing songs and charts. Level re-rates are only applied
+    when you choose to, since they also change the level shown on past matches.
+  </p>
+
+  <div class="actions">
+    <button mat-flat-button color="primary" type="button" (click)="onPreview()" [disabled]="isPreviewing || isImporting">
+      {{ isPreviewing ? 'Loading…' : 'Preview (fetch)' }}
+    </button>
+    <button mat-stroked-button color="primary" type="button" (click)="onImport()" [disabled]="isPreviewing || isImporting || !hasChanges">
+      {{ isImporting ? 'Importing…' : 'Import into database' }}
+    </button>
+  </div>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (importResult) {
+    <mat-card class="import-result-card">
+      <mat-card-header>
+        <mat-card-title>{{ importResult.message }}</mat-card-title>
+        <mat-card-subtitle>Source updated {{ formatDate(importResult.sourceLastUpdated) }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="summary-dl">
+          <dt>Songs added</dt>
+          <dd>{{ importResult.songsAdded }}</dd>
+          <dt>Charts added</dt>
+          <dd>{{ importResult.chartsAdded }}</dd>
+          <dt>Level changes applied</dt>
+          <dd>{{ importResult.levelChangesApplied }}</dd>
+          <dt>Level changes left as-is</dt>
+          <dd>{{ importResult.levelChangesSkipped }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (preview) {
+    <mat-card class="result-card">
+      <mat-card-header>
+        <mat-card-title>Changes from ddr.tools</mat-card-title>
+        <mat-card-subtitle>
+          Source updated {{ formatDate(preview.sourceLastUpdated) }} ·
+          <a [href]="preview.sourceUrl" target="_blank" rel="noopener">smx.json</a>
+        </mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <dl class="summary-dl">
+          <dt>Songs upstream / local</dt>
+          <dd>{{ preview.upstreamSongCount }} / {{ preview.localSongCount }}</dd>
+          <dt>New songs</dt>
+          <dd>{{ preview.newSongs.length }} ({{ newSongChartCount }} charts)</dd>
+          <dt>New charts on existing songs</dt>
+          <dd>{{ preview.newCharts.length }}</dd>
+          <dt>Level changes</dt>
+          <dd>{{ preview.levelChanges.length }}</dd>
+          <dt>Local songs not in ddr.tools</dt>
+          <dd>{{ preview.localOnlySongs.length }}</dd>
+        </dl>
+
+        @if (preview.levelChanges.length) {
+          <mat-checkbox [formControl]="applyLevelChanges">Apply level changes ({{ preview.levelChanges.length }})</mat-checkbox>
+        }
+
+        <mat-accordion multi>
+          @if (preview.newSongs.length) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>New songs ({{ preview.newSongs.length }})</mat-panel-title>
+              </mat-expansion-panel-header>
+              <ul class="change-list">
+                @for (s of preview.newSongs; track s.title + s.artist) {
+                  <li>
+                    <strong>{{ s.title }}</strong> — {{ s.artist || 'unknown artist' }}
+                    <div class="muted">{{ chartList(s.charts) }}</div>
+                  </li>
+                }
+              </ul>
+            </mat-expansion-panel>
+          }
+          @if (preview.newCharts.length) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>New charts on existing songs ({{ preview.newCharts.length }})</mat-panel-title>
+              </mat-expansion-panel-header>
+              <ul class="change-list">
+                @for (c of preview.newCharts; track c.songId + c.mode) {
+                  <li>{{ c.title }} — {{ c.artist }} · {{ c.mode }} {{ c.difficulty }}</li>
+                }
+              </ul>
+            </mat-expansion-panel>
+          }
+          @if (preview.levelChanges.length) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Level changes ({{ preview.levelChanges.length }})</mat-panel-title>
+              </mat-expansion-panel-header>
+              <ul class="change-list">
+                @for (c of preview.levelChanges; track c.chartId) {
+                  <li>
+                    {{ c.title }} — {{ c.artist }} · {{ c.mode }} {{ c.from }} → {{ c.to }}
+                    @if (c.matchCount) {
+                      <span class="muted">(used in {{ c.matchCount }} matches)</span>
+                    }
+                  </li>
+                }
+              </ul>
+            </mat-expansion-panel>
+          }
+          @if (preview.localOnlySongs.length) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Local songs not in ddr.tools ({{ preview.localOnlySongs.length }})</mat-panel-title>
+              </mat-expansion-panel-header>
+              <p class="muted">Kept as-is. These may be manually added songs, or title/artist spellings that differ from ddr.tools.</p>
+              <ul class="change-list">
+                @for (s of preview.localOnlySongs; track s.id) {
+                  <li>{{ s.title }} — {{ s.artist || 'unknown artist' }} <span class="muted">#{{ s.id }}</span></li>
+                }
+              </ul>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+
+        @if (!hasChanges && !preview.levelChanges.length) {
+          <p class="muted">The local song list is already up to date.</p>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

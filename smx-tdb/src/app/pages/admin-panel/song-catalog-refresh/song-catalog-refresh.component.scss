@@ -1,0 +1,69 @@
+.song-catalog-refresh {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 960px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-size: 0.9em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.error-card {
+  border-color: var(--mat-sys-error, #b3261e);
+
+  mat-card-content {
+    color: var(--mat-sys-error, #b3261e);
+  }
+}
+
+.import-result-card {
+  border-left: 4px solid var(--mat-sys-primary, #6750a4);
+}
+
+.summary-dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  margin: 0 0 16px;
+
+  dt {
+    margin: 0;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+mat-checkbox {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.change-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+
+  li {
+    padding: 4px 0;
+  }
+}

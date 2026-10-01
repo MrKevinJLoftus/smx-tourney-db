@@ -1,5 +1,55 @@
 const dbconn = require('../database/connector');
 const queries = require('../queries/song');
+const {
+  SmxSongCatalogError,
+  buildCatalogDiff,
+  applyCatalogDiff,
+} = require('../services/smxSongCatalog');
+
+function handleCatalogError(res, e, logLabel) {
+  if (e instanceof SmxSongCatalogError) {
+    return res.status(502).json({ message: e.message });
+  }
+  console.error(`${logLabel}:`, e);
+  return res.status(500).json({ message: e.message || 'Song catalog refresh failed' });
+}
+
+/**
+ * POST: compare the ddr.tools StepManiaX song data with the local catalog. Writes nothing.
+ */
+exports.previewSongCatalogRefresh = async (req, res) => {
+  try {
+    const diff = await buildCatalogDiff();
+    res.status(200).json(diff);
+  } catch (e) {
+    return handleCatalogError(res, e, 'previewSongCatalogRefresh');
+  }
+};
+
+/**
+ * POST body: { applyLevelChanges?: boolean }
+ * Adds missing songs and charts (and re-rated levels when asked) in one transaction.
+ */
+exports.applySongCatalogRefresh = async (req, res) => {
+  const applyLevelChanges = req.body?.applyLevelChanges === true;
+  try {
+    const result = await dbconn.withTransaction(async (connection) => {
+      const diff = await buildCatalogDiff(connection);
+      const summary = await applyCatalogDiff(diff, { applyLevelChanges }, connection);
+      return { diff, summary };
+    });
+    const { songsAdded, chartsAdded, levelChangesApplied } = result.summary;
+    const changed = songsAdded + chartsAdded + levelChangesApplied > 0;
+    res.status(200).json({
+      message: changed ? 'Song catalog updated' : 'Song catalog already up to date',
+      sourceUrl: result.diff.sourceUrl,
+      sourceLastUpdated: result.diff.sourceLastUpdated,
+      ...result.summary,
+    });
+  } catch (e) {
+    return handleCatalogError(res, e, 'applySongCatalogRefresh');
+  }
+};
 
 exports.getAllSongs = async (req, res) => {
   console.log('Fetching all songs');
