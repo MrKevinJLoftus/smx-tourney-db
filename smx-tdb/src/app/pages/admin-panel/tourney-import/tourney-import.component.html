@@ -1,0 +1,248 @@
+<div class="tourney-import">
+  <p class="hint">
+    Import players, rounds, charts and per-chart scores from
+    <a href="https://www.blamethepads.com/" target="_blank" rel="noopener">blamethepads</a>
+    (formerly piu-tourney-maker) or a ddr.tools event room.
+    For ddr.tools, paste the event link the TO shared (<code>https://next.ddr.tools/e/&lt;CODE&gt;/…</code>) or just the room code.
+    For blamethepads, paste a tourney link (<code>…/tourney/&lt;id&gt;</code>) or the tourney id.
+    Re-importing is safe: rounds already imported (from either source) are skipped.
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-button-toggle-group formControlName="source" aria-label="Import source" class="source-toggle">
+      <mat-button-toggle value="ddrtools">ddr.tools</mat-button-toggle>
+      <mat-button-toggle value="blamethepads">blamethepads</mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <mat-form-field appearance="outline" class="ref-field">
+      @if (source === 'ddrtools') {
+        <mat-label>ddr.tools event URL or room code</mat-label>
+      } @else {
+        <mat-label>blamethepads tourney URL or id</mat-label>
+      }
+      <input matInput formControlName="ref" autocomplete="off" />
+      @if (form.get('ref')?.invalid && form.get('ref')?.touched) {
+        <mat-error>Required.</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="actions">
+      <button mat-flat-button color="primary" type="submit" [disabled]="isSubmitting || isImporting || form.invalid">
+        @if (isSubmitting) {
+          <span>Loading…</span>
+        } @else {
+          <span>Preview (fetch)</span>
+        }
+      </button>
+      <button
+        mat-stroked-button
+        color="primary"
+        type="button"
+        (click)="onImport()"
+        [disabled]="isSubmitting || isImporting || form.invalid || !hasImportableMatches"
+        [matTooltip]="hasImportableMatches ? '' : 'Preview first; import is enabled when there are new rounds to import.'"
+      >
+        @if (isImporting) {
+          <span>Importing…</span>
+        } @else {
+          <span>Import into database</span>
+        }
+      </button>
+      @if (preview || importResult || errorMessage) {
+        <button mat-button type="button" (click)="clearResult()">Clear</button>
+      }
+    </div>
+  </form>
+
+  @if (errorMessage) {
+    <mat-card class="error-card">
+      <mat-card-content>{{ errorMessage }}</mat-card-content>
+    </mat-card>
+  }
+
+  @if (importResult) {
+    <mat-card class="import-result-card">
+      <mat-card-header>
+        <mat-card-title>{{ importResult.message }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @for (w of importResult.warnings; track w) {
+          <p class="warning">{{ w }}</p>
+        }
+        @for (ev of importResult.events; track ev.externalSource + ev.externalId) {
+          <h3 class="section-title">{{ ev.name }}</h3>
+          <dl class="summary-dl">
+            <dt>Local event id</dt>
+            <dd>{{ ev.localEventId ?? '—' }}@if (ev.eventCreated) { (created) }</dd>
+            <dt>Matches imported</dt>
+            <dd>{{ ev.matchesImported }}</dd>
+            <dt>Already imported</dt>
+            <dd>{{ ev.matchesAlreadyImported }}</dd>
+            <dt>Skipped</dt>
+            <dd>{{ ev.matchesSkipped }}</dd>
+            <dt>Event players added</dt>
+            <dd>{{ ev.eventPlayersAdded }}</dd>
+            <dt>Players created</dt>
+            <dd>{{ ev.playersCreated }}</dd>
+            <dt>Unresolved charts</dt>
+            <dd>{{ ev.unresolvedCharts }}</dd>
+          </dl>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (preview) {
+    @for (w of preview.warnings; track w) {
+      <p class="warning">{{ w }}</p>
+    }
+    @if (!preview.events.length) {
+      <mat-card><mat-card-content>No draws or rounds found.</mat-card-content></mat-card>
+    }
+    @for (ev of preview.events; track ev.externalSource + ev.externalId) {
+      <mat-card class="result-card">
+        <mat-card-header>
+          <mat-card-title>{{ ev.name }}</mat-card-title>
+          <mat-card-subtitle>
+            {{ ev.externalSource }} {{ ev.externalId }}
+            @if (ev.localEventId) {
+              · already in database as event {{ ev.localEventId }}
+            } @else {
+              · new event
+            }
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          @if (ev.blocker) {
+            <p class="warning">{{ ev.blocker }}</p>
+          }
+          <dl class="summary-dl">
+            <dt>Date</dt>
+            <dd>{{ ev.date || '—' }}</dd>
+            @if (ev.location) {
+              <dt>Location</dt>
+              <dd>{{ ev.location }}</dd>
+            }
+            <dt>Players</dt>
+            <dd>{{ ev.players.length }}</dd>
+            <dt>Rounds to import</dt>
+            <dd>{{ ev.counts.toImport }}</dd>
+            <dt>Already imported</dt>
+            <dd>{{ ev.counts.alreadyImported }}</dd>
+            <dt>Skipped</dt>
+            <dd>{{ ev.counts.skipped }}</dd>
+          </dl>
+
+          @if (ev.unresolvedCharts.length) {
+            <h3 class="section-title">Charts not found in the song list ({{ ev.unresolvedCharts.length }})</h3>
+            <p class="hint">These scores import without a song/chart link. To link them, add the missing songs/charts before importing.</p>
+            <ul class="unresolved-list">
+              @for (c of ev.unresolvedCharts; track c.title + c.artist + c.label) {
+                <li>{{ c.title }} — {{ c.artist || 'unknown artist' }} · {{ c.label }} <span class="muted">({{ c.reason }})</span></li>
+              }
+            </ul>
+          }
+
+          <h3 class="section-title">Rounds</h3>
+          <mat-accordion multi>
+            @for (m of ev.matches; track m.sourceKey) {
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>{{ m.round }}</mat-panel-title>
+                  <mat-panel-description>
+                    <span [class]="'status status-' + matchStatus(m, !!ev.blocker)">{{ matchStatusLabel(m, !!ev.blocker) }}</span>
+                    @if (m.winnerName) {
+                      <span class="winner">Winner: {{ m.winnerName }}</span>
+                    }
+                  </mat-panel-description>
+                </mat-expansion-panel-header>
+                @if (m.charts.length) {
+                  <div class="table-wrap">
+                    <table class="preview-table">
+                      <thead>
+                        <tr>
+                          <th>Chart</th>
+                          @for (p of m.players; track p) {
+                            <th [class.winner-col]="p === m.winnerName">{{ p }}</th>
+                          }
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (c of m.charts; track $index) {
+                          <tr>
+                            <td>
+                              {{ c.title }} <span class="muted">{{ c.label }}</span>
+                              @if (!c.resolved) {
+                                <span class="unresolved" [matTooltip]="c.unresolvedReason || ''">not found</span>
+                              }
+                            </td>
+                            @for (p of m.players; track p) {
+                              <td>{{ formatScore(c.scores[p]) }}</td>
+                            }
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <p class="muted">No charts. Players: {{ m.players.join(', ') }}</p>
+                }
+              </mat-expansion-panel>
+            }
+          </mat-accordion>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+
+  <mat-divider></mat-divider>
+
+  <section class="discovery">
+    <h3 class="section-title">StepManiaX tourneys on blamethepads</h3>
+    <div class="actions">
+      <button mat-stroked-button type="button" (click)="loadTourneys()" [disabled]="isLoadingTourneys">
+        {{ isLoadingTourneys ? 'Loading…' : (tourneys ? 'Refresh list' : 'Load list') }}
+      </button>
+    </div>
+    @if (tourneysError) {
+      <p class="warning">{{ tourneysError }}</p>
+    }
+    @if (tourneys) {
+      @if (!tourneys.length) {
+        <p class="muted">No StepManiaX tourneys found.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="preview-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Tourney</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Local</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of tourneys; track t.id) {
+                <tr>
+                  <td>{{ t.eventName || '—' }}</td>
+                  <td>{{ t.name }} <span class="muted">#{{ t.id }}</span></td>
+                  <td>{{ t.startDate || '—' }}</td>
+                  <td>{{ t.status || '—' }}</td>
+                  <td>{{ t.localEventId ? 'Event ' + t.localEventId : '—' }}</td>
+                  <td class="row-actions">
+                    <button mat-button type="button" (click)="previewFrom('blamethepads', t.id)">Preview</button>
+                    @if (t.ddrtoolsRoom) {
+                      <button mat-button type="button" (click)="previewFrom('ddrtools', t.ddrtoolsRoom)">Preview ddr.tools room</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </section>
+</div>

@@ -16,6 +16,7 @@ const startGgPublicRoutes = require('./routes/startGgPublic');
 const browseRoutes = require('./routes/browse');
 const seedRoutes = require('./routes/seed');
 const scoutRoutes = require('./routes/scout');
+const tourneyImportRoutes = require('./routes/tourneyImport');
 
 // middleware
 const requestLogger = require('./middleware/request-logger');
@@ -47,6 +48,7 @@ app.use("/api/startgg", startGgPublicRoutes);
 app.use("/api/browse", browseRoutes);
 app.use("/api/seed", seedRoutes);
 app.use("/api/scout", scoutRoutes);
+app.use("/api/tourney-import", tourneyImportRoutes);
 
 
 app.use((req, res, next) => {

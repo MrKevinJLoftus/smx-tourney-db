@@ -20,9 +20,12 @@ CREATE TABLE IF NOT EXISTS `event` (
     `organizers` VARCHAR(200),
     `created_by` INT,
     `start_gg_event_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+    `external_source` VARCHAR(30) NULL DEFAULT NULL,
+    `external_id` VARCHAR(100) NULL DEFAULT NULL,
     `hidden` BOOLEAN NOT NULL DEFAULT FALSE,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY `uniq_event_start_gg_event_id` (`start_gg_event_id`),
+    UNIQUE KEY `uniq_event_external_source_id` (`external_source`, `external_id`),
     FOREIGN KEY (`created_by`) REFERENCES `user`(`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -120,4 +123,15 @@ CREATE TABLE IF NOT EXISTS `start_gg_discovery_state` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT IGNORE INTO `start_gg_discovery_state` (`id`, `last_max_event_start_at`) VALUES (1, NULL);
+
+-- Table 11: match_external_source (references match) — dedup keys for blamethepads / ddr.tools imports
+CREATE TABLE IF NOT EXISTS `match_external_source` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `match_id` INT NOT NULL,
+    `source` VARCHAR(30) NOT NULL,
+    `source_key` VARCHAR(150) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`match_id`) REFERENCES `match`(`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    UNIQUE KEY `uniq_match_external_source_key` (`source`, `source_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

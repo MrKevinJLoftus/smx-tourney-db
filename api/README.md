@@ -80,6 +80,19 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 # START_GG_STEPMANIAX_VIDEOGAME_IDS=33834,55766
 # START_GG_STEPMANIAX_VIDEOGAME_ID=33834
 
+# blamethepads (formerly piu-tourney-maker) Supabase project, for the blamethepads / ddr.tools import tab.
+# Copy both from any request blamethepads.com makes to *.supabase.co in browser dev tools:
+# the URL is https://<project-id>.supabase.co and the key is the `apikey` request header (public anon key).
+# BLAMETHEPADS_SUPABASE_URL=https://<project-id>.supabase.co
+# BLAMETHEPADS_SUPABASE_ANON_KEY=
+
+# Override the ddr.tools PartyKit host (default: ddr-card-draw-party.noahm.partykit.dev)
+# DDRTOOLS_PARTY_HOST=
+
+# Override the StepManiaX song data used by Admin Panel > Import Songs
+# (default: https://raw.githubusercontent.com/noahm/DDRCardDraw/main/src/songs/smx.json)
+# SMX_SONGS_JSON_URL=
+
 # Enable debug logging from server.js (namespace: smx-tdb)
 # DEBUG=smx-tdb
 ```
@@ -97,9 +110,29 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 | `START_GG_API_KEY` | No* | — | start.gg API bearer token |
 | `START_GG_STEPMANIAX_VIDEOGAME_IDS` | No | `33834`, `55766` | Comma-separated start.gg videogame IDs |
 | `START_GG_STEPMANIAX_VIDEOGAME_ID` | No | (see above) | Single videogame ID if the list var is unset |
+| `BLAMETHEPADS_SUPABASE_URL` | No** | — | blamethepads Supabase project URL |
+| `BLAMETHEPADS_SUPABASE_ANON_KEY` | No** | — | blamethepads Supabase public anon key |
+| `DDRTOOLS_PARTY_HOST` | No | `ddr-card-draw-party.noahm.partykit.dev` | ddr.tools room state host |
+| `SMX_SONGS_JSON_URL` | No | ddr.tools `smx.json` on GitHub | Song data for the song catalog refresh |
 | `DEBUG` | No | — | Set to `smx-tdb` for debug output |
 
 \*Required when calling start.gg endpoints (`/api/startgg-import/*`, `/api/startgg/*`). Other routes work without it.
+
+\*\*Required for blamethepads imports and the blamethepads tourney list. ddr.tools imports work without them, but linked draws then get placeholder event names and no event date.
+
+### blamethepads / ddr.tools import
+
+`/api/tourney-import` (admin only) imports players, rounds, charts and per-chart scores. Apply `migration_add_external_sources.sql` first.
+
+- `GET /blamethepads/tourneys` — StepManiaX tourneys on blamethepads, with the local event id if already imported.
+- `POST /preview` `{ source: 'blamethepads' | 'ddrtools', ref }` — fetch and show what would be imported; writes nothing.
+- `POST /import` — same body; imports every round not imported before, then rebuilds ratings.
+
+`ref` is a blamethepads tourney URL/id or a ddr.tools event URL (`https://next.ddr.tools/e/<CODE>/…`)/room code. ddr.tools draws created from blamethepads carry the blamethepads tourney and round ids, so both sources dedupe against the same keys (`match_external_source`) and one event per blamethepads tourney. Each round becomes one match; gauntlet rounds (3+ players) are stored with all scores but stay out of Glicko ratings, which only count 1v1 matches. Charts are matched to the local song list by title/artist and difficulty; unmatched charts are listed in the preview and imported without a song link, so refresh the song catalog first.
+
+### Song catalog refresh
+
+`POST /api/song/catalog/preview` and `POST /api/song/catalog/import` `{ applyLevelChanges?: boolean }` (admin only) sync `song` / `song_x_chart` with the ddr.tools StepManiaX song data. Songs match on title + artist, and charts on song + mode (e.g. `Hard+`). Missing songs and charts are added; level re-rates are applied only with `applyLevelChanges`; nothing is deleted.
 
 ## Scripts
 
@@ -127,6 +160,7 @@ node -r dotenv/config scripts/test-startgg-import-queries.js
 | `/api/browse` | Public browse/summary data |
 | `/api/startgg-import` | Admin start.gg import (requires `START_GG_API_KEY`) |
 | `/api/startgg` | Public start.gg upcoming events |
+| `/api/tourney-import` | Admin blamethepads / ddr.tools results import |
 | `/api/seed` | Seed helpers |
 
 Mutating admin routes require a valid JWT (`Authorization: Bearer <token>`) from `POST /api/user/login`.

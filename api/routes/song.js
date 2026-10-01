@@ -10,6 +10,8 @@ router.get("/:id/charts", asyncWrapper(songController.getChartsBySong));
 router.get("/:id", asyncWrapper(songController.getSongById));
 
 // Admin-only routes
+router.post("/catalog/preview", checkAdmin, asyncWrapper(songController.previewSongCatalogRefresh));
+router.post("/catalog/import", checkAdmin, asyncWrapper(songController.applySongCatalogRefresh));
 router.post("/", checkAdmin, asyncWrapper(songController.createSong));
 router.put("/:id", checkAdmin, asyncWrapper(songController.updateSong));
 router.delete("/:id", checkAdmin, asyncWrapper(songController.deleteSong));
