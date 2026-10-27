@@ -35,7 +35,7 @@ export interface WeeklyChallengeChart {
 }
 
 export interface WeeklyChallengeDifficulty {
-  key: 'easy' | 'hard' | 'wild' | 'full';
+  key: 'easy' | 'hard' | 'wild' | 'dual' | 'full';
   label: string;
   levelRange: { min: number; max: number } | null;
   charts: WeeklyChallengeChart[];

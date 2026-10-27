@@ -18,6 +18,7 @@ const DIFFICULTIES = [
   { key: 'easy', label: 'Easy', names: ['easy', 'easy2'] },
   { key: 'hard', label: 'Hard', names: ['hard', 'hard2'] },
   { key: 'wild', label: 'Wild', names: ['wild'] },
+  { key: 'dual', label: 'Dual', names: ['dual', 'dual2'] },
   { key: 'full', label: 'Full', names: ['full', 'full2'] },
 ];
 
