@@ -1,0 +1,251 @@
+<div class="weekly-container">
+  <div class="header-section">
+    <mat-icon class="header-icon">emoji_events</mat-icon>
+    <div class="header-main">
+      <h1>Weekly Challenge</h1>
+      <p class="header-subtitle">
+        Three new charts per difficulty every Monday. Just play them: your best 100% speed score
+        from the week counts automatically.
+      </p>
+    </div>
+  </div>
+
+  <mat-button-toggle-group
+    class="view-toggle"
+    [value]="view"
+    (change)="setView($event.value)"
+    aria-label="Weekly challenge view"
+  >
+    <mat-button-toggle value="weekly">This week</mat-button-toggle>
+    <mat-button-toggle value="all-time">All time</mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <div *ngIf="error" class="error-section">
+    <mat-icon class="error-icon">error</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <ng-container *ngIf="view === 'weekly'">
+  <div class="week-nav">
+    <button
+      mat-icon-button
+      type="button"
+      aria-label="Previous week"
+      matTooltip="Previous week"
+      [disabled]="isLoading || weekOffset <= -maxWeeksBack"
+      (click)="changeWeek(-1)"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <div class="week-label">
+      <span class="week-title">
+        {{ weekOffset === 0 ? 'This week' : weekOffset === -1 ? 'Last week' : -weekOffset + ' weeks ago' }}
+      </span>
+      <span *ngIf="challenge" class="week-dates">
+        {{ formatDay(challenge.from) }} – {{ formatDay(challenge.to) }}
+      </span>
+    </div>
+    <button
+      mat-icon-button
+      type="button"
+      aria-label="Next week"
+      matTooltip="Next week"
+      [disabled]="isLoading || weekOffset >= 0"
+      (click)="changeWeek(1)"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <span *ngIf="countdown" class="week-meta">{{ countdown }}</span>
+    <span *ngIf="challenge" class="week-meta">
+      Updated {{ challenge.refreshedAt | date: 'shortTime' }}
+    </span>
+  </div>
+
+  <div *ngIf="isLoading && !challenge" class="loading-section">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading scores from smx.573.no...</p>
+  </div>
+
+  <mat-tab-group
+    *ngIf="challenge && !error"
+    [(selectedIndex)]="selectedTab"
+    [class.is-refreshing]="isLoading"
+    animationDuration="0ms"
+  >
+    <mat-tab *ngFor="let difficulty of challenge.difficulties" [label]="difficulty.label">
+      <div class="tab-body">
+        <div *ngIf="!difficulty.charts.length" class="empty-message">
+          <mat-icon>music_off</mat-icon>
+          <p>No charts were available to draw for {{ difficulty.label }} this week.</p>
+        </div>
+
+        <div class="chart-cards">
+          <mat-card *ngFor="let chart of difficulty.charts; let i = index" class="chart-card">
+            <div class="chart-card__body">
+              <img
+                *ngIf="chart.coverUrl; else noCover"
+                class="chart-cover"
+                [src]="chart.coverUrl"
+                [alt]="chart.title + ' cover'"
+                loading="lazy"
+              />
+              <ng-template #noCover>
+                <div class="chart-cover chart-cover--empty"><mat-icon>album</mat-icon></div>
+              </ng-template>
+              <div class="chart-info">
+                <span class="chart-slot">Chart {{ i + 1 }}</span>
+                <span class="chart-title">{{ chart.title }}</span>
+                <span *ngIf="chart.subtitle" class="chart-subtitle">{{ chart.subtitle }}</span>
+                <span class="chart-artist">{{ chart.artist }}</span>
+                <div class="chart-badges">
+                  <span class="level-badge" [ngClass]="'level-badge--' + difficulty.key">
+                    {{ difficulty.label }}{{ chart.isPlus ? '+' : '' }} {{ chart.level }}
+                  </span>
+                  <span class="bucket-label">from {{ chart.bucket.min }}–{{ chart.bucket.max }}</span>
+                </div>
+                <a class="chart-link" [href]="chart.browserUrl" target="_blank" rel="noopener">
+                  View on smx.573.no <mat-icon inline>open_in_new</mat-icon>
+                </a>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+
+        <mat-card *ngIf="difficulty.charts.length" class="standings-card">
+          <mat-card-header>
+            <mat-card-title>Overall standings</mat-card-title>
+            <mat-card-subtitle>Sum of each player's best score on all three charts</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="!difficulty.overall.length" class="empty-message">
+              <mat-icon>hourglass_empty</mat-icon>
+              <p>No scores yet. Be the first!</p>
+            </div>
+
+            <div *ngIf="difficulty.overall.length" class="table-scroll">
+              <table class="standings-table">
+                <thead>
+                  <tr>
+                    <th class="col-rank">#</th>
+                    <th class="col-player">Player</th>
+                    <th class="col-score">Total</th>
+                    <th *ngFor="let chart of difficulty.charts; let i = index" class="col-score col-chart">
+                      <span [matTooltip]="chart.title">Chart {{ i + 1 }}</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let entry of difficulty.overall">
+                    <td class="col-rank">{{ entry.rank }}</td>
+                    <td class="col-player">
+                      <div class="player-cell">
+                        <img *ngIf="entry.avatarUrl" class="avatar" [src]="entry.avatarUrl" alt="" loading="lazy" />
+                        <span>{{ entry.username }}</span>
+                      </div>
+                    </td>
+                    <td class="col-score total">{{ entry.total | number }}</td>
+                    <td *ngFor="let score of entry.scores" class="col-score col-chart">
+                      {{ score != null ? (score | number) : '—' }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <div class="chart-boards">
+          <mat-card *ngFor="let chart of difficulty.charts; let i = index" class="chart-board">
+            <mat-card-header>
+              <mat-card-title>Chart {{ i + 1 }}: {{ chart.title }}</mat-card-title>
+              <mat-card-subtitle>
+                {{ difficulty.label }}{{ chart.isPlus ? '+' : '' }} {{ chart.level }} ·
+                {{ chart.scores.length }} {{ chart.scores.length === 1 ? 'player' : 'players' }}
+              </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <p *ngIf="!chart.scores.length" class="muted">No scores yet.</p>
+              <ol *ngIf="chart.scores.length" class="chart-scores">
+                <li *ngFor="let entry of visibleScores(chart)">
+                  <span class="col-rank">{{ entry.rank }}</span>
+                  <img *ngIf="entry.avatarUrl" class="avatar" [src]="entry.avatarUrl" alt="" loading="lazy" />
+                  <span class="score-name">{{ entry.username }}</span>
+                  <mat-icon *ngIf="entry.fullCombo" class="fc-icon" inline matTooltip="Full combo">star</mat-icon>
+                  <span class="score-value">{{ entry.score | number }}</span>
+                </li>
+              </ol>
+              <button
+                *ngIf="chart.scores.length > chartPreviewCount"
+                mat-button
+                type="button"
+                (click)="toggleChart(chart.chartId)"
+              >
+                {{ expandedCharts.has(chart.chartId) ? 'Show top ' + chartPreviewCount : 'Show all ' + chart.scores.length }}
+              </button>
+            </mat-card-content>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <p *ngIf="challenge" class="footnote">
+    Scores come from the <a href="https://smx.573.no/browser" target="_blank" rel="noopener">smx.573.no score browser</a>
+    and refresh every few minutes. Weeks run Monday to Sunday ({{ challenge.timeZone }}). Tied scores share a rank.
+  </p>
+  </ng-container>
+
+  <ng-container *ngIf="view === 'all-time'">
+    <div *ngIf="isLoading && !allTime" class="loading-section">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading all-time standings...</p>
+    </div>
+
+    <ng-container *ngIf="allTime && !error">
+      <p class="all-time-summary">
+        <ng-container *ngIf="allTime.launchWeek; else notLaunched">
+          {{ allTime.weeksCounted }} {{ allTime.weeksCounted === 1 ? 'week' : 'weeks' }} counted since
+          {{ formatDay(allTime.launchWeek) }}<ng-container *ngIf="allTime.lastFinalizedWeek">,
+          through the week of {{ formatDay(allTime.lastFinalizedWeek) }}</ng-container>.
+          Each week is added a few hours after it ends.
+        </ng-container>
+        <ng-template #notLaunched>All-time standings haven't started yet.</ng-template>
+      </p>
+
+      <div class="all-time-grid">
+        <mat-card *ngFor="let difficulty of allTime.difficulties" class="all-time-card">
+          <mat-card-header>
+            <mat-card-title>{{ difficulty.label }}</mat-card-title>
+            <mat-card-subtitle>1st place and top {{ allTime.topRank }} finishes</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <p *ngIf="!difficulty.players.length" class="muted">No finished weeks yet.</p>
+            <table *ngIf="difficulty.players.length" class="standings-table">
+              <thead>
+                <tr>
+                  <th class="col-rank">#</th>
+                  <th class="col-player">Player</th>
+                  <th class="col-score">1st</th>
+                  <th class="col-score">Top {{ allTime.topRank }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of difficulty.players">
+                  <td class="col-rank">{{ entry.rank }}</td>
+                  <td class="col-player">{{ entry.username }}</td>
+                  <td class="col-score total">{{ entry.wins }}</td>
+                  <td class="col-score">{{ entry.top10s }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <p class="footnote">
+        Ranked by 1st place finishes, then top {{ allTime.topRank }} finishes, from each week's overall
+        standings. Ties count for everyone tied, and players with the same counts share a rank.
+      </p>
+    </ng-container>
+  </ng-container>
+</div>

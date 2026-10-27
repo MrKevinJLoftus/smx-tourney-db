@@ -1,0 +1,289 @@
+.weekly-container {
+  padding: 1rem;
+  max-width: 1200px;
+}
+
+.header-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.header-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.header-main h1,
+.header-main p {
+  margin: 0;
+}
+
+.header-subtitle,
+.muted,
+.week-meta,
+.bucket-label,
+.chart-slot,
+.chart-subtitle,
+.chart-artist,
+.footnote {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.view-toggle {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.all-time-summary {
+  margin: 0 0 1rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.all-time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.week-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.week-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 9rem;
+  text-align: center;
+}
+
+.week-title {
+  font-weight: 700;
+}
+
+.week-meta {
+  font-size: 0.875rem;
+}
+
+.loading-section,
+.error-section,
+.empty-message {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem 0;
+}
+
+.is-refreshing {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.tab-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.chart-cards,
+.chart-boards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.chart-card__body {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+}
+
+.chart-cover {
+  width: 96px;
+  height: 96px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.chart-cover--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.chart-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.chart-slot {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.chart-title {
+  font-weight: 700;
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.chart-subtitle,
+.chart-artist {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.chart-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.level-badge {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #111;
+}
+
+.level-badge--easy {
+  background: #5fd35f;
+}
+
+.level-badge--hard {
+  background: #ffb13b;
+}
+
+.level-badge--wild {
+  background: #ff5a5a;
+}
+
+.level-badge--full {
+  background: #5ab4ff;
+}
+
+.bucket-label {
+  font-size: 0.8rem;
+}
+
+.chart-link {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+  color: inherit;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.standings-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.4rem 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    white-space: nowrap;
+  }
+
+  th {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+  }
+}
+
+.col-rank {
+  width: 2.5rem;
+  font-weight: 700;
+}
+
+.col-score {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.total {
+  font-weight: 700;
+}
+
+.player-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.chart-scores {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+.score-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.score-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-icon {
+  color: #ffd54f;
+}
+
+.footnote {
+  font-size: 0.85rem;
+  margin-top: 1rem;
+
+  a {
+    color: inherit;
+  }
+}
+
+@media (max-width: 600px) {
+  .weekly-container {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .chart-cover {
+    width: 72px;
+    height: 72px;
+  }
+
+  .col-chart {
+    display: none;
+  }
+}

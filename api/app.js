@@ -17,6 +17,7 @@ const browseRoutes = require('./routes/browse');
 const seedRoutes = require('./routes/seed');
 const scoutRoutes = require('./routes/scout');
 const tourneyImportRoutes = require('./routes/tourneyImport');
+const weeklyChallengeRoutes = require('./routes/weeklyChallenge');
 
 // middleware
 const requestLogger = require('./middleware/request-logger');
@@ -49,6 +50,7 @@ app.use("/api/browse", browseRoutes);
 app.use("/api/seed", seedRoutes);
 app.use("/api/scout", scoutRoutes);
 app.use("/api/tourney-import", tourneyImportRoutes);
+app.use("/api/weekly-challenge", weeklyChallengeRoutes);
 
 
 app.use((req, res, next) => {

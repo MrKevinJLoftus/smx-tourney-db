@@ -37,6 +37,7 @@ export class AppComponent {
     { url: "/", text: "Home", icon: "home" },
     { url: "/browse", text: "Browse", icon: "list" },
     { url: "/leaderboard", text: "Leaderboard", icon: "leaderboard" },
+    { url: "/weekly-challenge", text: "Weekly", icon: "emoji_events" },
     { url: "/compare", text: "Compare", icon: "compare_arrows" },
     { url: "/protect-veto", text: "Protect/Veto", icon: "query_stats" },
     { url: "/seed-generator", text: "Seeds", icon: "format_list_numbered" }
