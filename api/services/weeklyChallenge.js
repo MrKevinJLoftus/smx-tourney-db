@@ -314,7 +314,7 @@ async function buildSnapshot(window, weekOffset, nowMs) {
         coverUrl: song.coverThumb ? DATA_HOST + song.coverThumb : null,
         level: chart.level,
         difficultyDisplay: chart.difficultyDisplay,
-        isPlus: chart.difficultyName.endsWith('2'),
+        isPlus: chart.difficultyDisplay.endsWith('+'),
         bucket,
         browserUrl: browserUrl(chart.id, window, tz),
         scores: rankBy(
