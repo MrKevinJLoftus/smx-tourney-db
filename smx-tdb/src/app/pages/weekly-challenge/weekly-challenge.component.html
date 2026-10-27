@@ -32,7 +32,7 @@
       type="button"
       aria-label="Previous week"
       matTooltip="Previous week"
-      [disabled]="isLoading || weekOffset <= -maxWeeksBack"
+      [disabled]="isLoading || weekOffset <= minWeekOffset"
       (click)="changeWeek(-1)"
     >
       <mat-icon>chevron_left</mat-icon>
