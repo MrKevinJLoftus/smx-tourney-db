@@ -16,7 +16,7 @@ type WeeklyChallengeView = 'weekly' | 'all-time';
 const MAX_WEEKS_BACK = 8;
 const CHART_PREVIEW_COUNT = 10;
 /** URL fragments for the difficulty tabs, in the order the API returns them. */
-const TAB_KEYS = ['easy', 'hard', 'wild', 'full'] as const;
+const TAB_KEYS = ['easy', 'hard', 'wild', 'dual', 'full'] as const;
 
 @Component({
   selector: 'app-weekly-challenge',
