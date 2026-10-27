@@ -68,7 +68,8 @@
 
   <mat-tab-group
     *ngIf="challenge && !error"
-    [(selectedIndex)]="selectedTab"
+    [selectedIndex]="selectedTab"
+    (selectedIndexChange)="selectTab($event)"
     [class.is-refreshing]="isLoading"
     animationDuration="0ms"
   >

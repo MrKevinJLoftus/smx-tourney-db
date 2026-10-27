@@ -15,6 +15,8 @@ type WeeklyChallengeView = 'weekly' | 'all-time';
 
 const MAX_WEEKS_BACK = 8;
 const CHART_PREVIEW_COUNT = 10;
+/** URL fragments for the difficulty tabs, in the order the API returns them. */
+const TAB_KEYS = ['easy', 'hard', 'wild', 'full'] as const;
 
 @Component({
   selector: 'app-weekly-challenge',
@@ -57,6 +59,13 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
         } else {
           this.load();
         }
+      })
+    );
+    this.subscriptions.add(
+      this.route.fragment.subscribe((fragment) => {
+        if (this.view !== 'weekly') return;
+        const index = TAB_KEYS.indexOf(fragment as (typeof TAB_KEYS)[number]);
+        this.selectedTab = index >= 0 ? index : 0;
       })
     );
     this.subscriptions.add(interval(30_000).subscribe(() => this.updateCountdown()));
@@ -104,6 +113,17 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { view: view === 'all-time' ? 'all-time' : null, week: null },
+      fragment: view === 'weekly' ? TAB_KEYS[this.selectedTab] : undefined,
+    });
+  }
+
+  selectTab(index: number): void {
+    this.selectedTab = index;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParamsHandling: 'preserve',
+      fragment: TAB_KEYS[index],
+      replaceUrl: true,
     });
   }
 
@@ -113,6 +133,7 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { week: week === 0 ? null : week },
+      preserveFragment: true,
     });
   }
 
