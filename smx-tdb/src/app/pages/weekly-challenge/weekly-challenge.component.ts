@@ -13,7 +13,6 @@ import {
 
 type WeeklyChallengeView = 'weekly' | 'all-time';
 
-const MAX_WEEKS_BACK = 8;
 const CHART_PREVIEW_COUNT = 10;
 /** URL fragments for the difficulty tabs, in the order the API returns them. */
 const TAB_KEYS = ['easy', 'hard', 'wild', 'dual', 'full'] as const;
@@ -26,7 +25,6 @@ const TAB_KEYS = ['easy', 'hard', 'wild', 'dual', 'full'] as const;
   styleUrl: './weekly-challenge.component.scss',
 })
 export class WeeklyChallengeComponent implements OnInit, OnDestroy {
-  readonly maxWeeksBack = MAX_WEEKS_BACK;
   readonly chartPreviewCount = CHART_PREVIEW_COUNT;
 
   view: WeeklyChallengeView = 'weekly';
@@ -52,8 +50,7 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
       this.route.queryParamMap.subscribe((params) => {
         this.view = params.get('view') === 'all-time' ? 'all-time' : 'weekly';
         const week = Number(params.get('week') ?? 0);
-        this.weekOffset =
-          Number.isInteger(week) && week <= 0 && week >= -MAX_WEEKS_BACK ? week : 0;
+        this.weekOffset = Number.isInteger(week) && week <= 0 ? week : 0;
         if (this.view === 'all-time') {
           this.loadAllTime();
         } else {
@@ -88,10 +85,24 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
           this.updateCountdown();
         },
         error: (err) => {
+          if (err?.status === 400 && this.weekOffset !== 0) {
+            this.router.navigate([], {
+              relativeTo: this.route,
+              queryParams: { week: null },
+              queryParamsHandling: 'merge',
+              preserveFragment: true,
+              replaceUrl: true,
+            });
+            return;
+          }
           this.error = err?.error?.message || 'Unable to load the weekly challenge right now.';
           this.challenge = null;
         },
       });
+  }
+
+  get minWeekOffset(): number {
+    return this.challenge?.minWeekOffset ?? 0;
   }
 
   loadAllTime(): void {
@@ -129,7 +140,7 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
 
   changeWeek(delta: number): void {
     const week = this.weekOffset + delta;
-    if (week > 0 || week < -MAX_WEEKS_BACK) return;
+    if (week > 0 || week < this.minWeekOffset) return;
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { week: week === 0 ? null : week },

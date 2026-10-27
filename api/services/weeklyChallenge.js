@@ -356,6 +356,36 @@ async function buildSnapshot(window, weekOffset, nowMs) {
   };
 }
 
+let warnedBadLaunchWeek = false;
+
+/** @returns {string|null} the first Monday of the challenge, or null when unset */
+function launchWeek() {
+  const raw = String(process.env.WEEKLY_CHALLENGE_LAUNCH_WEEK || '').trim();
+  if (!raw) return null;
+  if (!isWeekKey(raw)) {
+    if (!warnedBadLaunchWeek) {
+      console.error(`WEEKLY_CHALLENGE_LAUNCH_WEEK must be a Monday as YYYY-MM-DD (got "${raw}").`);
+      warnedBadLaunchWeek = true;
+    }
+    return null;
+  }
+  return raw;
+}
+
+/**
+ * Oldest week offset that can be viewed: never before the launch week, and never more than
+ * MAX_WEEKS_BACK. Without a launch week only the current week is shown.
+ */
+function minWeekOffset(nowMs, tz) {
+  const launch = launchWeek();
+  if (!launch) return 0;
+  const currentKey = weekWindow(nowMs, 0, tz).weekKey;
+  const weeksSinceLaunch = Math.round(
+    (Date.parse(`${currentKey}T00:00:00Z`) - Date.parse(`${launch}T00:00:00Z`)) / (7 * 86400000)
+  );
+  return -Math.min(MAX_WEEKS_BACK, Math.max(0, weeksSinceLaunch));
+}
+
 const snapshots = new Map();
 const inflight = new Map();
 
@@ -390,15 +420,24 @@ function refresh(weekOffset, weekKey, nowMs) {
  * @param {{ weekOffset?: number }} [opts]
  */
 async function getWeeklyChallenge({ weekOffset = 0 } = {}) {
-  const offset = Number(weekOffset);
-  if (!Number.isInteger(offset) || offset > 0 || offset < -MAX_WEEKS_BACK) {
-    throw new WeeklyChallengeError(
-      `week must be a whole number from -${MAX_WEEKS_BACK} to 0.`
-    );
-  }
-
   const nowMs = Date.now();
   const tz = timeZone();
+  const minOffset = minWeekOffset(nowMs, tz);
+
+  const offset = Number(weekOffset);
+  if (!Number.isInteger(offset) || offset > 0) {
+    throw new WeeklyChallengeError('week must be a whole number, 0 or below.');
+  }
+  if (offset < minOffset) {
+    const launch = launchWeek();
+    const requestedKey = weekWindow(nowMs, offset, tz).weekKey;
+    let message;
+    if (!launch) message = 'Only the current week is available.';
+    else if (requestedKey < launch) message = `The weekly challenge started the week of ${launch}.`;
+    else message = `Only the last ${MAX_WEEKS_BACK} weeks can be viewed.`;
+    throw new WeeklyChallengeError(message);
+  }
+
   const { weekKey } = weekWindow(nowMs, offset, tz);
 
   const oldestKey = weekWindow(nowMs, -MAX_WEEKS_BACK, tz).weekKey;
@@ -407,17 +446,22 @@ async function getWeeklyChallenge({ weekOffset = 0 } = {}) {
   }
 
   const cached = snapshots.get(weekKey);
-  if (!cached) return refresh(offset, weekKey, nowMs);
-
-  if (Date.now() > cached.expiresAt) {
-    refresh(offset, weekKey, nowMs).catch((err) =>
-      console.error('weeklyChallenge background refresh failed:', err)
-    );
+  let snapshot;
+  if (!cached) {
+    snapshot = await refresh(offset, weekKey, nowMs);
+  } else {
+    snapshot = cached.snapshot;
+    if (Date.now() > cached.expiresAt) {
+      refresh(offset, weekKey, nowMs).catch((err) =>
+        console.error('weeklyChallenge background refresh failed:', err)
+      );
+    }
   }
   return {
-    ...cached.snapshot,
+    ...snapshot,
     weekOffset: offset,
     isCurrent: offset === 0,
+    minWeekOffset: minOffset,
   };
 }
 
@@ -428,6 +472,7 @@ module.exports = {
   timeZone,
   addDays,
   isWeekKey,
+  launchWeek,
   weekWindow,
   windowForWeekKey,
   levelBuckets,

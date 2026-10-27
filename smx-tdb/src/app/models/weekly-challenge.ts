@@ -65,6 +65,8 @@ export interface WeeklyChallengeAllTimeResponse {
 export interface WeeklyChallengeResponse {
   weekKey: string;
   weekOffset: number;
+  /** Oldest week offset that can be viewed (0 when only the current week exists). */
+  minWeekOffset: number;
   isCurrent: boolean;
   from: string;
   to: string;

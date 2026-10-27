@@ -8,28 +8,13 @@ const dbconn = require('../database/connector');
 const queries = require('../queries/weeklyChallenge');
 const weeklyChallenge = require('./weeklyChallenge');
 
-const { WeeklyChallengeError, DIFFICULTIES } = weeklyChallenge;
+const { WeeklyChallengeError, DIFFICULTIES, launchWeek } = weeklyChallenge;
 
 const TOP_RANK = 10;
 const BACKGROUND_CHECK_INTERVAL_MS = 10 * 60 * 1000;
 
 let lastBackgroundCheckAt = 0;
 let backgroundRun = null;
-let warnedBadLaunchWeek = false;
-
-/** @returns {string|null} the first Monday that counts, or null when history is off */
-function launchWeek() {
-  const raw = String(process.env.WEEKLY_CHALLENGE_LAUNCH_WEEK || '').trim();
-  if (!raw) return null;
-  if (!weeklyChallenge.isWeekKey(raw)) {
-    if (!warnedBadLaunchWeek) {
-      console.error(`WEEKLY_CHALLENGE_LAUNCH_WEEK must be a Monday as YYYY-MM-DD (got "${raw}").`);
-      warnedBadLaunchWeek = true;
-    }
-    return null;
-  }
-  return raw;
-}
 
 function finalizeDelayMs() {
   const hours = Number(process.env.WEEKLY_CHALLENGE_FINALIZE_DELAY_HOURS);
