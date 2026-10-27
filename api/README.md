@@ -93,6 +93,19 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 # (default: https://raw.githubusercontent.com/noahm/DDRCardDraw/main/src/songs/smx.json)
 # SMX_SONGS_JSON_URL=
 
+# Weekly challenge leaderboards (scores pulled from the smx.573.no score browser API)
+# SMX573_BASE_URL=https://smx.573.no
+# Time zone that defines the Monday-to-Sunday challenge week (default: America/New_York)
+# WEEKLY_CHALLENGE_TZ=America/New_York
+# Secret mixed into the weekly chart draw so future weeks can't be precomputed
+# WEEKLY_CHALLENGE_SALT=
+# Minutes before the current week's scores are refetched (default: 10)
+# WEEKLY_CHALLENGE_REFRESH_MINUTES=10
+# First Monday (YYYY-MM-DD) counted by the all-time weekly challenge leaderboard; unset = no history saved
+# WEEKLY_CHALLENGE_LAUNCH_WEEK=
+# Hours after a week ends before its results are saved, to allow for late score uploads (default: 6)
+# WEEKLY_CHALLENGE_FINALIZE_DELAY_HOURS=6
+
 # Enable debug logging from server.js (namespace: smx-tdb)
 # DEBUG=smx-tdb
 ```
@@ -114,6 +127,12 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 | `BLAMETHEPADS_SUPABASE_ANON_KEY` | No** | — | blamethepads Supabase public anon key |
 | `DDRTOOLS_PARTY_HOST` | No | `ddr-card-draw-party.noahm.partykit.dev` | ddr.tools room state host |
 | `SMX_SONGS_JSON_URL` | No | ddr.tools `smx.json` on GitHub | Song data for the song catalog refresh |
+| `SMX573_BASE_URL` | No | `https://smx.573.no` | Score browser API used by the weekly challenge |
+| `WEEKLY_CHALLENGE_TZ` | No | `America/New_York` | Time zone for the Monday–Sunday challenge week |
+| `WEEKLY_CHALLENGE_SALT` | No | — | Secret mixed into the weekly chart draw |
+| `WEEKLY_CHALLENGE_REFRESH_MINUTES` | No | `10` | How long the current week's scores are cached |
+| `WEEKLY_CHALLENGE_LAUNCH_WEEK` | No | — | First Monday counted by the all-time leaderboard; history is off when unset |
+| `WEEKLY_CHALLENGE_FINALIZE_DELAY_HOURS` | No | `6` | Hours after a week ends before its results are saved |
 | `DEBUG` | No | — | Set to `smx-tdb` for debug output |
 
 \*Required when calling start.gg endpoints (`/api/startgg-import/*`, `/api/startgg/*`). Other routes work without it.
@@ -133,6 +152,17 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 ### Song catalog refresh
 
 `POST /api/song/catalog/preview` and `POST /api/song/catalog/import` `{ applyLevelChanges?: boolean }` (admin only) sync `song` / `song_x_chart` with the ddr.tools StepManiaX song data. Songs match on title + artist, and charts on song + mode (e.g. `Hard+`). Missing songs and charts are added; level re-rates are applied only with `applyLevelChanges`; nothing is deleted.
+
+### Weekly challenge
+
+`GET /api/weekly-challenge?week=<offset>` (public) returns the Easy, Hard, Wild and Full challenge leaderboards for a Monday–Sunday week; `week` is `0` for the current week (default) down to `-8`. Each difficulty gets 3 charts (including `+` charts), one drawn from each third of that difficulty's level range. The draw is seeded by the week, so it is the same on every restart and nothing is written to the database. Scores are each player's best 100%-speed score on the chart within the week, read from the [smx.573.no](https://smx.573.no/browser) score browser API and cached in memory. The overall standings sum a player's best score on each of the 3 charts; equal scores share a rank.
+
+`GET /api/weekly-challenge/all-time` (public) returns, per difficulty, how many 1st place and top 10 finishes each player has in the overall standings, counting weeks from `WEEKLY_CHALLENGE_LAUNCH_WEEK` onward. Apply `migration_add_weekly_challenge_history.sql` first. A week is saved (its drawn chart ids plus every player ranked 10th or better, including ties) the first time either weekly challenge endpoint is called after the week ends plus `WEEKLY_CHALLENGE_FINALIZE_DELAY_HOURS`. Scores are fetched fresh for this, not from the cache. To save or re-save weeks by hand:
+
+```bash
+node -r dotenv/config scripts/finalize-weekly-challenge.js                       # all ended, unsaved weeks
+node -r dotenv/config scripts/finalize-weekly-challenge.js --week 2026-11-02 --replace
+```
 
 ## Scripts
 
@@ -161,6 +191,7 @@ node -r dotenv/config scripts/test-startgg-import-queries.js
 | `/api/startgg-import` | Admin start.gg import (requires `START_GG_API_KEY`) |
 | `/api/startgg` | Public start.gg upcoming events |
 | `/api/tourney-import` | Admin blamethepads / ddr.tools results import |
+| `/api/weekly-challenge` | Public weekly challenge leaderboards (smx.573.no scores) |
 | `/api/seed` | Seed helpers |
 
 Mutating admin routes require a valid JWT (`Authorization: Bearer <token>`) from `POST /api/user/login`.

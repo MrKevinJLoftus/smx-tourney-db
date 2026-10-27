@@ -11,12 +11,14 @@ import { SeedGeneratorComponent } from './pages/seed-generator/seed-generator.co
 import { EventDetailComponent } from './pages/event-detail/event-detail.component';
 import { MatchDetailComponent } from './pages/match-detail/match-detail.component';
 import { LeaderboardComponent } from './pages/leaderboard/leaderboard.component';
+import { WeeklyChallengeComponent } from './pages/weekly-challenge/weekly-challenge.component';
 import { AuthGuard } from './shared/auth/auth-guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent, data: { title: 'Home' } },
   { path: 'browse', component: BrowseComponent, data: { title: 'Browse' } },
   { path: 'leaderboard', component: LeaderboardComponent, data: { title: 'Leaderboard' } },
+  { path: 'weekly-challenge', component: WeeklyChallengeComponent, data: { title: 'Weekly Challenge' } },
   { path: 'compare', component: PlayerCompareComponent, data: { title: 'Compare Players' } },
   { path: 'protect-veto', component: PocketVetoComponent, data: { title: 'Protect / Veto' } },
   { path: 'seed-generator', component: SeedGeneratorComponent, data: { title: 'Seed Generator' } },
