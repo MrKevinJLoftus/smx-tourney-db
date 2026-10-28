@@ -42,6 +42,44 @@ export interface WeeklyChallengeDifficulty {
   overall: WeeklyChallengeOverallEntry[];
 }
 
+export interface LevelBucket {
+  min: number;
+  max: number;
+}
+
+export interface BucketSettingSummary {
+  /** False when the automatic thirds of the level range are in use. */
+  custom: boolean;
+  buckets: LevelBucket[];
+  /** Week the setting started, or null when automatic has never been changed. */
+  since: string | null;
+}
+
+export interface DifficultyBucketSettings {
+  key: WeeklyChallengeDifficulty['key'];
+  label: string;
+  levelRange: LevelBucket | null;
+  levelCounts: { level: number; count: number }[];
+  automaticBuckets: LevelBucket[];
+  thisWeek: BucketSettingSummary & {
+    charts: { chartId: number; title: string; level: number; difficultyDisplay: string; bucket: LevelBucket }[];
+  };
+  nextWeek: BucketSettingSummary;
+}
+
+export interface WeeklyChallengeBucketSettings {
+  currentWeek: string;
+  nextWeek: string;
+  minLevel: number;
+  maxLevel: number;
+  difficulties: DifficultyBucketSettings[];
+}
+
+export interface SaveBucketSettingResponse {
+  effectiveWeek: string;
+  difficulty: DifficultyBucketSettings;
+}
+
 export interface WeeklyChallengeAllTimeEntry {
   rank: number;
   gamerId: number;

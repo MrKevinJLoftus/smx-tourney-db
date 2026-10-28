@@ -1,0 +1,84 @@
+.buckets-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.intro {
+  margin: 0;
+  max-width: 760px;
+}
+
+.loading-row,
+.error-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.difficulty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.status {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 12px;
+  margin: 0 0 12px;
+
+  dt {
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.drawn-charts {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+.bucket-table {
+  border-collapse: collapse;
+  margin-bottom: 8px;
+
+  th,
+  td {
+    padding: 4px 8px;
+    text-align: left;
+  }
+}
+
+.level-input {
+  width: 64px;
+}
+
+.error-text,
+.redraw-warning {
+  color: #f44336;
+}
+
+.warnings {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  color: #ff9800;
+}
+
+.redraw-warning {
+  margin: 4px 0 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}

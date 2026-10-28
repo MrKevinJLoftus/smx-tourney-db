@@ -24,6 +24,38 @@ exports.getWeeklyChallenge = async (req, res) => {
   }
 };
 
+exports.getBucketSettings = async (req, res) => {
+  try {
+    res.status(200).json(await weeklyChallenge.getBucketSettings());
+  } catch (error) {
+    if (error instanceof Smx573Error) {
+      return res.status(502).json({ message: `Could not load charts from smx.573.no: ${error.message}` });
+    }
+    throw error;
+  }
+};
+
+exports.saveBucketSetting = async (req, res) => {
+  const { buckets, applyToCurrentWeek } = req.body || {};
+  try {
+    const result = await weeklyChallenge.saveBucketSetting({
+      difficulty: req.params.difficulty,
+      buckets,
+      applyToCurrentWeek: applyToCurrentWeek === true,
+      userId: req.userData && req.userData.userId,
+    });
+    res.status(200).json(result);
+  } catch (error) {
+    if (error instanceof weeklyChallenge.WeeklyChallengeError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    if (error instanceof Smx573Error) {
+      return res.status(502).json({ message: `Saved, but reloading charts from smx.573.no failed: ${error.message}` });
+    }
+    throw error;
+  }
+};
+
 exports.getAllTime = async (req, res) => {
   weeklyChallengeHistory.finalizeDueWeeksInBackground();
 
