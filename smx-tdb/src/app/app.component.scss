@@ -9,18 +9,22 @@
 
 .app-toolbar {
   // background-color: $primary-light;
+
+  .spacer {
+    flex: 1 1 auto;
+  }
   
   button[mat-icon-button] {
     background-color: transparent !important;
     box-shadow: none !important;
     
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04) !important;
+      background-color: rgba(var(--app-fg-rgb), 0.06) !important;
       box-shadow: none !important;
     }
     
     &:active {
-      background-color: rgba(0, 0, 0, 0.08) !important;
+      background-color: rgba(var(--app-fg-rgb), 0.1) !important;
       box-shadow: none !important;
     }
     
@@ -40,7 +44,7 @@
 }
 
 .mat-nav-list * {
-  color: white;
+  color: var(--mat-sys-on-surface);
 }
 
 .mat-nav-list {

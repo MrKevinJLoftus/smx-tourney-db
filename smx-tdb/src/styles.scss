@@ -1,4 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: dark;
+  /* Base foreground as an RGB triplet so component styles can use rgba(var(--app-fg-rgb), alpha) */
+  --app-fg-rgb: 255, 255, 255;
+  --app-accent-orange: #f57c00;
+  --app-accent-gold: #ffd54f;
+  --app-accent-amber: #ffb74d;
+  --app-accent-blue: #90caf9;
+  --app-accent-error: #ff8a80;
+  --app-accent-negative: #e57373;
+  --app-accent-positive: #81c784;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$magenta-palette,
+      tertiary: mat.$violet-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+html.light-theme {
+  color-scheme: light;
+  --app-fg-rgb: 0, 0, 0;
+  --app-accent-orange: #e65100;
+  --app-accent-gold: #8d6e00;
+  --app-accent-amber: #b26a00;
+  --app-accent-blue: #1565c0;
+  --app-accent-error: #c62828;
+  --app-accent-negative: #c62828;
+  --app-accent-positive: #2e7d32;
+}
 
 html, body {
   height: 100%;
@@ -14,7 +49,11 @@ app-root {
   overflow: hidden;
 }
 
-body { font-family: Roboto, "Helvetica Neue", sans-serif; }
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
 .mat-sidenav {
   width: 250px;
 }
@@ -23,7 +62,7 @@ mat-error {
   font-weight: bold;
 }
 .white-text {
-  color: white;
+  color: var(--mat-sys-on-surface);
 }
 
 /* Expansion panel headers: subtle edge + hover (all routes) */

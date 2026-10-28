@@ -5,11 +5,14 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 import { Route } from './models/general';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from './services/auth.service';
 import { LoadingService } from './services/loading.service';
+import { ThemeService } from './services/theme.service';
 import { filter, map } from 'rxjs';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -24,6 +27,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatIconModule,
     MatSidenavModule,
     MatListModule,
+    MatButtonModule,
+    MatTooltipModule,
     ReactiveFormsModule
   ],
   templateUrl: './app.component.html',
@@ -52,7 +57,8 @@ export class AppComponent {
     private titleService: Title,
     private activatedRoute: ActivatedRoute,
     private authService: AuthService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    public themeService: ThemeService
   ) {
       // subscribe to loading status
       this.loadingService.getIsLoadingListener().subscribe(res => {

@@ -29,7 +29,7 @@
 .chart-subtitle,
 .chart-artist,
 .footnote {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
 }
 
 .view-toggle {
@@ -38,7 +38,7 @@
 
 .all-time-summary {
   margin: 0 0 1rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
 }
 
 .all-time-grid {
@@ -116,7 +116,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--app-fg-rgb), 0.08);
 }
 
 .chart-info {
@@ -202,13 +202,13 @@
   td {
     padding: 0.4rem 0.5rem;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(var(--app-fg-rgb), 0.08);
     white-space: nowrap;
   }
 
   th {
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(var(--app-fg-rgb), 0.65);
   }
 }
 
@@ -250,7 +250,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.3rem 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(var(--app-fg-rgb), 0.08);
   }
 }
 
@@ -265,7 +265,7 @@
 }
 
 .fc-icon {
-  color: #ffd54f;
+  color: var(--app-accent-gold);
 }
 
 .footnote {

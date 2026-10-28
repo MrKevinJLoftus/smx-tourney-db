@@ -2,7 +2,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 16px;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(var(--app-fg-rgb), 0.92);
 }
 
 .header-section {
@@ -16,7 +16,7 @@
   font-size: 40px;
   width: 40px;
   height: 40px;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(var(--app-fg-rgb), 0.88);
 }
 
 .header-main h1 {
@@ -27,7 +27,7 @@
 
 .header-subtitle {
   margin: 8px 0 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
   line-height: 1.5;
 }
 
@@ -40,7 +40,7 @@
   height: 24px;
   padding: 0;
   margin: -2px 0 0 2px;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
   --mat-icon-button-state-layer-size: 24px;
   --mat-icon-button-touch-target-display: none;
 
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 8px;
   margin-top: 12px;
-  color: #ff8a80;
+  color: var(--app-accent-error);
 }
 
 .loading-section {
@@ -140,7 +140,7 @@
   align-items: center;
   padding: 10px 12px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(var(--app-fg-rgb), 0.04);
 }
 
 .seed-number {
@@ -157,7 +157,7 @@
 }
 
 .player-link {
-  color: #90caf9;
+  color: var(--app-accent-blue);
   text-decoration: none;
 }
 
@@ -166,7 +166,7 @@
 }
 
 .player-name {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(var(--app-fg-rgb), 0.92);
 }
 
 .guest-badge {
@@ -174,7 +174,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(144, 202, 249, 0.18);
-  color: #90caf9;
+  color: var(--app-accent-blue);
 }
 
 .provisional-badge {
@@ -182,7 +182,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   background: rgba(255, 193, 7, 0.2);
-  color: #ffd54f;
+  color: var(--app-accent-gold);
 }
 
 .rating-block {
@@ -198,7 +198,7 @@
 }
 
 .muted {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
   font-size: 13px;
 }
 

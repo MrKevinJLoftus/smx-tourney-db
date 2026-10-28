@@ -20,9 +20,9 @@
 .mpr--chips .mpr__entry {
   font-size: 0.85rem;
   padding: 0.25rem 0.5rem;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(var(--app-fg-rgb), 0.15);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(var(--app-fg-rgb), 0.85);
 }
 
 .mpr--inline .mpr__entry {
@@ -37,6 +37,6 @@
 
 .mpr__rating {
   margin-left: 0.4rem;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(var(--app-fg-rgb), 0.68);
   white-space: nowrap;
 }

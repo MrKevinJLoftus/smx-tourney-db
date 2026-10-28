@@ -6,6 +6,15 @@
     <button mat-icon-button (click)="sidenav.toggle()">
       <mat-icon class="white-text">menu</mat-icon>
     </button>
+    <span class="spacer"></span>
+    <button
+      mat-icon-button
+      (click)="themeService.toggle()"
+      [attr.aria-label]="themeService.isLight() ? 'Switch to dark mode' : 'Switch to light mode'"
+      [matTooltip]="themeService.isLight() ? 'Switch to dark mode' : 'Switch to light mode'"
+    >
+      <mat-icon class="white-text">{{ themeService.isLight() ? 'dark_mode' : 'light_mode' }}</mat-icon>
+    </button>
   </mat-toolbar>
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #sidenav>

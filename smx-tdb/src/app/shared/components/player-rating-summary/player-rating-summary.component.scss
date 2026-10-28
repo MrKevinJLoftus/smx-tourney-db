@@ -16,7 +16,7 @@
 }
 
 .rating-summary__label {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
   font-size: 0.85rem;
 }
 
@@ -24,7 +24,7 @@
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   background: rgba(255, 193, 7, 0.16);
-  color: #ffd54f;
+  color: var(--app-accent-gold);
   font-size: 0.8rem;
   font-weight: 600;
 }

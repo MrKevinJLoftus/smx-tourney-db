@@ -1,6 +1,6 @@
 .chart-row {
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(var(--app-fg-rgb), 0.12);
   border-radius: 8px;
 }
 
@@ -39,19 +39,19 @@
 }
 
 .score-delta.positive {
-  color: #81c784;
+  color: var(--app-accent-positive);
 }
 
 .score-delta.fallback {
-  color: #ffb74d;
+  color: var(--app-accent-amber);
 }
 
 .score-delta.even {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(var(--app-fg-rgb), 0.88);
 }
 
 .score-delta.negative {
-  color: #e57373;
+  color: var(--app-accent-negative);
 }
 
 .opp-breakdown {
@@ -65,11 +65,11 @@
 }
 
 .muted {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
 }
 
 .link {
-  color: #90caf9;
+  color: var(--app-accent-blue);
   text-decoration: none;
 }
 

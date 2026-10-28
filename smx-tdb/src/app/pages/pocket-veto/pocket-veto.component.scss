@@ -2,7 +2,7 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 16px;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(var(--app-fg-rgb), 0.92);
 }
 
 .header-section {
@@ -16,7 +16,7 @@
   font-size: 40px;
   width: 40px;
   height: 40px;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(var(--app-fg-rgb), 0.88);
 }
 
 .header-main h1 {
@@ -27,7 +27,7 @@
 
 .header-subtitle {
   margin: 8px 0 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
   line-height: 1.5;
 }
 
@@ -40,7 +40,7 @@
   height: 24px;
   padding: 0;
   margin: -2px 0 0 2px;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
   --mat-icon-button-state-layer-size: 24px;
   --mat-icon-button-touch-target-display: none;
 
@@ -60,7 +60,7 @@
 .section-label {
   font-weight: 600;
   margin: 8px 0;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(var(--app-fg-rgb), 0.88);
 }
 
 .picker-field,
@@ -110,7 +110,7 @@
   align-items: center;
   gap: 8px;
   margin-top: 12px;
-  color: #ff8a80;
+  color: var(--app-accent-error);
 }
 
 .error-icon {
@@ -125,7 +125,7 @@
   align-items: center;
   gap: 12px;
   padding: 24px 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
 }
 
 .results-summary {
@@ -142,7 +142,7 @@
 }
 
 .results-accordion mat-panel-description {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
 }
 
 .chart-list {
@@ -160,14 +160,14 @@
   border-radius: 8px;
   background: rgba(255, 183, 77, 0.12);
   border: 1px solid rgba(255, 183, 77, 0.25);
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(var(--app-fg-rgb), 0.85);
 
   mat-icon {
     flex-shrink: 0;
     font-size: 20px;
     width: 20px;
     height: 20px;
-    color: #ffb74d;
+    color: var(--app-accent-amber);
   }
 
   p {
@@ -177,7 +177,7 @@
 }
 
 .score-delta.negative {
-  color: #e57373;
+  color: var(--app-accent-negative);
 }
 
 .opp-breakdown {
@@ -196,12 +196,12 @@
   align-items: center;
   gap: 8px;
   padding: 24px 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
 }
 
 .muted,
 .source-badge {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(var(--app-fg-rgb), 0.65);
 }
 
 .source-badge {
@@ -210,7 +210,7 @@
 }
 
 .link {
-  color: #90caf9;
+  color: var(--app-accent-blue);
   text-decoration: none;
 }
 

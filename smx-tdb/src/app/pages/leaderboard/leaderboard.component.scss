@@ -30,7 +30,7 @@
   width: 32px;
   height: 32px;
   line-height: 32px;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(var(--app-fg-rgb), 0.72);
 
   .mat-icon {
     font-size: 20px;
@@ -140,6 +140,6 @@
   app-player-rating-summary ::ng-deep .rating-summary__item:not(:last-child)::after {
     content: '·';
     margin-left: 0.35rem;
-    color: rgba(255, 255, 255, 0.45);
+    color: rgba(var(--app-fg-rgb), 0.45);
   }
 }
