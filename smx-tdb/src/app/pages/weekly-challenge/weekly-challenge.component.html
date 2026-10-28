@@ -4,8 +4,8 @@
     <div class="header-main">
       <h1>Weekly Challenge</h1>
       <p class="header-subtitle">
-        Three new charts per difficulty every Monday. Just play them: your best 100% speed score
-        from the week counts automatically.
+        Three new charts per difficulty every Monday. Just play them: your first 100% speed play
+        of each chart that week counts automatically.
       </p>
     </div>
   </div>
@@ -115,7 +115,7 @@
         <mat-card *ngIf="difficulty.charts.length" class="standings-card">
           <mat-card-header>
             <mat-card-title>Overall standings</mat-card-title>
-            <mat-card-subtitle>Sum of each player's best score on all three charts</mat-card-subtitle>
+            <mat-card-subtitle>Sum of each player's first score on all three charts</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <div *ngIf="!difficulty.overall.length" class="empty-message">

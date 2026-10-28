@@ -124,6 +124,7 @@ function normalizeScore(raw) {
   const gamerId = Number(gamer && gamer.id);
   if (!Number.isFinite(score) || !Number.isFinite(gamerId)) return null;
   return {
+    id: Number(raw.id),
     gamerId,
     username: String(gamer.username || '').trim(),
     country: gamer.country || null,
@@ -135,18 +136,24 @@ function normalizeScore(raw) {
   };
 }
 
+function isEarlier(a, b) {
+  const aMs = Date.parse(a.createdAt);
+  const bMs = Date.parse(b.createdAt);
+  if (aMs !== bMs) return aMs < bMs;
+  return a.id < b.id;
+}
+
 /**
- * Best score per player on one chart, at 100% music speed, within [from, to] in tz.
+ * Each player's first play on one chart, at 100% music speed, within [from, to] in tz.
  * @param {number} chartId
  * @param {{ from: string, to: string, tz: string }} range dates as YYYY-MM-DD
  */
-async function getBestScoresForChart(chartId, { from, to, tz }) {
+async function getFirstScoresForChart(chartId, { from, to, tz }) {
   const byGamer = new Map();
   for (let page = 0; page < MAX_PAGES; page++) {
+    // Default order is newest first, so plays arriving mid-fetch only repeat rows across pages.
     const params = new URLSearchParams({
       chart_ids: String(chartId),
-      best_per_user: '1',
-      sort: 'score',
       music_speed: '100',
       from,
       to,
@@ -158,18 +165,18 @@ async function getBestScoresForChart(chartId, { from, to, tz }) {
 
     for (const raw of json) {
       const score = normalizeScore(raw);
-      if (!score) continue;
+      if (!score || !Number.isFinite(Date.parse(score.createdAt))) continue;
       const existing = byGamer.get(score.gamerId);
-      if (!existing || score.score > existing.score) byGamer.set(score.gamerId, score);
+      if (!existing || isEarlier(score, existing)) byGamer.set(score.gamerId, score);
     }
     if (json.length < PAGE_SIZE) break;
   }
-  return [...byGamer.values()];
+  return [...byGamer.values()].map(({ id, ...score }) => score);
 }
 
 module.exports = {
   Smx573Error,
   getCharts,
   getSongs,
-  getBestScoresForChart,
+  getFirstScoresForChart,
 };

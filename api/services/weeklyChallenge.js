@@ -285,8 +285,6 @@ function playerFields(s) {
 function browserUrl(chartId, window, tz) {
   const params = new URLSearchParams({
     chart_ids: String(chartId),
-    best_per_user: '1',
-    sort: 'score',
     music_speed: '100',
     from: window.from,
     to: window.to,
@@ -315,7 +313,7 @@ async function buildSnapshot(window, weekOffset, nowMs) {
 
   const allPicks = draw.difficulties.flatMap((d) => d.picks);
   const scoreLists = await mapWithConcurrency(allPicks, FETCH_CONCURRENCY, ({ chart }) =>
-    smx573.getBestScoresForChart(chart.id, { from: window.from, to: window.to, tz })
+    smx573.getFirstScoresForChart(chart.id, { from: window.from, to: window.to, tz })
   );
   const scoresByChart = new Map(allPicks.map((p, i) => [p.chart.id, scoreLists[i]]));
 
