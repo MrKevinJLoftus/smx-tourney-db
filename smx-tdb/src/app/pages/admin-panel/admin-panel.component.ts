@@ -11,10 +11,11 @@ import { PlayerRatingsRefreshComponent } from './player-ratings-refresh/player-r
 import { PlayerMergeComponent } from './player-merge/player-merge.component';
 import { TourneyImportComponent } from './tourney-import/tourney-import.component';
 import { SongCatalogRefreshComponent } from './song-catalog-refresh/song-catalog-refresh.component';
+import { WeeklyChallengeBucketsComponent } from './weekly-challenge-buckets/weekly-challenge-buckets.component';
 
 @Component({
   selector: 'app-admin-panel',
-  imports: [SharedModule, EventListComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent, StartGgImportComponent, StartGgStepmaniaDiscoveryComponent, SongCatalogRefreshComponent, TourneyImportComponent, PlayerMatchPrivacyComponent, PlayerRatingsRefreshComponent, PlayerMergeComponent],
+  imports: [SharedModule, EventListComponent, EventUsersListComponent, EventMatchesListComponent, FormWrapperComponent, StartGgImportComponent, StartGgStepmaniaDiscoveryComponent, SongCatalogRefreshComponent, TourneyImportComponent, PlayerMatchPrivacyComponent, PlayerRatingsRefreshComponent, PlayerMergeComponent, WeeklyChallengeBucketsComponent],
   templateUrl: './admin-panel.component.html',
   styleUrl: './admin-panel.component.scss'
 })

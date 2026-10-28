@@ -6,6 +6,7 @@
  */
 
 const smx573 = require('./smx573Client');
+const bucketSettings = require('./weeklyChallengeBuckets');
 
 const DATA_HOST = 'https://data.stepmaniax.com/';
 const BROWSER_URL = 'https://smx.573.no/browser';
@@ -166,21 +167,30 @@ function eligiblePool(charts, songs, difficulty, weekStartMs) {
     .sort((a, b) => a.id - b.id);
 }
 
-function drawDifficulty(pool, difficulty, weekKey) {
-  if (!pool.length) return { levelRange: null, picks: [] };
-
+function poolLevelRange(pool) {
+  if (!pool.length) return null;
   const levels = pool.map((c) => c.level);
-  const min = Math.min(...levels);
-  const max = Math.max(...levels);
-  const buckets = levelBuckets(min, max);
+  return { min: Math.min(...levels), max: Math.max(...levels) };
+}
+
+/**
+ * Picks one chart per bucket. Buckets may overlap, so a chart already picked for an earlier
+ * bucket is never picked again; a bucket with nothing left falls back to the nearest bucket.
+ * @param {Array<{min:number,max:number}>|null} customBuckets null for the automatic thirds
+ */
+function drawDifficulty(pool, difficulty, weekKey, customBuckets = null) {
+  const levelRange = poolLevelRange(pool);
+  if (!levelRange) return { levelRange: null, buckets: customBuckets || [], picks: [] };
+
+  const buckets = customBuckets || levelBuckets(levelRange.min, levelRange.max);
   const salt = process.env.WEEKLY_CHALLENGE_SALT || '';
   const rng = mulberry32(hashString(`${weekKey}|${difficulty.key}|${salt}`));
 
   const picked = new Set();
   const picks = [];
   buckets.forEach((bucket, index) => {
-    const order = [0, 1, 2]
-      .map((i) => ({ i, distance: Math.abs(i - index) }))
+    const order = buckets
+      .map((_, i) => ({ i, distance: Math.abs(i - index) }))
       .sort((a, b) => a.distance - b.distance || a.i - b.i)
       .map((o) => buckets[o.i]);
     for (const range of order) {
@@ -193,20 +203,37 @@ function drawDifficulty(pool, difficulty, weekKey) {
       picks.push({ chart, bucket });
       return;
     }
+
+    const distance = (c) => (c.level < bucket.min ? bucket.min - c.level : Math.max(0, c.level - bucket.max));
+    const remaining = pool.filter((c) => !picked.has(c.id));
+    if (!remaining.length) return;
+    const closest = Math.min(...remaining.map(distance));
+    const nearest = remaining.filter((c) => distance(c) === closest);
+    const chart = nearest[Math.floor(rng() * nearest.length)];
+    picked.add(chart.id);
+    picks.push({ chart, bucket });
   });
 
-  return { levelRange: { min, max }, picks };
+  return { levelRange, buckets, picks };
 }
 
-/** Draws 3 charts per difficulty for the week. */
+/** Draws 3 charts per difficulty for the week, using the bucket settings in force that week. */
 async function drawWeek(weekKey, weekStartMs) {
-  const [charts, songs] = await Promise.all([smx573.getCharts(), smx573.getSongs()]);
+  const [charts, songs, configs] = await Promise.all([
+    smx573.getCharts(),
+    smx573.getSongs(),
+    bucketSettings.getConfigs(),
+  ]);
   return {
     songs,
-    difficulties: DIFFICULTIES.map((difficulty) => ({
-      difficulty,
-      ...drawDifficulty(eligiblePool(charts, songs, difficulty, weekStartMs), difficulty, weekKey),
-    })),
+    difficulties: DIFFICULTIES.map((difficulty) => {
+      const setting = bucketSettings.settingFor(configs, difficulty.key, weekKey);
+      const pool = eligiblePool(charts, songs, difficulty, weekStartMs);
+      return {
+        difficulty,
+        ...drawDifficulty(pool, difficulty, weekKey, setting ? setting.buckets : null),
+      };
+    }),
   };
 }
 
@@ -403,17 +430,152 @@ function buildSnapshotForWeek(weekKey) {
   return buildSnapshot(windowForWeekKey(weekKey, tz), weekOffset, nowMs);
 }
 
+const generations = new Map();
+
 function refresh(weekOffset, weekKey, nowMs) {
   if (inflight.has(weekKey)) return inflight.get(weekKey);
+  const generation = generations.get(weekKey) || 0;
   const promise = buildSnapshot(windowForWeekKey(weekKey, timeZone()), weekOffset, nowMs)
     .then((snapshot) => {
-      const ttl = weekOffset === 0 ? refreshTtlMs() : PAST_WEEK_TTL_MS;
-      snapshots.set(weekKey, { snapshot, expiresAt: Date.now() + ttl });
+      if ((generations.get(weekKey) || 0) === generation) {
+        const ttl = weekOffset === 0 ? refreshTtlMs() : PAST_WEEK_TTL_MS;
+        snapshots.set(weekKey, { snapshot, expiresAt: Date.now() + ttl });
+      }
       return snapshot;
     })
-    .finally(() => inflight.delete(weekKey));
+    .finally(() => {
+      if (inflight.get(weekKey) === promise) inflight.delete(weekKey);
+    });
   inflight.set(weekKey, promise);
   return promise;
+}
+
+/** Drops a week's cached snapshot, including one still being built with old settings. */
+function invalidateWeek(weekKey) {
+  generations.set(weekKey, (generations.get(weekKey) || 0) + 1);
+  snapshots.delete(weekKey);
+  inflight.delete(weekKey);
+}
+
+// ---------- Admin: bucket settings ----------
+
+function describeSetting(setting, automaticBuckets) {
+  return {
+    custom: Boolean(setting && setting.buckets),
+    buckets: (setting && setting.buckets) || automaticBuckets,
+    since: setting ? setting.effectiveWeek : null,
+  };
+}
+
+function levelCounts(pool) {
+  const counts = new Map();
+  for (const c of pool) counts.set(c.level, (counts.get(c.level) || 0) + 1);
+  return [...counts.entries()].sort((a, b) => a[0] - b[0]).map(([level, count]) => ({ level, count }));
+}
+
+/**
+ * Bucket settings for every difficulty: this week's (with its drawn charts) and the ones
+ * next Monday's draw will use, plus the chart count at each level for editing.
+ */
+async function getBucketSettings() {
+  const nowMs = Date.now();
+  const tz = timeZone();
+  const current = weekWindow(nowMs, 0, tz);
+  const nextKey = addDays(current.weekKey, 7);
+  const [charts, songs, configs] = await Promise.all([
+    smx573.getCharts(),
+    smx573.getSongs(),
+    bucketSettings.getConfigs(),
+  ]);
+
+  return {
+    currentWeek: current.weekKey,
+    nextWeek: nextKey,
+    minLevel: bucketSettings.MIN_LEVEL,
+    maxLevel: bucketSettings.MAX_LEVEL,
+    difficulties: DIFFICULTIES.map((difficulty) => {
+      const thisWeekPool = eligiblePool(charts, songs, difficulty, current.startsAtMs);
+      const upcomingPool = eligiblePool(charts, songs, difficulty, nowMs);
+      const thisRange = poolLevelRange(thisWeekPool);
+      const upcomingRange = poolLevelRange(upcomingPool);
+      const thisSetting = bucketSettings.settingFor(configs, difficulty.key, current.weekKey);
+      const nextSetting = bucketSettings.settingFor(configs, difficulty.key, nextKey);
+      const draw = drawDifficulty(
+        thisWeekPool,
+        difficulty,
+        current.weekKey,
+        thisSetting ? thisSetting.buckets : null
+      );
+      return {
+        key: difficulty.key,
+        label: difficulty.label,
+        levelRange: upcomingRange,
+        levelCounts: levelCounts(upcomingPool),
+        automaticBuckets: upcomingRange ? levelBuckets(upcomingRange.min, upcomingRange.max) : [],
+        thisWeek: {
+          ...describeSetting(thisSetting, thisRange ? levelBuckets(thisRange.min, thisRange.max) : []),
+          charts: draw.picks.map(({ chart, bucket }) => {
+            const song = songs.get(chart.songId) || {};
+            return {
+              chartId: chart.id,
+              title: song.title || '',
+              level: chart.level,
+              difficultyDisplay: chart.difficultyDisplay,
+              bucket,
+            };
+          }),
+        },
+        nextWeek: describeSetting(
+          nextSetting,
+          upcomingRange ? levelBuckets(upcomingRange.min, upcomingRange.max) : []
+        ),
+      };
+    }),
+  };
+}
+
+/**
+ * Saves a difficulty's buckets (null for automatic) from next Monday, or from this week,
+ * which redraws this week's charts for that difficulty.
+ */
+async function saveBucketSetting({ difficulty, buckets, applyToCurrentWeek, userId }) {
+  if (!DIFFICULTIES.some((d) => d.key === difficulty)) {
+    throw new WeeklyChallengeError(`Unknown difficulty "${difficulty}".`);
+  }
+  if (buckets === undefined) {
+    throw new WeeklyChallengeError('Provide buckets, or null to use the automatic thirds.');
+  }
+  let validated = null;
+  if (buckets !== null) {
+    try {
+      validated = bucketSettings.validateBuckets(buckets);
+    } catch (err) {
+      if (err instanceof bucketSettings.BucketConfigError) {
+        throw new WeeklyChallengeError(err.message, err.statusCode);
+      }
+      throw err;
+    }
+  }
+
+  const currentKey = weekWindow(Date.now(), 0, timeZone()).weekKey;
+  const effectiveWeek = applyToCurrentWeek ? currentKey : addDays(currentKey, 7);
+  try {
+    await bucketSettings.saveSetting({
+      difficulty,
+      effectiveWeek,
+      buckets: validated,
+      createdBy: Number.isFinite(Number(userId)) ? Number(userId) : null,
+    });
+  } catch (err) {
+    if (err instanceof bucketSettings.BucketConfigError) {
+      throw new WeeklyChallengeError(err.message, err.statusCode);
+    }
+    throw err;
+  }
+  if (applyToCurrentWeek) invalidateWeek(currentKey);
+
+  const settings = await getBucketSettings();
+  return { effectiveWeek, difficulty: settings.difficulties.find((d) => d.key === difficulty) };
 }
 
 /**
@@ -477,7 +639,10 @@ module.exports = {
   windowForWeekKey,
   levelBuckets,
   rankBy,
+  drawDifficulty,
   drawWeek,
+  getBucketSettings,
+  saveBucketSetting,
   buildSnapshotForWeek,
   getWeeklyChallenge,
 };

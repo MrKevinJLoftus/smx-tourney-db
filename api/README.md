@@ -155,7 +155,7 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 
 ### Weekly challenge
 
-`GET /api/weekly-challenge?week=<offset>` (public) returns the Easy, Hard, Wild, Dual and Full challenge leaderboards for a Monday–Sunday week; `week` is `0` for the current week (default), `-1` for last week, and so on, back to `WEEKLY_CHALLENGE_LAUNCH_WEEK` and at most 8 weeks; older weeks are rejected, and without a launch week only the current week is available. The response's `minWeekOffset` is the oldest `week` allowed. Each difficulty gets 3 charts (including `+` charts), one drawn from each third of that difficulty's level range. The draw is seeded by the week, so it is the same on every restart and nothing is written to the database. Scores are each player's best 100%-speed score on the chart within the week, read from the [smx.573.no](https://smx.573.no/browser) score browser API and cached in memory. The overall standings sum a player's best score on each of the 3 charts; equal scores share a rank.
+`GET /api/weekly-challenge?week=<offset>` (public) returns the Easy, Hard, Wild, Dual and Full challenge leaderboards for a Monday–Sunday week; `week` is `0` for the current week (default), `-1` for last week, and so on, back to `WEEKLY_CHALLENGE_LAUNCH_WEEK` and at most 8 weeks; older weeks are rejected, and without a launch week only the current week is available. The response's `minWeekOffset` is the oldest `week` allowed. Each difficulty gets 3 charts (including `+` charts), one drawn from each third of that difficulty's level range (or from admin-set buckets, below). The draw is seeded by the week, so it is the same on every restart. Scores are each player's best 100%-speed score on the chart within the week, read from the [smx.573.no](https://smx.573.no/browser) score browser API and cached in memory. The overall standings sum a player's best score on each of the 3 charts; equal scores share a rank.
 
 `GET /api/weekly-challenge/all-time` (public) returns, per difficulty, how many 1st place and top 10 finishes each player has in the overall standings, counting weeks from `WEEKLY_CHALLENGE_LAUNCH_WEEK` onward. Apply `migration_add_weekly_challenge_history.sql` and then `migration_add_weekly_challenge_dual.sql` first. A week is saved (its drawn chart ids plus every player ranked 10th or better, including ties) the first time either weekly challenge endpoint is called after the week ends plus `WEEKLY_CHALLENGE_FINALIZE_DELAY_HOURS`. Scores are fetched fresh for this, not from the cache. To save or re-save weeks by hand:
 
@@ -163,6 +163,11 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 node -r dotenv/config scripts/finalize-weekly-challenge.js                       # all ended, unsaved weeks
 node -r dotenv/config scripts/finalize-weekly-challenge.js --week 2026-11-02 --replace
 ```
+
+Admins can replace a difficulty's automatic thirds with three custom level ranges from the admin panel's **Weekly Challenge** tab (apply `migration_add_weekly_challenge_bucket_config.sql` first). Ranges may overlap. A chart is never drawn twice in the same week. If a range has no unused chart, the draw falls back to the nearest range, then to the unused chart closest in level. A saved setting applies from next Monday by default and keeps applying until changed. Past weeks keep their charts. Ticking "Also redraw this week" applies it to the current week right away, which replaces this week's charts. On a multi-dyno deploy, other dynos can keep showing the old charts for up to about 10 minutes. Each save inserts a new row, so the history of settings is kept.
+
+- `GET /api/weekly-challenge/admin/buckets` (admin): per difficulty, the current pool's chart count by level, the automatic thirds, and the buckets and drawn charts for this week and next.
+- `PUT /api/weekly-challenge/admin/buckets/:difficulty` (admin): body `{ "buckets": [{ "min": 19, "max": 21 }, ...3], "applyToCurrentWeek": false }`; levels are whole numbers 1–30. Send `"buckets": null` to switch back to automatic thirds.
 
 ## Scripts
 

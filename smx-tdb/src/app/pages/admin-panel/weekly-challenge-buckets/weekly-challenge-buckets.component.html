@@ -1,0 +1,131 @@
+<div class="buckets-admin">
+  <p class="intro">
+    Each difficulty draws one chart from each of its three level buckets every week. Buckets may overlap; a chart
+    is never drawn twice in the same week. Changes apply from next Monday's draw
+    <ng-container *ngIf="settings">({{ settings.nextWeek }})</ng-container> unless you also redraw this week.
+    Past weeks never change.
+  </p>
+
+  <div *ngIf="isLoading" class="loading-row">
+    <mat-spinner diameter="24"></mat-spinner>
+    <span>Loading buckets...</span>
+  </div>
+
+  <div *ngIf="error" class="error-row">
+    <mat-icon>error</mat-icon>
+    <span>{{ error }}</span>
+    <button mat-button type="button" (click)="load()">Retry</button>
+  </div>
+
+  <div *ngIf="settings && !isLoading" class="difficulty-grid">
+    <mat-card *ngFor="let difficulty of settings.difficulties" class="difficulty-card">
+      <mat-card-header>
+        <mat-card-title>{{ difficulty.label }}</mat-card-title>
+        <mat-card-subtitle *ngIf="difficulty.levelRange">
+          Charts span levels {{ difficulty.levelRange.min }}-{{ difficulty.levelRange.max }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content *ngIf="drafts[difficulty.key] as draft">
+        <dl class="status">
+          <dt>This week</dt>
+          <dd>
+            {{ difficulty.thisWeek.custom ? 'Custom' : 'Automatic' }}: {{ formatBuckets(difficulty.thisWeek.buckets) }}
+            <ul class="drawn-charts">
+              <li *ngFor="let chart of difficulty.thisWeek.charts">
+                {{ chart.title }} <span class="muted">({{ chart.difficultyDisplay }} {{ chart.level }})</span>
+              </li>
+            </ul>
+          </dd>
+          <dt>From {{ settings.nextWeek }}</dt>
+          <dd>
+            {{ difficulty.nextWeek.custom ? 'Custom' : 'Automatic' }}: {{ formatBuckets(difficulty.nextWeek.buckets) }}
+          </dd>
+        </dl>
+
+        <table class="bucket-table">
+          <thead>
+            <tr>
+              <th>Bucket</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Charts</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let bucket of draft.buckets; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>
+                <input
+                  class="level-input"
+                  type="number"
+                  [min]="settings.minLevel"
+                  [max]="settings.maxLevel"
+                  [value]="bucket.min"
+                  [attr.aria-label]="difficulty.label + ' bucket ' + (i + 1) + ' minimum level'"
+                  (input)="setLevel(difficulty.key, i, 'min', $event)"
+                />
+              </td>
+              <td>
+                <input
+                  class="level-input"
+                  type="number"
+                  [min]="settings.minLevel"
+                  [max]="settings.maxLevel"
+                  [value]="bucket.max"
+                  [attr.aria-label]="difficulty.label + ' bucket ' + (i + 1) + ' maximum level'"
+                  (input)="setLevel(difficulty.key, i, 'max', $event)"
+                />
+              </td>
+              <td>
+                <span *ngIf="bucketError(bucket) as message; else count" class="error-text">{{ message }}</span>
+                <ng-template #count>{{ chartCount(difficulty, bucket) }}</ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul *ngIf="warnings(difficulty).length" class="warnings">
+          <li *ngFor="let warning of warnings(difficulty)">{{ warning }}</li>
+        </ul>
+
+        <mat-checkbox
+          [checked]="draft.applyToCurrentWeek"
+          (change)="setApplyToCurrentWeek(difficulty.key, $event.checked)"
+        >
+          Also redraw this week's {{ difficulty.label }} charts
+        </mat-checkbox>
+        <p *ngIf="draft.applyToCurrentWeek" class="redraw-warning">
+          This replaces the {{ difficulty.label }} charts players already have this week, and scores already set
+          on the old charts stop counting.
+        </p>
+
+        <div class="actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            [disabled]="draft.isSaving || hasErrors(difficulty.key) || isUnchanged(difficulty)"
+            (click)="save(difficulty)"
+          >
+            {{ draft.applyToCurrentWeek ? 'Save and redraw' : 'Save' }}
+          </button>
+          <button mat-button type="button" [disabled]="draft.isSaving" (click)="fillAutomatic(difficulty)">
+            Fill automatic thirds
+          </button>
+          <button
+            mat-button
+            type="button"
+            [disabled]="draft.isSaving || !(draft.applyToCurrentWeek ? difficulty.thisWeek.custom : difficulty.nextWeek.custom)"
+            (click)="save(difficulty, true)"
+          >
+            Switch to automatic
+          </button>
+          <button mat-button type="button" [disabled]="draft.isSaving" (click)="resetDraft(difficulty)">
+            Undo edits
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
