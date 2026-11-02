@@ -44,6 +44,13 @@ function wrapTableError(err) {
       503
     );
   }
+  if (err && (err.code === 'WARN_DATA_TRUNCATED' || err.code === 'ER_TRUNCATED_WRONG_VALUE_FOR_FIELD')) {
+    return new WeeklyChallengeError(
+      `Weekly challenge history table rejected a value (${err.sqlMessage || err.message}). ` +
+        'Apply the weekly challenge migrations, e.g. migration_fix_weekly_challenge_dual_results.sql.',
+      503
+    );
+  }
   return err;
 }
 
@@ -89,6 +96,8 @@ async function finalizeWeek(weekKey, { replace = false } = {}) {
 
   try {
     await dbconn.withTransaction(async (connection) => {
+      // Without strict mode an unknown difficulty is stored as '' and silently dropped from the counts.
+      await dbconn.executeMysqlQuery(queries.ENABLE_STRICT_MODE, [], connection);
       if (replace) await dbconn.executeMysqlQuery(queries.DELETE_WEEK, [weekKey], connection);
       await dbconn.executeMysqlQuery(
         queries.CREATE_WEEK,
@@ -166,14 +175,24 @@ async function getAllTime() {
 
   const latestUsername = new Map();
   const counts = new Map(DIFFICULTIES.map((d) => [d.key, new Map()]));
+  let unknownDifficultyRows = 0;
   for (const row of rows || []) {
     latestUsername.set(row.gamer_id, row.username);
     const byGamer = counts.get(row.difficulty);
-    if (!byGamer) continue;
+    if (!byGamer) {
+      unknownDifficultyRows++;
+      continue;
+    }
     const entry = byGamer.get(row.gamer_id) || { gamerId: row.gamer_id, wins: 0, top10s: 0 };
     entry.top10s += 1;
     if (row.final_rank === 1) entry.wins += 1;
     byGamer.set(row.gamer_id, entry);
+  }
+  if (unknownDifficultyRows) {
+    console.warn(
+      `weeklyChallenge: skipped ${unknownDifficultyRows} history rows with an unknown difficulty; ` +
+        'apply migration_fix_weekly_challenge_dual_results.sql.'
+    );
   }
 
   const sortedWeeks = [...weeks].sort();
