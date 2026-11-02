@@ -13,6 +13,7 @@ const BROWSER_URL = 'https://smx.573.no/browser';
 const DEFAULT_TZ = 'America/New_York';
 const MAX_WEEKS_BACK = 8;
 const PAST_WEEK_TTL_MS = 24 * 60 * 60 * 1000;
+const MIN_FORCED_REFRESH_AGE_MS = 60 * 1000;
 const FETCH_CONCURRENCY = 4;
 
 const DIFFICULTIES = [
@@ -577,9 +578,10 @@ async function saveBucketSetting({ difficulty, buckets, applyToCurrentWeek, user
 }
 
 /**
- * @param {{ weekOffset?: number }} [opts]
+ * `forceRefresh` refetches scores from smx.573.no unless the cached snapshot is under a minute old.
+ * @param {{ weekOffset?: number, forceRefresh?: boolean }} [opts]
  */
-async function getWeeklyChallenge({ weekOffset = 0 } = {}) {
+async function getWeeklyChallenge({ weekOffset = 0, forceRefresh = false } = {}) {
   const nowMs = Date.now();
   const tz = timeZone();
   const minOffset = minWeekOffset(nowMs, tz);
@@ -606,8 +608,10 @@ async function getWeeklyChallenge({ weekOffset = 0 } = {}) {
   }
 
   const cached = snapshots.get(weekKey);
+  const canForceRefresh =
+    cached && nowMs - Date.parse(cached.snapshot.refreshedAt) >= MIN_FORCED_REFRESH_AGE_MS;
   let snapshot;
-  if (!cached) {
+  if (!cached || (forceRefresh && canForceRefresh)) {
     snapshot = await refresh(offset, weekKey, nowMs);
   } else {
     snapshot = cached.snapshot;

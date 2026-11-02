@@ -59,6 +59,17 @@
     <span *ngIf="challenge" class="week-meta">
       Updated {{ challenge.refreshedAt | date: 'shortTime' }}
     </span>
+    <button
+      mat-stroked-button
+      type="button"
+      class="refresh-button"
+      [disabled]="isLoading"
+      (click)="refreshScores()"
+      *ngIf="challenge?.isCurrent"
+    >
+      <mat-icon [class.spinning]="isLoading">refresh</mat-icon>
+      Refresh scores
+    </button>
   </div>
 
   <div *ngIf="isLoading && !challenge" class="loading-section">
