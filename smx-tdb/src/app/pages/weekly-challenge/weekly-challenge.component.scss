@@ -70,6 +70,16 @@
   font-size: 0.875rem;
 }
 
+.refresh-button .spinning {
+  animation: refresh-spin 1s linear infinite;
+}
+
+@keyframes refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .loading-section,
 .error-section,
 .empty-message {

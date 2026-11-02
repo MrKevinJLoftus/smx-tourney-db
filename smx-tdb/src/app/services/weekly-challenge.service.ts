@@ -21,8 +21,10 @@ export class WeeklyChallengeService {
     private authService: AuthService
   ) {}
 
-  get(weekOffset = 0): Observable<WeeklyChallengeResponse> {
-    const params = new HttpParams().set('week', String(weekOffset));
+  /** `refresh` asks the API to refetch scores from smx.573.no instead of serving its cache. */
+  get(weekOffset = 0, refresh = false): Observable<WeeklyChallengeResponse> {
+    let params = new HttpParams().set('week', String(weekOffset));
+    if (refresh) params = params.set('refresh', '1');
     return this.http.get<WeeklyChallengeResponse>(`${environment.apiUrl}/weekly-challenge`, { params });
   }
 

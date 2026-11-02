@@ -72,12 +72,12 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  load(): void {
+  load(refresh = false): void {
     this.isLoading = true;
     this.error = null;
-    this.expandedCharts.clear();
+    if (!refresh) this.expandedCharts.clear();
     this.weeklyChallengeService
-      .get(this.weekOffset)
+      .get(this.weekOffset, refresh)
       .pipe(finalize(() => (this.isLoading = false)))
       .subscribe({
         next: (response) => {
@@ -99,6 +99,11 @@ export class WeeklyChallengeComponent implements OnInit, OnDestroy {
           this.challenge = null;
         },
       });
+  }
+
+  refreshScores(): void {
+    if (this.isLoading) return;
+    this.load(true);
   }
 
   get minWeekOffset(): number {

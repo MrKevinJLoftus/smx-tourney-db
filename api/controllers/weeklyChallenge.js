@@ -4,11 +4,12 @@ const { Smx573Error } = require('../services/smx573Client');
 
 exports.getWeeklyChallenge = async (req, res) => {
   const weekOffset = req.query.week == null || req.query.week === '' ? 0 : Number(req.query.week);
+  const forceRefresh = req.query.refresh === '1' || req.query.refresh === 'true';
 
   weeklyChallengeHistory.finalizeDueWeeksInBackground();
 
   try {
-    const result = await weeklyChallenge.getWeeklyChallenge({ weekOffset });
+    const result = await weeklyChallenge.getWeeklyChallenge({ weekOffset, forceRefresh });
     res.status(200).json(result);
   } catch (error) {
     if (error instanceof weeklyChallenge.WeeklyChallengeError) {
