@@ -5,6 +5,7 @@ module.exports = {
     ORDER BY week_key ASC`,
   CREATE_WEEK: `INSERT INTO weekly_challenge_week (week_key, chart_ids) VALUES (?, ?)`,
   DELETE_WEEK: `DELETE FROM weekly_challenge_week WHERE week_key = ?`,
+  ENABLE_STRICT_MODE: `SET SESSION sql_mode = CONCAT_WS(',', NULLIF(@@SESSION.sql_mode, ''), 'STRICT_TRANS_TABLES')`,
   /** Pass row count; params = flat array of (week_key, difficulty, gamer_id, username, final_rank, total) per row. */
   CREATE_RESULTS_BATCH: (rowCount) => {
     if (rowCount < 1) return null;
