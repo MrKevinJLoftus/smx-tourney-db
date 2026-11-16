@@ -3,6 +3,9 @@ module.exports = {
     FROM weekly_challenge_week
     WHERE week_key >= ?
     ORDER BY week_key ASC`,
+  GET_FINALIZED_WEEKS: `SELECT DATE_FORMAT(week_key, '%Y-%m-%d') AS week_key, chart_ids
+    FROM weekly_challenge_week
+    ORDER BY week_key ASC`,
   CREATE_WEEK: `INSERT INTO weekly_challenge_week (week_key, chart_ids) VALUES (?, ?)`,
   DELETE_WEEK: `DELETE FROM weekly_challenge_week WHERE week_key = ?`,
   ENABLE_STRICT_MODE: `SET SESSION sql_mode = CONCAT_WS(',', NULLIF(@@SESSION.sql_mode, ''), 'STRICT_TRANS_TABLES')`,
