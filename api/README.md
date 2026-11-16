@@ -94,7 +94,7 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 # SMX_SONGS_JSON_URL=
 
 # Weekly challenge leaderboards (scores pulled from the smx.573.no score browser API)
-# SMX573_BASE_URL=https://smx.573.no
+# SMX573_BASE_URL=https://api.smx.573.no
 # Time zone that defines the Monday-to-Sunday challenge week (default: America/New_York)
 # WEEKLY_CHALLENGE_TZ=America/New_York
 # Secret mixed into the weekly chart draw so future weeks can't be precomputed
@@ -127,7 +127,7 @@ SMX_TDB_JWT_KEY=change-me-to-a-long-random-secret
 | `BLAMETHEPADS_SUPABASE_ANON_KEY` | No** | — | blamethepads Supabase public anon key |
 | `DDRTOOLS_PARTY_HOST` | No | `ddr-card-draw-party.noahm.partykit.dev` | ddr.tools room state host |
 | `SMX_SONGS_JSON_URL` | No | ddr.tools `smx.json` on GitHub | Song data for the song catalog refresh |
-| `SMX573_BASE_URL` | No | `https://smx.573.no` | Score browser API used by the weekly challenge |
+| `SMX573_BASE_URL` | No | `https://api.smx.573.no` | Score browser API used by the weekly challenge |
 | `WEEKLY_CHALLENGE_TZ` | No | `America/New_York` | Time zone for the Monday–Sunday challenge week |
 | `WEEKLY_CHALLENGE_SALT` | No | — | Secret mixed into the weekly chart draw |
 | `WEEKLY_CHALLENGE_REFRESH_MINUTES` | No | `10` | How long the current week's scores are cached |

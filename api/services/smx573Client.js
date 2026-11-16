@@ -1,11 +1,16 @@
 /**
  * Thin client for the public JSON API behind the smx.573.no score browser.
+ * Each resource takes one `q` parameter holding a JSON query (filters plus `_take`/`_skip`
+ * paging); plain query parameters are ignored.
  * Charts and songs change rarely; scores are fetched per chart and date range.
  */
 
-const DEFAULT_BASE_URL = 'https://smx.573.no';
+const DEFAULT_BASE_URL = 'https://api.smx.573.no';
+// The API never returns more than 100 rows per request.
 const PAGE_SIZE = 100;
-const MAX_PAGES = 50;
+const MAX_SCORE_PAGES = 50;
+const MAX_CATALOG_PAGES = 200;
+const REQUEST_TIMEOUT_MS = 15 * 1000;
 
 const CATALOG_TTL_MS = 6 * 60 * 60 * 1000;
 const cache = new Map();
@@ -42,26 +47,63 @@ function cacheSet(key, value, ttlMs) {
   cache.set(key, { value, expiresAt: Date.now() + ttlMs });
 }
 
-async function fetchJson(path) {
-  const url = `${baseUrl()}${path}`;
+/**
+ * @param {string} resource e.g. 'charts'
+ * @param {object} query filters plus `_take`/`_skip`, sent as the `q` parameter
+ * @returns {Promise<Array>}
+ */
+async function fetchPage(resource, query) {
+  const url = `${baseUrl()}/${resource}?q=${encodeURIComponent(JSON.stringify(query))}`;
   let res;
   try {
     res = await fetch(url, {
       headers: { Accept: 'application/json', 'User-Agent': 'smx-tdb-weekly/1.0' },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (err) {
+    if (err.name === 'TimeoutError') {
+      throw new Smx573Error(`smx.573.no did not answer /${resource} within ${REQUEST_TIMEOUT_MS / 1000}s.`);
+    }
     throw new Smx573Error(`Could not reach smx.573.no (${err.message}).`);
   }
   if (!res.ok) {
-    throw new Smx573Error(`smx.573.no returned HTTP ${res.status} for ${path}.`, {
+    throw new Smx573Error(`smx.573.no returned HTTP ${res.status} for /${resource}.`, {
       status: res.status,
     });
   }
-  try {
-    return await res.json();
-  } catch {
-    throw new Smx573Error(`Invalid JSON from smx.573.no for ${path}.`);
+  // A moved API tends to answer with the site's HTML page and a 200.
+  const contentType = res.headers.get('content-type') || '';
+  if (!contentType.includes('json')) {
+    throw new Smx573Error(
+      `smx.573.no returned ${contentType || 'no content type'} instead of JSON for ${baseUrl()}/${resource}; ` +
+        'check SMX573_BASE_URL.'
+    );
   }
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Smx573Error(`Invalid JSON from smx.573.no for /${resource}.`);
+  }
+  if (!Array.isArray(json)) throw new Smx573Error(`smx.573.no /${resource} is not an array.`);
+  return json;
+}
+
+/** Every row matching `filters`, sorted by id ascending. */
+async function fetchAll(resource, filters, maxPages) {
+  const rows = [];
+  for (let page = 0; page < maxPages; page++) {
+    const json = await fetchPage(resource, {
+      ...filters,
+      _sort_by: 'id',
+      _order: 'asc',
+      _take: PAGE_SIZE,
+      _skip: page * PAGE_SIZE,
+    });
+    rows.push(...json);
+    if (json.length < PAGE_SIZE) return rows;
+  }
+  throw new Smx573Error(`smx.573.no /${resource} has more than ${maxPages * PAGE_SIZE} rows.`);
 }
 
 /**
@@ -71,8 +113,8 @@ async function getCharts() {
   const cached = cacheGet('charts');
   if (cached) return cached;
 
-  const json = await fetchJson('/api/charts');
-  if (!Array.isArray(json)) throw new Smx573Error('smx.573.no chart list is not an array.');
+  // Player edits are most of the list and never in the draw.
+  const json = await fetchAll('charts', { is_edit: { nin: [true] } }, MAX_CATALOG_PAGES);
 
   const charts = json
     .map((c) => ({
@@ -97,8 +139,7 @@ async function getSongs() {
   const cached = cacheGet('songs');
   if (cached) return cached;
 
-  const json = await fetchJson('/api/songs');
-  if (!Array.isArray(json)) throw new Smx573Error('smx.573.no song list is not an array.');
+  const json = await fetchAll('songs', {}, MAX_CATALOG_PAGES);
 
   const songs = new Map();
   for (const s of json) {
@@ -144,24 +185,26 @@ function isEarlier(a, b) {
 }
 
 /**
- * Each player's first play on one chart, at 100% music speed, within [from, to] in tz.
+ * Each player's first play on one chart, at 100% music speed, in [fromMs, toMs).
  * @param {number} chartId
- * @param {{ from: string, to: string, tz: string }} range dates as YYYY-MM-DD
+ * @param {{ fromMs: number, toMs: number }} range
  */
-async function getFirstScoresForChart(chartId, { from, to, tz }) {
+async function getFirstScoresForChart(chartId, { fromMs, toMs }) {
   const byGamer = new Map();
-  for (let page = 0; page < MAX_PAGES; page++) {
-    // Default order is newest first, so plays arriving mid-fetch only repeat rows across pages.
-    const params = new URLSearchParams({
-      chart_ids: String(chartId),
-      music_speed: '100',
-      from,
-      to,
-      tz,
-      skip: String(page * PAGE_SIZE),
+  for (let page = 0; page < MAX_SCORE_PAGES; page++) {
+    // Newest first, so plays arriving mid-fetch only repeat rows across pages.
+    const json = await fetchPage('scores', {
+      song_chart_id: [chartId],
+      music_speed: 100,
+      created_at: {
+        gte: new Date(fromMs).toISOString(),
+        lte: new Date(toMs - 1).toISOString(),
+      },
+      _sort_by: 'id',
+      _order: 'desc',
+      _take: PAGE_SIZE,
+      _skip: page * PAGE_SIZE,
     });
-    const json = await fetchJson(`/api/scores?${params.toString()}`);
-    if (!Array.isArray(json)) throw new Smx573Error('smx.573.no score list is not an array.');
 
     for (const raw of json) {
       const score = normalizeScore(raw);
